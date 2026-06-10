@@ -23,45 +23,32 @@
     }
   </script>
   <style>
-    /* ── Theme tokens ── */
+    /* ── Light (default) ── */
     :root {
-      --s1:#f8fafc; --s2:#ffffff; --s3:#f1f5f9; --s4:#e2e8f0;
-      --ink:#0f172a; --sub:#475569; --mut:#94a3b8;
-      --grid:#e5e7eb; --gTxt:#9ca3af;
-      --s4a:rgba(226,232,240,0.8);
-      --header-bg:rgba(255,255,255,0.92);
-      --sb-bg:#f1f5f9; --sb-th:#cbd5e1;
-      --p-ok:#15803d; --p-w:#b45309; --p-bd:#b91c1c;
-      --du:#15803d;   --dd:#b91c1c;
-      --t-rc:#b91c1c; --t-sg:#b45309; --t-el:#15803d;
-      /* Sombras */
-      --shadow-sm:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
-      --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
-      /* Raios */
-      --radius-card:16px;
-      --radius-input:10px;
-      /* Tipografia */
-      --text-label:11px;
-      --text-body:13px;
-      --text-md:14px;
-      --text-title:17px;
-      /* Azul primário */
-      --blue:2563eb;
-      --blue-rgb:37,99,235;
-      /* Pills backgrounds */
-      --p-ok-bg:rgba(34,197,94,.13);
-      --p-w-bg:rgba(245,158,11,.13);
-      --p-bd-bg:rgba(239,68,68,.13);
+      --s1:#f5f5f7; --s2:#ffffff; --s3:#f0f0f5; --s4:rgba(0,0,0,0.08);
+      --ink:#1d1d1f; --sub:#6e6e73; --mut:#aeaeb2;
+      --grid:#e8e8ed; --gTxt:#aeaeb2;
+      --s4a:rgba(0,0,0,0.05);
+      --header-bg:rgba(255,255,255,0.88);
+      --card-shadow:0 1px 3px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.06);
+      --sb-bg:#f0f0f5; --sb-th:#c7c7cc;
+      --seg-bg:#e8e8ed; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:0 1px 2px rgba(37,99,235,.25);
+      --p-ok:#15803d; --p-w:#92400e; --p-bd:#991b1b;
+      --du:#15803d; --dd:#991b1b;
+      --t-rc:#991b1b; --t-sg:#92400e; --t-el:#15803d;
     }
+    /* ── Dark ── */
     .dark {
-      --s1:#1a1a1a; --s2:#262626; --s3:#333333; --s4:#424242;
-      --ink:#e8e8e8; --sub:#ababab; --mut:#6b7280;
-      --grid:#333333; --gTxt:#4b5563;
-      --s4a:rgba(66,66,66,0.6);
-      --header-bg:rgba(38,38,38,0.94);
-      --sb-bg:#262626; --sb-th:#424242;
+      --s1:#212121; --s2:#2f2f2f; --s3:#3a3a3a; --s4:#4a4a4a;
+      --ink:#ececec; --sub:#b4b4b4; --mut:#8e8ea0;
+      --grid:#3a3a3a; --gTxt:#555555;
+      --s4a:rgba(74,74,74,0.5);
+      --header-bg:rgba(47,47,47,0.92);
+      --card-shadow:none;
+      --sb-bg:#2f2f2f; --sb-th:#555555;
+      --seg-bg:#3a3a3a; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:none;
       --p-ok:#86efac; --p-w:#fcd34d; --p-bd:#fca5a5;
-      --du:#86efac;   --dd:#fca5a5;
+      --du:#86efac; --dd:#fca5a5;
       --t-rc:#fca5a5; --t-sg:#fcd34d; --t-el:#86efac;
       --shadow-sm:none;
       --shadow-md:none;
@@ -72,97 +59,112 @@
   </style>
   <style type="text/tailwindcss">
     @layer components {
-      .ctl    { @apply bg-s3 border border-s4 rounded-lg px-3 py-1.5 text-sm text-ink outline-none focus:border-blue-500 transition-colors; }
-      .card   { @apply bg-s2 border border-s4 p-6; border-radius:var(--radius-card); box-shadow:var(--shadow-sm); }
-      .btn    { @apply border border-s4 bg-s2 rounded-lg px-3 py-1.5 text-sm font-semibold text-sub hover:bg-s3 hover:text-ink transition; }
-      .btn-p  { @apply rounded-lg px-3 py-1.5 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition; box-shadow:0 1px 3px rgba(37,99,235,.25); }
-      .nav-b  { @apply px-3 py-1.5 text-sm font-medium text-mut hover:text-ink hover:bg-s3 transition relative; border-radius:8px; }
+      .ctl  { @apply bg-s3 border border-s4 rounded-lg px-3 py-1.5 text-sm text-ink outline-none focus:border-blue-500 transition-colors; }
+      .ctls { @apply bg-transparent border border-s4 rounded-md px-2.5 py-1 text-xs text-sub outline-none focus:border-blue-500 transition-colors; }
+      .card { @apply bg-s2 rounded-2xl p-5; }
+      .btn  { @apply border border-s4 bg-s2 rounded-lg px-3 py-1.5 text-sm font-medium text-sub hover:bg-s3 hover:text-ink transition; }
+      .btn-p{ @apply rounded-lg px-3.5 py-1.5 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition; }
+      .btn-g{ @apply border border-s4 rounded-md px-2.5 py-1 text-xs font-medium text-mut hover:text-sub hover:bg-s3 transition; }
+      .nav-b{ @apply px-3.5 py-1.5 rounded-lg text-sm font-medium text-mut hover:text-ink hover:bg-s3 transition; }
       .nav-b.active { @apply bg-s3 text-ink font-semibold; }
-      .fl     { @apply block text-xs font-bold uppercase tracking-wider text-mut mb-1.5; }
-      .fi     { @apply w-full bg-s3 border border-s4 text-sm text-ink outline-none focus:border-blue-500 transition-colors placeholder:text-mut; border-radius:var(--radius-input); padding:10px 12px; }
-      .fta    { @apply w-full bg-s3 border border-s4 text-sm text-ink outline-none focus:border-blue-500 transition-colors resize-y; border-radius:var(--radius-input); padding:10px 12px; min-height:76px; }
-      .ph     { @apply flex items-baseline justify-between gap-3 mb-6 flex-wrap; }
-      .pt     { @apply text-2xl font-extrabold; letter-spacing:-0.02em; }
-      .ch3    { @apply text-sm font-bold text-ink; }
-      .ch3s   { @apply text-xs text-mut mt-0.5; }
-      .section{ @apply hidden; }
-      .section.active { @apply block; animation: fade .2s ease; }
+      .fl   { @apply block text-xs font-semibold uppercase tracking-widest text-mut mb-1.5; }
+      .fi   { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition placeholder:text-mut; }
+      .fta  { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition resize-y; min-height:72px; }
+      .ph   { @apply flex items-center justify-between gap-3 mb-6 flex-wrap; }
+      .pt   { @apply text-xl font-bold tracking-tight; }
+      .ch3  { @apply text-sm font-semibold text-ink; }
+      .ch3s { @apply text-xs text-mut mt-0.5; }
+      .section { @apply hidden; }
+      .section.active { @apply block; animation:fade .18s ease; }
     }
-    @keyframes fade { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes fade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
   </style>
   <style>
-    *{box-sizing:border-box}html{-webkit-font-smoothing:antialiased}body{font-variant-numeric:tabular-nums;font-size:var(--text-body);line-height:1.5}
-    ::-webkit-scrollbar{width:5px;height:5px}
+    *{box-sizing:border-box}
+    html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    body{font-variant-numeric:tabular-nums}
+    ::-webkit-scrollbar{width:4px;height:4px}
     ::-webkit-scrollbar-track{background:var(--sb-bg)}
     ::-webkit-scrollbar-thumb{background:var(--sb-th);border-radius:99px}
-    .loading{opacity:.4;pointer-events:none}
+    .loading{opacity:.35;pointer-events:none}
     svg text{font-family:Inter,sans-serif}
-    /* Focus ring para inputs */
-    .fi:focus,.fta:focus{box-shadow:0 0 0 3px rgba(37,99,235,.15)}
-    /* Segmented radio */
-    .seg{display:flex;gap:4px;flex-wrap:wrap}
+    .card{box-shadow:var(--card-shadow)}
+
+    /* ── Segmented control (Apple iOS style) ── */
+    .seg{display:inline-flex;background:var(--seg-bg);border-radius:10px;padding:2px;gap:1px}
     .seg input{position:absolute;opacity:0;pointer-events:none}
-    .seg label{padding:4px 10px;border:1px solid var(--s4);border-radius:10px;font-size:var(--text-label);font-weight:600;color:var(--mut);cursor:pointer;transition:.15s;user-select:none;background:var(--s3)}
-    .seg label:hover{border-color:var(--sub);color:var(--sub);background:var(--s2)}
-    .seg input:checked+label{background:#2563eb;color:#fff;border-color:#2563eb;box-shadow:inset 0 1px 3px rgba(0,0,0,.15)}
-    /* Progress tracks */
-    .track{position:relative;height:5px;background:var(--s3);border-radius:99px;margin-top:14px;overflow:visible}
-    .track i{display:block;height:100%;border-radius:99px;transition:width .65s cubic-bezier(.4,0,.2,1)}
-    .track b{position:absolute;top:-3.5px;width:2px;height:12px;border-radius:2px;background:var(--s4)}
-    /* Mini bar */
-    .mbar{display:inline-block;width:52px;height:4px;background:var(--s3);border-radius:99px;overflow:hidden;margin-right:7px;vertical-align:2px}
+    .seg label{padding:4px 11px;border-radius:8px;font-size:12px;font-weight:500;color:var(--mut);cursor:pointer;transition:all .15s ease;user-select:none;white-space:nowrap}
+    .seg label:hover{color:var(--sub)}
+    .seg input:checked+label{background:var(--seg-sel);color:var(--seg-sel-c);box-shadow:var(--seg-sh)}
+
+    /* ── Track / progress ── */
+    .track{position:relative;height:3px;background:var(--s3);border-radius:99px;margin-top:14px;overflow:visible}
+    .track i{display:block;height:100%;border-radius:99px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+    .track b{position:absolute;top:-5px;width:1.5px;height:13px;border-radius:2px;background:var(--mut);opacity:.5}
+
+    /* ── Mini bar ── */
+    .mbar{display:inline-block;width:48px;height:3px;background:var(--s3);border-radius:99px;overflow:hidden;margin-right:6px;vertical-align:2px}
     .mbar i{display:block;height:100%;border-radius:99px;background:var(--ink)}
-    /* Stack bar */
-    .sbar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--s3);margin:14px 0 18px}
+
+    /* ── Stack bar ── */
+    .sbar{display:flex;height:7px;border-radius:99px;overflow:hidden;background:var(--s3);margin:10px 0 14px}
     .sbar span{height:100%}
-    /* Dist rows */
-    .drow{display:grid;grid-template-columns:64px 1fr 38px 52px;gap:10px;align-items:center;font-size:var(--text-body);margin-bottom:9px}
-    .dbar{height:5px;background:var(--s3);border-radius:99px;overflow:hidden}
+
+    /* ── Dist rows ── */
+    .drow{display:grid;grid-template-columns:60px 1fr 36px 48px;gap:10px;align-items:center;font-size:12.5px;margin-bottom:7px}
+    .dbar{height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
     .dbar span{display:block;height:100%;border-radius:99px}
-    .c-o{background:#22c55e}.c-b{background:#86efac}.c-r{background:#f59e0b}.c-ru{background:#ef4444}.c-n{background:#6b7280}
-    /* Pills */
-    .pill{display:inline-flex;align-items:center;font-size:var(--text-label);font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
-    .p-ok{background:var(--p-ok-bg);color:var(--p-ok)}
-    .p-w {background:var(--p-w-bg);color:var(--p-w)}
-    .p-bd{background:var(--p-bd-bg);color:var(--p-bd)}
+    .c-o{background:#34d399}.c-b{background:#86efac}.c-r{background:#fbbf24}.c-ru{background:#f87171}.c-n{background:#d1d5db}
+
+    /* ── Pills ── */
+    .pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;letter-spacing:.01em}
+    .p-ok{background:rgba(34,197,94,.12);color:var(--p-ok)}
+    .p-w {background:rgba(245,158,11,.12);color:var(--p-w)}
+    .p-bd{background:rgba(239,68,68,.12);color:var(--p-bd)}
     .p-mt{background:var(--s3);color:var(--mut)}
-    /* Dots */
-    .dot{display:inline-block;width:7px;height:7px;border-radius:99px;margin-right:7px;vertical-align:1px}
+
+    /* ── Dots ── */
+    .dot{display:inline-block;width:6px;height:6px;border-radius:99px;margin-right:7px;vertical-align:1px}
     .d-ok{background:#22c55e}.d-w{background:#f59e0b}.d-bd{background:#ef4444}.d-mt{background:var(--mut)}
-    /* Tags */
-    .tag{font-size:var(--text-label);font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
-    .t-rc{background:rgba(239,68,68,.12);color:var(--t-rc)}
-    .t-sg{background:rgba(245,158,11,.10);color:var(--t-sg)}
-    .t-el{background:rgba(34,197,94,.10);color:var(--t-el)}
+
+    /* ── Tags ── */
+    .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:5px;white-space:nowrap;letter-spacing:.02em}
+    .t-rc{background:rgba(239,68,68,.10);color:var(--t-rc)}
+    .t-sg{background:rgba(245,158,11,.09);color:var(--t-sg)}
+    .t-el{background:rgba(34,197,94,.09);color:var(--t-el)}
     .t-cm{background:var(--s3);color:var(--mut)}
-    /* Deltas */
-    .du{color:var(--du);font-weight:700}.dd{color:var(--dd);font-weight:700}
-    /* Tables */
+
+    /* ── Deltas ── */
+    .du{color:var(--du);font-weight:600}.dd{color:var(--dd);font-weight:600}
+
+    /* ── Tables ── */
     .tbl{width:100%;border-collapse:collapse}
-    .tbl thead{background:var(--s3)}
-    .tbl th{font-size:var(--text-label);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:11px 14px;border-bottom:1px solid var(--s4);text-align:left}
-    .tbl td{padding:12px 14px;border-bottom:1px solid var(--s4a);font-size:var(--text-body);vertical-align:middle;color:var(--ink)}
+    .tbl th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:10px 14px;border-bottom:1px solid var(--s4);text-align:left}
+    .tbl td{padding:11px 14px;border-bottom:1px solid var(--s4a);font-size:13px;vertical-align:middle;color:var(--ink)}
     .tbl tr:last-child td{border-bottom:0}
-    .tbl tbody tr:nth-child(odd) td{background:rgba(241,245,249,.35)}
-    .dark .tbl tbody tr:nth-child(odd) td{background:rgba(255,255,255,.03)}
-    .tbl tr:hover td{background:var(--s3)!important}
-    /* Report */
-    .rpt h2{text-align:center;font-size:var(--text-title);margin:0 0 20px;text-transform:uppercase;letter-spacing:.02em;color:var(--ink)}
-    .rpt h3{font-size:var(--text-md);margin:32px 0 10px;text-transform:uppercase;border-bottom:2px solid var(--s4);padding-bottom:6px;letter-spacing:.02em;color:var(--ink)}
-    .rpt h4{font-size:12px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub)}
-    .rpt p{font-size:var(--text-body);line-height:1.75;text-align:justify;color:var(--sub)}
-    .rpt table{width:100%;border-collapse:collapse;margin-bottom:14px}
-    .rpt th,.rpt td{border:1px solid var(--s4);padding:7px 10px;font-size:12px}
-    .rpt th{background:var(--s3);text-align:center;font-weight:700;color:var(--ink)}
+    .tbl tr:hover td{background:var(--s3)}
+
+    /* ── Report ── */
+    .rpt h2{text-align:center;font-size:16px;margin:0 0 18px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);font-weight:700}
+    .rpt h3{font-size:13px;font-weight:700;margin:28px 0 9px;text-transform:uppercase;border-bottom:1.5px solid var(--s4);padding-bottom:6px;letter-spacing:.04em;color:var(--ink)}
+    .rpt h4{font-size:11px;font-weight:600;margin:16px 0 7px;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)}
+    .rpt p{font-size:13px;line-height:1.75;text-align:justify;color:var(--sub)}
+    .rpt table{width:100%;border-collapse:collapse;margin-bottom:12px}
+    .rpt th,.rpt td{border:1px solid var(--s4);padding:6px 9px;font-size:12px}
+    .rpt th{background:var(--s3);text-align:center;font-weight:600;color:var(--ink)}
     .rpt td{color:var(--sub)}.rpt td.c{text-align:center}
-    .pbd{background:rgba(239,68,68,.10)}.pwn{background:rgba(245,158,11,.08)}
-    .rpt .mn{font-size:var(--text-body);margin:4px 0;line-height:1.65;color:var(--sub)}
+    .pbd{background:rgba(239,68,68,.09)}.pwn{background:rgba(245,158,11,.07)}
+    .rpt .mn{font-size:13px;margin:4px 0;line-height:1.65;color:var(--sub)}
     .rpt .mn b{text-transform:uppercase;color:var(--ink)}
-    .fn{color:var(--mut);font-size:var(--text-label)}
-    .empty{text-align:center;color:var(--mut);padding:36px 10px;font-size:var(--text-body)}
+    .fn{color:var(--mut);font-size:11px}
+    .empty{text-align:center;color:var(--mut);padding:36px 10px;font-size:13px}
     .toast-on{opacity:1!important;transform:translate(-50%,0)!important}
-    /* KPI value */
-    .kpi-val{font-size:32px;font-weight:800;letter-spacing:-0.03em;line-height:1}
+
+    /* ── Separator ── */
+    .crit-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;flex-wrap:wrap}
+    .crit-row+.crit-row{border-top:1px solid var(--s4a)}
+    .crit-lbl{font-size:13px;color:var(--sub);font-weight:400}
+
     @media(max-width:1080px){
       .g4{grid-template-columns:1fr 1fr!important}
       .g-hs,.g-nps{grid-template-columns:1fr!important}
@@ -184,79 +186,50 @@
       .section{display:none!important}.section.active{display:block!important;animation:none!important}
       .rpt{color:#000!important;background:#fff!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;box-shadow:none!important}
       .rpt *{color:#000!important;border-color:#9ca3af!important}
-      .rpt th{background:#e5e7eb!important}
+      .rpt th{background:#f3f4f6!important}
       .rpt table{page-break-inside:avoid}.rpt h3{page-break-after:avoid;border-color:#000!important}
     }
   </style>
-  <script>
-    // Apply saved theme before first paint to avoid flash
-    (function(){
-      if(localStorage.getItem('pesquisa-theme')==='dark')
-        document.documentElement.classList.add('dark');
-    })();
-  </script>
+  <script>(function(){if(localStorage.getItem('pesquisa-theme')==='dark')document.documentElement.classList.add('dark')})()</script>
 </head>
 <body class="bg-s1 text-ink font-sans min-h-screen">
 
   <!-- ── HEADER ─────────────────────────────────── -->
-  <header class="sticky top-0 z-30 border-b border-s4 no-print" style="background:var(--header-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)">
-    <div class="max-w-[1320px] mx-auto px-6 h-16 flex items-center gap-5">
+  <header class="sticky top-0 z-30 no-print" style="background:var(--header-bg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)">
 
+    <!-- Row 1: brand · nav · actions -->
+    <div class="max-w-[1320px] mx-auto px-6 h-12 flex items-center gap-4" style="border-bottom:1px solid var(--s4)">
       <!-- Brand -->
-      <div class="flex items-center gap-2.5 shrink-0">
-        <!-- Light icon (shown in light mode) -->
-        <svg id="iconLight" width="28" height="28" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+      <div class="flex items-center gap-2 shrink-0">
+        <svg id="iconLight" width="24" height="24" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
           <rect width="1024" height="1024" rx="220" fill="#F8FAFC"/>
           <rect width="1024" height="1024" rx="220" stroke="#E2E8F0" stroke-width="8"/>
-          <circle cx="322" cy="310" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="450" cy="310" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="578" cy="310" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="706" cy="310" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="322" cy="438" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="450" cy="438" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="578" cy="438" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="706" cy="438" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="322" cy="566" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="450" cy="566" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="706" cy="566" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="322" cy="694" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="450" cy="694" r="29" fill="#CBD5E1" opacity="0.78"/>
-          <circle cx="578" cy="694" r="29" fill="#CBD5E1" opacity="0.58"/>
-          <circle cx="706" cy="694" r="29" fill="#CBD5E1" opacity="0.78"/>
+          <circle cx="322" cy="310" r="29" fill="#CBD5E1" opacity="0.78"/><circle cx="450" cy="310" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="578" cy="310" r="29" fill="#CBD5E1" opacity="0.78"/><circle cx="706" cy="310" r="29" fill="#CBD5E1" opacity="0.58"/>
+          <circle cx="322" cy="438" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="450" cy="438" r="29" fill="#CBD5E1" opacity="0.78"/><circle cx="578" cy="438" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="706" cy="438" r="29" fill="#CBD5E1" opacity="0.78"/>
+          <circle cx="322" cy="566" r="29" fill="#CBD5E1" opacity="0.78"/><circle cx="450" cy="566" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="706" cy="566" r="29" fill="#CBD5E1" opacity="0.58"/>
+          <circle cx="322" cy="694" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="450" cy="694" r="29" fill="#CBD5E1" opacity="0.78"/><circle cx="578" cy="694" r="29" fill="#CBD5E1" opacity="0.58"/><circle cx="706" cy="694" r="29" fill="#CBD5E1" opacity="0.78"/>
           <circle cx="578" cy="574" r="59.4" fill="#000" opacity="0.12"/>
           <circle cx="578" cy="566" r="62.3" fill="#BFDBFE" opacity="0.58"/>
           <circle cx="578" cy="566" r="41.2" fill="#2563EB"/>
           <circle cx="565.8" cy="551.5" r="8.1" fill="#fff" opacity="0.50"/>
         </svg>
-        <!-- Dark icon (shown in dark mode) -->
-        <svg id="iconDark" width="28" height="28" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <svg id="iconDark" width="24" height="24" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" style="display:none">
           <rect width="1024" height="1024" rx="220" fill="#0F172A"/>
           <rect width="1024" height="1024" rx="220" stroke="#1E293B" stroke-width="8"/>
-          <circle cx="322" cy="310" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="450" cy="310" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="578" cy="310" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="706" cy="310" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="322" cy="438" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="450" cy="438" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="578" cy="438" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="706" cy="438" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="322" cy="566" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="450" cy="566" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="706" cy="566" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="322" cy="694" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="450" cy="694" r="29" fill="#475569" opacity="0.78"/>
-          <circle cx="578" cy="694" r="29" fill="#475569" opacity="0.58"/>
-          <circle cx="706" cy="694" r="29" fill="#475569" opacity="0.78"/>
+          <circle cx="322" cy="310" r="29" fill="#475569" opacity="0.78"/><circle cx="450" cy="310" r="29" fill="#475569" opacity="0.58"/><circle cx="578" cy="310" r="29" fill="#475569" opacity="0.78"/><circle cx="706" cy="310" r="29" fill="#475569" opacity="0.58"/>
+          <circle cx="322" cy="438" r="29" fill="#475569" opacity="0.58"/><circle cx="450" cy="438" r="29" fill="#475569" opacity="0.78"/><circle cx="578" cy="438" r="29" fill="#475569" opacity="0.58"/><circle cx="706" cy="438" r="29" fill="#475569" opacity="0.78"/>
+          <circle cx="322" cy="566" r="29" fill="#475569" opacity="0.78"/><circle cx="450" cy="566" r="29" fill="#475569" opacity="0.58"/><circle cx="706" cy="566" r="29" fill="#475569" opacity="0.58"/>
+          <circle cx="322" cy="694" r="29" fill="#475569" opacity="0.58"/><circle cx="450" cy="694" r="29" fill="#475569" opacity="0.78"/><circle cx="578" cy="694" r="29" fill="#475569" opacity="0.58"/><circle cx="706" cy="694" r="29" fill="#475569" opacity="0.78"/>
           <circle cx="578" cy="574" r="59.4" fill="#000" opacity="0.12"/>
           <circle cx="578" cy="566" r="62.3" fill="#1E40AF" opacity="0.58"/>
           <circle cx="578" cy="566" r="41.2" fill="#60A5FA"/>
           <circle cx="565.8" cy="551.5" r="8.1" fill="#fff" opacity="0.50"/>
         </svg>
-        <span class="text-sm font-extrabold" style="letter-spacing:-0.01em">Pesquisa <span class="text-mut font-medium">HUC</span></span>
+        <span class="text-[13px] font-bold tracking-tight text-ink">Pesquisa</span>
       </div>
 
-      <!-- Nav -->
-      <nav class="flex gap-1 mx-auto overflow-x-auto">
+      <!-- Nav (centered) -->
+      <nav class="flex gap-0.5 mx-auto">
         <button class="nav-b active" data-tab="overview">Visão geral</button>
         <button class="nav-b" data-tab="novo">Nova pesquisa</button>
         <button class="nav-b" data-tab="registros">Registros</button>
@@ -264,92 +237,94 @@
         <button class="nav-b" data-tab="relatorio">Relatório</button>
       </nav>
 
-      <!-- Controls -->
+      <!-- Actions -->
       <div class="flex items-center gap-2 shrink-0">
-        <select id="gMes"   onchange="renderAll()" class="ctl"><option value="">Todos os meses</option></select>
-        <select id="gSetor" onchange="renderAll()" class="ctl"><option value="">Todos os setores</option></select>
-        <button onclick="reload()" class="ctl px-3" title="Atualizar">↻</button>
-        <!-- Theme toggle -->
-        <button id="themeBtn" onclick="toggleTheme()" class="ctl px-2.5" title="Alternar tema" aria-label="Alternar tema claro/escuro">
-          <!-- Moon: shown in light mode (click to go dark) -->
-          <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-          <!-- Sun: shown in dark mode (click to go light) -->
-          <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
-            <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
-            <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
-            <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>
-          </svg>
+        <button id="themeBtn" onclick="toggleTheme()" class="btn-g p-1.5 rounded-lg" title="Alternar tema">
+          <svg id="themeIconMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="themeIconSun"  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>
         </button>
-        <button onclick="showTab('novo')" class="btn-p">+ Pesquisa</button>
+        <button onclick="showTab('novo')" class="btn-p">+ Nova pesquisa</button>
+      </div>
+    </div>
+
+    <!-- Row 2: filters -->
+    <div class="max-w-[1320px] mx-auto px-6 h-10 flex items-center gap-2" style="border-bottom:1px solid var(--s4)">
+      <span class="text-xs text-mut font-medium mr-1">Período</span>
+      <select id="gMes"   onchange="renderAll()" class="ctls">
+        <option value="">Todos os meses</option>
+      </select>
+      <select id="gSetor" onchange="renderAll()" class="ctls">
+        <option value="">Todos os setores</option>
+      </select>
+      <button onclick="reload()" class="btn-g px-2" title="Atualizar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+      <div class="ml-auto">
+        <button onclick="downloadCSV()" class="btn-g">Exportar CSV</button>
       </div>
     </div>
   </header>
 
-  <div id="app" class="max-w-[1320px] mx-auto px-6 py-7 pb-16">
+  <div id="app" class="max-w-[1320px] mx-auto px-6 py-6 pb-16">
 
     <!-- ══ VISÃO GERAL ══════════════════════════════ -->
     <section id="overview" class="section active">
       <div class="ph">
         <div>
           <h2 class="pt" id="ovTitle">Visão geral</h2>
-          <p class="text-sm text-mut mt-1">Indicadores do período · metas: 60% aplicação · 90% satisfação</p>
+          <p class="text-xs text-mut mt-0.5">Metas: 60% aplicação · 90% satisfação · NPS ≥ 75</p>
         </div>
-        <button onclick="downloadCSV()" class="btn">Exportar CSV</button>
       </div>
 
       <!-- KPIs -->
-      <div class="grid g4 gap-3.5" style="grid-template-columns:repeat(4,1fr)">
+      <div class="grid g4 gap-3" style="grid-template-columns:repeat(4,1fr)">
         <div class="card">
-          <div class="flex justify-between items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-sub">% de aplicação</span>
-            <span class="pill p-mt" id="pAplic">—</span>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">% de aplicação</p>
+          <div class="flex items-end justify-between gap-2">
+            <span class="text-[28px] font-bold tracking-tight leading-none" id="kAplic">—</span>
+            <span class="pill p-mt mb-1" id="pAplic">—</span>
           </div>
-          <div class="kpi-val mt-3" id="kAplic">—</div>
-          <div class="text-xs text-mut mt-2 min-h-[18px] leading-relaxed" id="dAplic"></div>
+          <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dAplic"></div>
           <div class="track mt-3"><i id="tAplic" style="width:0"></i><b style="left:60%"></b></div>
         </div>
         <div class="card">
-          <div class="flex justify-between items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-sub">Taxa de satisfação</span>
-            <span class="pill p-mt" id="pSat">—</span>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">Taxa de satisfação</p>
+          <div class="flex items-end justify-between gap-2">
+            <span class="text-[28px] font-bold tracking-tight leading-none" id="kSat">—</span>
+            <span class="pill p-mt mb-1" id="pSat">—</span>
           </div>
-          <div class="kpi-val mt-3" id="kSat">—</div>
-          <div class="text-xs text-mut mt-2 min-h-[18px] leading-relaxed" id="dSat"></div>
+          <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dSat"></div>
           <div class="track mt-3"><i id="tSat" style="width:0"></i><b style="left:90%"></b></div>
         </div>
         <div class="card">
-          <div class="flex justify-between items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-sub">NPS</span>
-            <span class="pill p-mt" id="pNps">—</span>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">NPS</p>
+          <div class="flex items-end justify-between gap-2">
+            <span class="text-[28px] font-bold tracking-tight leading-none" id="kNps">—</span>
+            <span class="pill p-mt mb-1" id="pNps">—</span>
           </div>
-          <div class="kpi-val mt-3" id="kNps">—</div>
-          <div class="text-xs text-mut mt-2 min-h-[18px] leading-relaxed" id="dNps"></div>
+          <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dNps"></div>
           <div class="track mt-3"><i id="tNps" style="width:0"></i><b style="left:75%"></b></div>
         </div>
         <div class="card">
-          <div class="flex justify-between items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-sub">Pesquisas aplicadas</span>
-            <span class="pill p-mt" id="pTotal">—</span>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">Pesquisas aplicadas</p>
+          <div class="flex items-end justify-between gap-2">
+            <span class="text-[28px] font-bold tracking-tight leading-none" id="kTotal">0</span>
+            <span class="pill p-mt mb-1" id="pTotal">—</span>
           </div>
-          <div class="kpi-val mt-3" id="kTotal">0</div>
-          <div class="text-xs text-mut mt-2 min-h-[18px] leading-relaxed" id="dTotal"></div>
+          <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dTotal"></div>
           <div class="track mt-3"><i id="tTotal" style="width:0;background:var(--mut)"></i></div>
         </div>
       </div>
 
       <!-- Charts row 1 -->
-      <div class="grid g-hs gap-3.5 mt-3.5" style="grid-template-columns:1.45fr .55fr">
+      <div class="grid g-hs gap-3 mt-3" style="grid-template-columns:1.5fr .5fr">
         <div class="card">
           <h3 class="ch3">Série histórica</h3>
-          <p class="ch3s mb-4">Evolução mensal · linha pontilhada = meta 90%</p>
+          <p class="ch3s mb-4">Evolução mensal · linha tracejada = meta 90%</p>
           <div id="histChart"></div>
-          <div class="flex gap-5 mt-3 flex-wrap">
-            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:14px;height:2.5px;display:inline-block;background:#3b82f6;border-radius:2px;vertical-align:2px"></i>Satisfação</span>
-            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:14px;height:2.5px;display:inline-block;background:#a78bfa;border-radius:2px;vertical-align:2px"></i>NPS</span>
+          <div class="flex gap-5 mt-3">
+            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:12px;height:2px;display:inline-block;background:#3b82f6;border-radius:2px;vertical-align:2px"></i>Satisfação</span>
+            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:12px;height:2px;display:inline-block;background:#a78bfa;border-radius:2px;vertical-align:2px"></i>NPS</span>
           </div>
         </div>
         <div class="card">
@@ -361,16 +336,16 @@
       </div>
 
       <!-- Charts row 2 -->
-      <div class="grid g-nps gap-3.5 mt-3.5" style="grid-template-columns:.42fr 1.58fr">
+      <div class="grid g-nps gap-3 mt-3" style="grid-template-columns:.4fr 1.6fr">
         <div class="card">
-          <h3 class="ch3">NPS · composição</h3>
+          <h3 class="ch3">NPS</h3>
           <p class="ch3s">promotores · neutros · detratores</p>
           <div id="npsDonut" class="flex justify-center items-center py-3"></div>
           <div id="npsLegend" class="flex flex-col gap-2 mt-1"></div>
         </div>
         <div class="card">
           <h3 class="ch3">Desempenho por setor</h3>
-          <p class="ch3s mb-3">farol verde = ≥ 90% de satisfação</p>
+          <p class="ch3s mb-3">farol verde ≥ 90% satisfação</p>
           <div class="overflow-auto">
             <table class="tbl"><thead><tr>
               <th>Setor</th><th>Pesquisas</th><th>Aplicação</th><th>Satisfação</th><th>NPS</th>
@@ -380,10 +355,10 @@
       </div>
 
       <!-- Manifestações -->
-      <div class="card mt-3.5">
+      <div class="card mt-3">
         <h3 class="ch3">Manifestações do período</h3>
         <p class="ch3s mb-4">reclamações primeiro — são as mais acionáveis</p>
-        <div id="manifList" class="grid gap-2.5"></div>
+        <div id="manifList" class="grid gap-2"></div>
       </div>
     </section>
 
@@ -391,31 +366,44 @@
     <section id="novo" class="section">
       <form id="form" onsubmit="saveRecord(event)">
         <div class="ph">
-          <div><h2 class="pt">Nova pesquisa</h2><p class="text-sm text-mut mt-1">Registro na aba MATRIZ · toque nos chips para avaliar</p></div>
-          <button class="btn-p" type="submit">Salvar pesquisa</button>
+          <div>
+            <h2 class="pt">Nova pesquisa</h2>
+            <p class="text-xs text-mut mt-0.5">Registro na aba MATRIZ</p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="btn" onclick="setForm({})">Limpar</button>
+            <button class="btn-p" type="submit">Salvar pesquisa</button>
+          </div>
         </div>
         <input type="hidden" id="rowNumber">
-        <div class="card">
-          <div class="grid g-form gap-3.5" style="grid-template-columns:repeat(4,1fr)">
-            <div><label class="fl">Setor</label><input id="setor" required list="setoresList" class="fi" placeholder="Ex.: CLÍNICA ORTOPÉDICA"></div>
+
+        <!-- Identificação -->
+        <div class="card mb-3">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Identificação</h4>
+          <div class="grid g-form gap-3" style="grid-template-columns:repeat(3,1fr)">
+            <div><label class="fl">Setor</label><input id="setor" required list="setoresList" class="fi" placeholder="Clínica…"></div>
             <div><label class="fl">Prontuário</label><input id="pront" class="fi"></div>
-            <div><label class="fl">Data</label><input id="data" type="date" class="fi"></div>
             <div><label class="fl">Tipo</label><input id="tipo" list="tiposList" class="fi" placeholder="PAC, ACOMP…"></div>
-            <div><label class="fl">Data nasc.</label><input id="dn" type="date" class="fi"></div>
-            <div><label class="fl">Idade</label><input id="idade" type="number" min="0" class="fi"></div>
-            <div><label class="fl">Sexo</label><select id="sexo" class="fi"><option></option><option>F</option><option>M</option><option>Outro</option></select></div>
-            <div><label class="fl">NPS 0–10</label><input id="nps" type="number" min="0" max="10" class="fi" placeholder="Recomendaria?"></div>
+            <div><label class="fl">Data da pesquisa</label><input id="data" type="date" class="fi"></div>
+            <div><label class="fl">Data de nascimento</label><input id="dn" type="date" class="fi"></div>
+            <div><label class="fl">Sexo</label><select id="sexo" class="fi"><option value=""></option><option>F</option><option>M</option><option>Outro</option></select></div>
           </div>
           <datalist id="setoresList"></datalist>
           <datalist id="tiposList"></datalist>
         </div>
-        <div class="grid g-rates gap-3.5 mt-3.5" id="rateBlocks" style="grid-template-columns:repeat(3,1fr)"></div>
-        <div class="card mt-3.5">
-          <div class="grid g-form gap-3.5" style="grid-template-columns:repeat(4,1fr)">
-            <div style="grid-column:span 2"><label class="fl">Sugestões</label><textarea id="sugestoes" class="fta"></textarea></div>
-            <div style="grid-column:span 2"><label class="fl">Reclamações</label><textarea id="reclamacoes" class="fta"></textarea></div>
-            <div style="grid-column:span 2"><label class="fl">Comentários</label><textarea id="comentarios" class="fta"></textarea></div>
-            <div style="grid-column:span 2"><label class="fl">Elogios</label><textarea id="elogios" class="fta"></textarea></div>
+
+        <!-- Rating blocks -->
+        <div class="grid g-rates gap-3 mb-3" id="rateBlocks" style="grid-template-columns:repeat(3,1fr)"></div>
+
+        <!-- Manifestações + extras -->
+        <div class="card">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Manifestações e encerramento</h4>
+          <div class="grid g-form gap-3" style="grid-template-columns:repeat(2,1fr)">
+            <div><label class="fl">Sugestões</label><textarea id="sugestoes" class="fta"></textarea></div>
+            <div><label class="fl">Reclamações</label><textarea id="reclamacoes" class="fta"></textarea></div>
+            <div><label class="fl">Comentários</label><textarea id="comentarios" class="fta"></textarea></div>
+            <div><label class="fl">Elogios</label><textarea id="elogios" class="fta"></textarea></div>
+            <div><label class="fl">NPS 0–10</label><input id="nps" type="number" min="0" max="10" class="fi" placeholder="Nota de 0 a 10 — recomendaria?"></div>
             <div><label class="fl">Entrevistador</label><input id="entrevistador" class="fi"></div>
             <div style="grid-column:span 2"><label class="fl">Encaminhamentos</label><input id="encaminhamentos" class="fi"></div>
           </div>
@@ -426,11 +414,11 @@
     <!-- ══ REGISTROS ════════════════════════════════ -->
     <section id="registros" class="section">
       <div class="ph">
-        <div><h2 class="pt">Registros</h2><p class="text-sm text-mut mt-1">Pesquisas salvas na MATRIZ</p></div>
-        <input id="q" class="ctl" placeholder="Buscar…" oninput="renderTable()" style="min-width:220px">
+        <div><h2 class="pt">Registros</h2><p class="text-xs text-mut mt-0.5">Pesquisas salvas na MATRIZ</p></div>
+        <input id="q" class="ctl" placeholder="Buscar…" oninput="renderTable()" style="min-width:200px">
       </div>
       <div class="card p-0 overflow-auto">
-        <table class="tbl" style="min-width:1000px">
+        <table class="tbl" style="min-width:960px">
           <thead><tr><th>Data</th><th>Setor</th><th>Pront.</th><th>Tipo</th><th>Sexo</th><th>Satisfação</th><th>NPS</th><th>Manifestação</th><th></th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -440,11 +428,11 @@
     <!-- ══ SAÍDAS ════════════════════════════════════ -->
     <section id="saidas" class="section">
       <div class="ph">
-        <div><h2 class="pt">Saídas hospitalares</h2><p class="text-sm text-mut mt-1">Altas, transferências e óbitos · base da % de aplicação (meta 60%)</p></div>
+        <div><h2 class="pt">Saídas hospitalares</h2><p class="text-xs text-mut mt-0.5">Altas, transferências e óbitos · base da % de aplicação</p></div>
       </div>
-      <div class="grid gap-3.5" style="grid-template-columns:310px 1fr;align-items:start">
+      <div class="grid gap-3" style="grid-template-columns:290px 1fr;align-items:start">
         <form class="card" id="formSaida" onsubmit="saveSaida(event)">
-          <h3 class="ch3 mb-4">Registrar saídas do mês</h3>
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Registrar saídas</h4>
           <input type="hidden" id="sRowNumber">
           <div class="grid gap-3">
             <div><label class="fl">Mês/Ano</label><input id="sMes" type="month" required class="fi"></div>
@@ -465,7 +453,7 @@
     <!-- ══ RELATÓRIO ═════════════════════════════════ -->
     <section id="relatorio" class="section">
       <div class="ph no-print">
-        <div><h2 class="pt">Relatório mensal</h2><p class="text-sm text-mut mt-1">Formato institucional · pronto para imprimir ou salvar em PDF</p></div>
+        <div><h2 class="pt">Relatório mensal</h2><p class="text-xs text-mut mt-0.5">Formato institucional · pronto para imprimir</p></div>
         <div class="flex gap-2">
           <select id="repMes" class="ctl" onchange="renderReport()"></select>
           <button onclick="window.print()" class="btn-p">Imprimir / PDF</button>
@@ -477,8 +465,8 @@
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 left-1/2 bg-s2 border border-s4 text-ink px-4 py-2.5 text-sm font-medium opacity-0 z-50"
-       style="border-radius:var(--radius-card);box-shadow:var(--shadow-md),0 8px 24px rgba(0,0,0,.12);transform:translate(-50%,10px);transition:opacity .22s,transform .22s"></div>
+  <div id="toast" class="fixed bottom-6 left-1/2 bg-s2 border border-s4 text-ink px-4 py-2.5 rounded-xl text-sm font-medium opacity-0 z-50"
+       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12)"></div>
 
 <script>
 const META_A=60,META_S=90,META_N=75;
@@ -494,13 +482,13 @@ const MA=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez
 let ST={records:[],saidas:[],lookups:{setores:[],tipos:[],sexos:[]}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
 function toast(msg){const t=$('toast');t.textContent=msg;t.style.opacity='1';t.style.transform='translate(-50%,0)';setTimeout(()=>{t.style.opacity='0';t.style.transform='translate(-50%,8px)'},2500)}
 function load(v){$('app').classList.toggle('loading',v)}
 function showTab(tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(tab).classList.add('active');document.querySelectorAll('.nav-b').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 document.querySelectorAll('.nav-b').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
-/* ── Theme toggle ── */
+/* ── Theme ── */
 function applyThemeUI(){
   const dark=document.documentElement.classList.contains('dark');
   $('iconLight').style.display=dark?'none':'';
@@ -511,8 +499,7 @@ function applyThemeUI(){
 function toggleTheme(){
   const dark=document.documentElement.classList.toggle('dark');
   localStorage.setItem('pesquisa-theme',dark?'dark':'light');
-  applyThemeUI();
-  renderAll();
+  applyThemeUI();renderAll();
 }
 applyThemeUI();
 
@@ -523,7 +510,7 @@ function pm(m){const[y,mm]=m.split('-').map(Number);const d=new Date(y,mm-2,1);r
 const fmt=(v,d=0)=>v==null||isNaN(v)?'—':v.toFixed(d).replace('.',',')+'%';
 function allM(){const s=new Set(ST.records.map(mo).filter(Boolean));ST.saidas.forEach(x=>x.mes&&s.add(x.mes));return[...s].sort()}
 function hydrate(){
-  const m=allM().reverse();const cm=$('gMes').value;
+  const m=allM().reverse(),cm=$('gMes').value;
   $('gMes').innerHTML='<option value="">Todos os meses</option>'+m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('');
   $('gMes').value=m.includes(cm)?cm:(m[0]||'');
   const cr=$('repMes').value;
@@ -550,50 +537,51 @@ function sum(rr){
 function cf(rr,f){const c={'ÓTIMO':0,'BOM':0,'REGULAR':0,'RUIM':0,'N/A':0};rr.forEach(r=>{const v=String(r[f]||'').trim().toUpperCase();if(v in c)c[v]++});return c}
 function wp(c){const v=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM'];if(!v)return null;return(c['ÓTIMO']*3+c['BOM']*2+c['REGULAR']-c['RUIM'])/(v*3)*100}
 const zona=v=>v>=75?'zona de excelência':v>=50?'zona de qualidade':v>=0?'zona de aperfeiçoamento':'zona crítica';
+
 function renderAll(){
   const mes=$('gMes').value,set=$('gSetor').value;
   const rr=rows(mes,set),s=sum(rr);
-  const sd=saidas(mes,set);
-  const ap=sd?s.total/sd*100:null;
+  const sd=saidas(mes,set),ap=sd?s.total/sd*100:null;
   const pv=mes?sum(rows(pm(mes),set)):null;
-  const pvS=mes?saidas(pm(mes),set):0;
-  const pvA=pv&&pvS?pv.total/pvS*100:null;
+  const pvS=mes?saidas(pm(mes),set):0,pvA=pv&&pvS?pv.total/pvS*100:null;
   $('ovTitle').textContent=(mes?ml(mes):'Todos os meses')+(set?' · '+set:'');
-  kpi('Aplic',ap,META_A,pvA,sd?`${s.total} pesquisas / ${sd} saídas`:'cadastre as saídas do mês');
+  kpi('Aplic',ap,META_A,pvA,sd?`${s.total} / ${sd} saídas`:'cadastre as saídas');
   kpi('Sat',s.sat,META_S,pv?pv.sat:null,'');
   kpi('Nps',s.nps,META_N,pv?pv.nps:null,s.nps!=null?zona(s.nps):'');
-  $('kTotal').textContent=s.total;$('pTotal').textContent=s.mn+' manifestações';
-  $('dTotal').innerHTML=pv&&mes?dt(s.total-pv.total,' pesquisas vs '+mc(pm(mes)),0):'';
+  $('kTotal').textContent=s.total;
+  $('pTotal').textContent=s.mn+' manifest.';
+  $('dTotal').innerHTML=pv&&mes?dt(s.total-pv.total,' vs '+mc(pm(mes)),0):'';
   $('tTotal').style.width=Math.min(100,s.total/Math.max(1,...allM().map(m=>rows(m,set).length))*100)+'%';
   rHist(set);rDist(s);rDonut(s);rSetores(mes);rManif(rr);renderTable();rSaidas();renderReport();
 }
 function kpi(k,v,meta,pv,foot){
   const pl=$('p'+k),el=$('k'+k),tr=$('t'+k),dl=$('d'+k);
   el.textContent=fmt(v,k==='Sat'?1:0);
-  if(v==null){pl.className='pill p-mt';pl.textContent='sem dados';tr.style.width='0';tr.style.background=cv('--mut')}
+  if(v==null){pl.className='pill p-mt';pl.textContent='sem dados';tr.style.width='0';tr.style.background=getComputedStyle(document.documentElement).getPropertyValue('--mut').trim()}
   else{const ok=v>=meta,wn=v>=meta-10;pl.className='pill '+(ok?'p-ok':wn?'p-w':'p-bd');pl.textContent='Meta '+meta+'%'+(ok?' ✓':'');tr.style.width=Math.max(0,Math.min(100,v))+'%';tr.style.background=ok?'#22c55e':wn?'#f59e0b':'#ef4444'}
   const curM=$('gMes').value,pr=curM?pm(curM):null;
   dl.innerHTML=[pv!=null&&v!=null&&curM?dt(v-pv,' pp vs '+mc(pr),1):'',esc(foot)].filter(Boolean).join(' · ');
 }
 function dt(d,sf,dc){if(Math.abs(d)<.05)return`<span style="color:var(--gTxt)">— estável${sf}</span>`;const u=d>0;return`<span class="${u?'du':'dd'}">${u?'▲':'▼'} ${Math.abs(d).toFixed(dc).replace('.',',')}${sf}</span>`}
+
 function rHist(set){
-  const m=allM().slice(-12);const el=$('histChart');
+  const m=allM().slice(-12),el=$('histChart');
   if(m.length<2){el.innerHTML='<div class="empty">Registre dois meses para ver a evolução.</div>';return}
   const sa=[],np=[];m.forEach(x=>{const s=sum(rows(x,set));sa.push(s.sat);np.push(s.nps)});
-  const W=760,H=210,P={l:34,r:44,t:10,b:24};
+  const W=760,H=200,P={l:32,r:42,t:8,b:22};
   const X=i=>P.l+i*(W-P.l-P.r)/(m.length-1);
   const Y=v=>P.t+(100-Math.max(0,Math.min(100,v)))*(H-P.t-P.b)/100;
   let g='';
-  [0,25,50,75,100].forEach(v=>{g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" style="stroke:var(--grid)" stroke-width="1"/><text x="${P.l-7}" y="${Y(v)+4}" font-size="10" style="fill:var(--gTxt)" text-anchor="end">${v}</text>`});
-  g+=`<line x1="${P.l}" y1="${Y(90)}" x2="${W-P.r}" y2="${Y(90)}" style="stroke:var(--gTxt)" stroke-dasharray="3 5" stroke-width="1"/>`;
-  m.forEach((x,i)=>{g+=`<text x="${X(i)}" y="${H-5}" font-size="10" style="fill:var(--gTxt)" text-anchor="middle">${mc(x)}</text>`});
+  [0,25,50,75,100].forEach(v=>{g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" style="stroke:var(--grid)" stroke-width="1"/><text x="${P.l-6}" y="${Y(v)+4}" font-size="9.5" style="fill:var(--gTxt)" text-anchor="end">${v}</text>`});
+  g+=`<line x1="${P.l}" y1="${Y(90)}" x2="${W-P.r}" y2="${Y(90)}" style="stroke:var(--gTxt)" stroke-dasharray="3 4" stroke-width="1"/>`;
+  m.forEach((x,i)=>{g+=`<text x="${X(i)}" y="${H-4}" font-size="9.5" style="fill:var(--gTxt)" text-anchor="middle">${mc(x)}</text>`});
   const line=(vals,color)=>{
     const pts=vals.map((v,i)=>v==null?null:[X(i),Y(v)]);
     let path='',st=false;pts.forEach(p=>{if(!p){st=false;return}path+=(st?'L':'M')+p[0]+' '+p[1]+' ';st=true});
-    const dots=pts.map((p,i)=>p?`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${color}"><title>${ml(m[i])}: ${fmt(vals[i],1)}</title></circle>`:'').join('');
+    const dots=pts.map((p,i)=>p?`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}"><title>${ml(m[i])}: ${fmt(vals[i],1)}</title></circle>`:'').join('');
     const last=[...pts].reverse().find(Boolean),lv=[...vals].reverse().find(v=>v!=null);
-    const lbl=last?`<text x="${Math.min(last[0]+7,W-4)}" y="${last[1]-8}" font-size="11" font-weight="700" style="fill:${color}">${fmt(lv,0)}</text>`:'';
-    return`<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`+dots+lbl;
+    const lbl=last?`<text x="${Math.min(last[0]+6,W-4)}" y="${last[1]-7}" font-size="10.5" font-weight="700" style="fill:${color}">${fmt(lv,0)}</text>`:'';
+    return`<path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`+dots+lbl;
   };
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${line(sa,'#3b82f6')}${line(np,'#a78bfa')}</svg>`;
 }
@@ -604,16 +592,16 @@ function rDist(s){
   const items=[['Ótimo',s.ot,'c-o'],['Bom',s.bo,'c-b'],['Regular',s.re,'c-r'],['Ruim',s.ru,'c-ru'],['N/A',s.na,'c-n']];
   $('distStack').innerHTML=items.map(([,v,c])=>`<span class="${c}" style="width:${v/tot*100}%"></span>`).join('');
   const mx=Math.max(...items.map(i=>i[1]),1);
-  $('distRows').innerHTML=items.map(([k,v,c])=>`<div class="drow"><span style="color:var(--sub)">${k}</span><div class="dbar"><span class="${c}" style="width:${v/mx*100}%"></span></div><b style="color:var(--ink)">${v}</b><span style="color:var(--gTxt);font-size:11.5px;text-align:right">${(v/tot*100).toFixed(1).replace('.',',')}%</span></div>`).join('');
+  $('distRows').innerHTML=items.map(([k,v,c])=>`<div class="drow"><span style="color:var(--sub)">${k}</span><div class="dbar"><span class="${c}" style="width:${v/mx*100}%"></span></div><b style="color:var(--ink)">${v}</b><span style="color:var(--gTxt);font-size:11px;text-align:right">${(v/tot*100).toFixed(1).replace('.',',')}%</span></div>`).join('');
 }
 function rDonut(s){
   const tot=s.p+s.n+s.d;
   if(!tot){$('npsDonut').innerHTML='<div class="empty">Sem NPS.</div>';$('npsLegend').innerHTML='';return}
   const R=52,C=2*Math.PI*R;const segs=[[s.p,'#22c55e'],[s.n,'#f59e0b'],[s.d,'#ef4444']];
   let off=0,arcs='';
-  segs.forEach(([v,c])=>{const l=v/tot*C;if(v)arcs+=`<circle r="${R}" cx="64" cy="64" fill="none" stroke="${c}" stroke-width="12" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 64 64)"/>`;off+=l});
-  $('npsDonut').innerHTML=`<svg viewBox="0 0 128 128" style="width:148px"><circle r="${R}" cx="64" cy="64" fill="none" style="stroke:var(--grid)" stroke-width="12"/>${arcs}<text x="64" y="60" text-anchor="middle" font-size="22" font-weight="800" style="fill:var(--ink)">${fmt(s.nps)}</text><text x="64" y="77" text-anchor="middle" font-size="9" style="fill:var(--mut)">NPS</text></svg>`;
-  $('npsLegend').innerHTML=[['Promotores',s.p,'#22c55e'],['Neutros',s.n,'#f59e0b'],['Detratores',s.d,'#ef4444']].map(([l,v,c])=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--text-body);padding:3px 0"><span style="display:flex;align-items:center;gap:7px"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:${c};flex-shrink:0"></span><span style="color:var(--sub)">${l}</span></span><b style="color:var(--ink)">${v}</b></div>`).join('');
+  segs.forEach(([v,c])=>{const l=v/tot*C;if(v)arcs+=`<circle r="${R}" cx="64" cy="64" fill="none" stroke="${c}" stroke-width="11" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 64 64)"/>`;off+=l});
+  $('npsDonut').innerHTML=`<svg viewBox="0 0 128 128" style="width:140px"><circle r="${R}" cx="64" cy="64" fill="none" style="stroke:var(--grid)" stroke-width="11"/>${arcs}<text x="64" y="60" text-anchor="middle" font-size="20" font-weight="700" style="fill:var(--ink)">${fmt(s.nps)}</text><text x="64" y="76" text-anchor="middle" font-size="9" style="fill:var(--mut)">NPS</text></svg>`;
+  $('npsLegend').innerHTML=[['Promotores',s.p,'#22c55e'],['Neutros',s.n,'#f59e0b'],['Detratores',s.d,'#ef4444']].map(([l,v,c])=>`<div style="display:flex;justify-content:space-between;font-size:12px"><span><span style="display:inline-block;width:7px;height:7px;border-radius:99px;background:${c};margin-right:7px;vertical-align:1px"></span><span style="color:var(--sub)">${l}</span></span><b style="color:var(--ink)">${v}</b></div>`).join('');
 }
 function rSetores(mes){
   const map={};rows(mes,'').forEach(r=>{const k=r.setor||'Sem setor';(map[k]=map[k]||[]).push(r)});
@@ -630,14 +618,14 @@ function rSetores(mes){
 function rManif(rr){
   const cats=[['t-rc','RECLAMAÇÃO','reclamacoes'],['t-sg','SUGESTÃO','sugestoes'],['t-el','ELOGIO','elogios'],['t-cm','COMENTÁRIO','comentarios']];
   const items=[];cats.forEach(([cls,lbl,f])=>rr.forEach(r=>{const t=String(r[f]||'').trim();if(t)items.push({cls,lbl,t,setor:r.setor,data:r.data})}));
-  $('manifList').innerHTML=items.length?items.map(i=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--s4);border-radius:var(--radius-card);background:var(--s2);box-shadow:var(--shadow-sm)"><span class="tag ${i.cls}" style="margin-top:2px;flex-shrink:0">${i.lbl}</span><div><p style="margin:0;font-size:var(--text-body);color:var(--ink);line-height:1.55">${esc(i.t)}</p><small style="color:var(--gTxt);font-size:var(--text-label);display:block;margin-top:4px">${esc(i.setor||'')}${i.data?' · '+i.data.split('-').reverse().join('/'):''}</small></div></div>`).join(''):'<div class="empty">Nenhuma manifestação no período. 🎉</div>';
+  $('manifList').innerHTML=items.length?items.map(i=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1px solid var(--s4);border-radius:10px"><span class="tag ${i.cls}" style="margin-top:2px;flex-shrink:0">${i.lbl}</span><div style="min-width:0"><p style="margin:0;font-size:13px;color:var(--ink);line-height:1.5">${esc(i.t)}</p><small style="color:var(--gTxt);font-size:11px;display:block;margin-top:2px">${esc(i.setor||'')}${i.data?' · '+i.data.split('-').reverse().join('/'):''}</small></div></div>`).join(''):'<div class="empty">Nenhuma manifestação no período.</div>';
 }
 function renderTable(){
   const q=($('q')?.value||'').toLowerCase();
   const rr=rows($('gMes').value,$('gSetor').value).filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();
   $('tbody').innerHTML=rr.length?rr.map(r=>{
     const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
-    return`<tr><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:4px 10px;font-size:var(--text-label)" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
+    return`<tr><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
   }).join(''):'<tr><td colspan="9" class="empty">Sem registros.</td></tr>';
 }
 function rSaidas(){
@@ -646,7 +634,7 @@ function rSaidas(){
     const p=ST.records.filter(r=>mo(r)===s.mes&&r.setor===s.setor).length;
     const ap=s.saidas?p/s.saidas*100:null;
     const cls=ap==null?'d-mt':ap>=META_A?'d-ok':ap>=META_A-10?'d-w':'d-bd';
-    return`<tr><td>${ml(s.mes)}</td><td>${esc(s.setor)}</td><td>${s.saidas}</td><td>${p}</td><td><span class="dot ${cls}"></span>${fmt(ap)}</td><td style="white-space:nowrap"><button class="btn" style="padding:4px 10px;font-size:var(--text-label)" onclick="editSaida(${s.rowNumber})">Editar</button> <button class="btn" style="padding:4px 10px;font-size:var(--text-label)" onclick="rmSaida(${s.rowNumber})">Excluir</button></td></tr>`;
+    return`<tr><td>${ml(s.mes)}</td><td>${esc(s.setor)}</td><td>${s.saidas}</td><td>${p}</td><td><span class="dot ${cls}"></span>${fmt(ap)}</td><td style="white-space:nowrap"><button class="btn" style="padding:3px 9px;font-size:12px" onclick="editSaida(${s.rowNumber})">Editar</button> <button class="btn" style="padding:3px 9px;font-size:12px" onclick="rmSaida(${s.rowNumber})">Excluir</button></td></tr>`;
   }).join(''):'<tr><td colspan="6" class="empty">Nenhuma saída registrada.</td></tr>';
 }
 function renderReport(){
@@ -656,7 +644,7 @@ function renderReport(){
   if(!rr.length){out.innerHTML='<div class="empty">Nenhuma pesquisa em '+esc(ml(mes))+'.</div>';return}
   const sets=[...new Set(rr.map(r=>r.setor||'SEM SETOR'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const sG=sum(rr),sm=ST.saidas.filter(s=>s.mes===mes);
-  const tS=sm.reduce((t,x)=>t+x.saidas,0),apG=tS?sG.total/tS*100:null;
+  const tS=sm.reduce((t,x)=>t+x.saidas,0);
   let h=`<h2>Pesquisa de Satisfação — ${esc(ml(mes))}</h2>
   <p>A pesquisa de satisfação tem por objetivo avaliar a satisfação dos usuários atendidos no Hospital Universitário do Ceará – HUC, priorizando a percepção do cuidado centrado no paciente e as oportunidades de melhorias na prestação dos serviços ofertados. A meta de aplicação é de 60%, considerando as saídas hospitalares (altas, transferências externas e óbitos). O indicador de satisfação tem meta de 90%.</p>
   <p>Dados quantitativos por setor:</p>
@@ -684,21 +672,29 @@ function renderReport(){
   h+=`<br><br><p style="text-align:center;color:var(--sub)">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
   out.innerHTML=h;
 }
+
+/* ── Form ── */
 function buildForm(){
-  $('rateBlocks').innerHTML=BLOCKS.map(([titulo,,crit,obs])=>`
-    <div class="card" style="background:var(--s3);box-shadow:none">
-      <h4 class="text-sm font-bold text-ink mb-3">${titulo}</h4>
-      ${crit.map(([f,l])=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--s4a);flex-wrap:wrap"><span style="font-size:var(--text-body);color:var(--sub)">${l}</span><span class="seg">${RATINGS.map((r,i)=>`<input type="radio" name="${f}" id="${f}_${i}" value="${r}" ${i===0?'checked':''}><label for="${f}_${i}">${r==='ÓTIMO'?'Ótimo':r==='BOM'?'Bom':r==='REGULAR'?'Regular':r==='RUIM'?'Ruim':'N/A'}</label>`).join('')}</span></div>`).join('')}
-      <div style="margin-top:16px"><label class="fl">Observações</label><textarea id="${obs}" class="fta"></textarea></div>
+  $('rateBlocks').innerHTML=BLOCKS.map(([titulo,,crit,obs],bi)=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h4 class="text-xs font-semibold uppercase tracking-widest text-mut">${titulo}</h4>
+        <button type="button" class="btn-g" onclick="markAllOtimo(${bi})">Tudo Ótimo</button>
+      </div>
+      ${crit.map(([f,l])=>`<div class="crit-row"><span class="crit-lbl">${l}</span><span class="seg">${RATINGS.map((r,i)=>`<input type="radio" name="${f}" id="${f}_${i}" value="${r}" ${i===0?'checked':''}><label for="${f}_${i}">${r==='ÓTIMO'?'Ótimo':r==='BOM'?'Bom':r==='REGULAR'?'Regular':r==='RUIM'?'Ruim':'N/A'}</label>`).join('')}</span></div>`).join('')}
+      <div style="margin-top:14px"><label class="fl">Observações</label><textarea id="${obs}" class="fta"></textarea></div>
     </div>`).join('');
 }
+function markAllOtimo(bi){
+  BLOCKS[bi][2].forEach(([f])=>{const el=document.querySelector(`input[name="${f}"][value="ÓTIMO"]`);if(el)el.checked=true});
+}
 function getForm(){
-  const ids=['setor','pront','data','tipo','dn','idade','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'];
-  const o={rowNumber:$('rowNumber').value};ids.forEach(id=>o[id]=$(id).value);
+  const ids=['setor','pront','data','tipo','dn','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'];
+  const o={rowNumber:$('rowNumber').value};ids.forEach(id=>o[id]=$(id)?.value||'');
   RF.forEach(f=>{o[f]=document.querySelector(`input[name="${f}"]:checked`)?.value||''});return o;
 }
 function setForm(r={}){
-  ['setor','pront','data','tipo','dn','idade','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'].forEach(id=>{if($(id))$(id).value=r[id]||''});
+  ['setor','pront','data','tipo','dn','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'].forEach(id=>{if($(id))$(id).value=r[id]||''});
   RF.forEach(f=>{const v=String(r[f]||'ÓTIMO').toUpperCase();const el=document.querySelector(`input[name="${f}"][value="${CSS.escape(v)}"]`)||document.querySelector(`input[name="${f}"]`);if(el)el.checked=true});
   $('rowNumber').value=r.rowNumber||'';
 }
