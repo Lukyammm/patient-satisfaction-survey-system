@@ -68,8 +68,8 @@
       .nav-b{ @apply px-3.5 py-1.5 rounded-lg text-sm font-medium text-mut hover:text-ink hover:bg-s3 transition; }
       .nav-b.active { @apply bg-s3 text-ink font-semibold; }
       .fl   { @apply block text-xs font-semibold uppercase tracking-widest text-mut mb-1.5; }
-      .fi   { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition placeholder:text-mut; }
-      .fta  { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition resize-y; min-height:72px; }
+      .fi   { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-s2 transition placeholder:text-mut; }
+      .fta  { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-s2 transition resize-y; min-height:72px; }
       .ph   { @apply flex items-center justify-between gap-3 mb-6 flex-wrap; }
       .pt   { @apply text-xl font-bold tracking-tight; }
       .ch3  { @apply text-sm font-semibold text-ink; }
@@ -90,12 +90,25 @@
     svg text{font-family:Inter,sans-serif}
     .card{box-shadow:var(--card-shadow)}
 
-    /* ── Segmented control (Apple iOS style) ── */
-    .seg{display:inline-flex;background:var(--seg-bg);border-radius:10px;padding:2px;gap:1px}
+    /* ── Filtros avançados ── */
+    .advp{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0}
+    .advp.open{display:flex;animation:fade .15s ease}
+    .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#2563eb;color:#fff;font-size:10px;font-weight:700;margin-left:5px}
+
+    /* ── Critérios de avaliação (empilhados, cor por resposta) ── */
+    .crit{padding:12px 0}
+    .crit+.crit{border-top:1px solid var(--s4a)}
+    .crit-lbl{display:block;font-size:13px;font-weight:500;color:var(--ink);margin-bottom:8px}
+    .seg{display:flex;background:var(--seg-bg);border-radius:10px;padding:2px;gap:2px;width:100%}
     .seg input{position:absolute;opacity:0;pointer-events:none}
-    .seg label{padding:4px 11px;border-radius:8px;font-size:12px;font-weight:500;color:var(--mut);cursor:pointer;transition:all .15s ease;user-select:none;white-space:nowrap}
+    .seg label{flex:1;text-align:center;padding:6px 4px;border-radius:8px;font-size:12px;font-weight:500;color:var(--mut);cursor:pointer;transition:all .15s ease;user-select:none;white-space:nowrap}
     .seg label:hover{color:var(--sub)}
-    .seg input:checked+label{background:var(--seg-sel);color:var(--seg-sel-c);box-shadow:var(--seg-sh)}
+    .seg input:checked+label{background:var(--seg-sel);color:#fff;box-shadow:var(--seg-sh)}
+    .seg input[value="ÓTIMO"]:checked+label{background:#059669;box-shadow:0 1px 3px rgba(5,150,105,.3)}
+    .seg input[value="BOM"]:checked+label{background:#10b981;box-shadow:0 1px 3px rgba(16,185,129,.3)}
+    .seg input[value="REGULAR"]:checked+label{background:#f59e0b;box-shadow:0 1px 3px rgba(245,158,11,.3)}
+    .seg input[value="RUIM"]:checked+label{background:#ef4444;box-shadow:0 1px 3px rgba(239,68,68,.3)}
+    .seg input[value="N/A"]:checked+label{background:#6b7280;box-shadow:0 1px 3px rgba(107,114,128,.3)}
 
     /* ── Track / progress ── */
     .track{position:relative;height:3px;background:var(--s3);border-radius:99px;margin-top:14px;overflow:visible}
@@ -134,6 +147,11 @@
     .t-el{background:rgba(34,197,94,.09);color:var(--t-el)}
     .t-cm{background:var(--s3);color:var(--mut)}
 
+    /* ── Chips (cadastros) ── */
+    .chip{display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--s4);border-radius:99px;padding:5px 7px 5px 12px;font-size:12.5px;font-weight:500;color:var(--ink);margin:0 6px 6px 0}
+    .chip button{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:99px;border:0;background:transparent;color:var(--mut);font-size:13px;line-height:1;cursor:pointer;transition:all .12s}
+    .chip button:hover{background:rgba(239,68,68,.12);color:#ef4444}
+
     /* ── Deltas ── */
     .du{color:var(--du);font-weight:600}.dd{color:var(--dd);font-weight:600}
 
@@ -153,6 +171,9 @@
     .rpt th,.rpt td{border:1px solid var(--s4);padding:6px 9px;font-size:12px}
     .rpt th{background:var(--s3);text-align:center;font-weight:600;color:var(--ink)}
     .rpt td{color:var(--sub)}.rpt td.c{text-align:center}
+    .rpt td.orow{text-align:left;background:var(--s3);font-size:12px;line-height:1.65;padding:8px 10px}
+    .rpt td.orow b{color:var(--ink);font-size:10.5px;letter-spacing:.05em}
+    .rpt td.orow div{margin-top:3px}
     .pbd{background:rgba(239,68,68,.09)}.pwn{background:rgba(245,158,11,.07)}
     .rpt .mn{font-size:13px;margin:4px 0;line-height:1.65;color:var(--sub)}
     .rpt .mn b{text-transform:uppercase;color:var(--ink)}
@@ -160,33 +181,20 @@
     .empty{text-align:center;color:var(--mut);padding:36px 10px;font-size:13px}
     .toast-on{opacity:1!important;transform:translate(-50%,0)!important}
 
-    /* ── Separator ── */
-    .crit-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;flex-wrap:wrap}
-    .crit-row+.crit-row{border-top:1px solid var(--s4a)}
-    .crit-lbl{font-size:13px;color:var(--sub);font-weight:400}
-
     @media(max-width:1080px){
       .g4{grid-template-columns:1fr 1fr!important}
-      .g-hs,.g-nps{grid-template-columns:1fr!important}
+      .g-hs,.g-nps,.g-cad{grid-template-columns:1fr!important}
       .g-form{grid-template-columns:1fr 1fr!important}
       .g-rates{grid-template-columns:1fr!important}
     }
-    @media(max-width:768px){
-      .g4{grid-template-columns:1fr 1fr!important}
-      .g-form{grid-template-columns:1fr 1fr!important}
-      .g-rates{grid-template-columns:1fr!important}
-    }
-    @media(max-width:640px){
-      .g4{grid-template-columns:1fr!important}
-      .g-form{grid-template-columns:1fr!important}
-    }
+    @media(max-width:640px){.g4{grid-template-columns:1fr!important}}
     @media print{
       header,.no-print{display:none!important}
       body{background:#fff!important;color:#000!important}
       .section{display:none!important}.section.active{display:block!important;animation:none!important}
       .rpt{color:#000!important;background:#fff!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;box-shadow:none!important}
       .rpt *{color:#000!important;border-color:#9ca3af!important}
-      .rpt th{background:#f3f4f6!important}
+      .rpt th,.rpt td.orow{background:#f3f4f6!important}
       .rpt table{page-break-inside:avoid}.rpt h3{page-break-after:avoid;border-color:#000!important}
     }
   </style>
@@ -199,7 +207,6 @@
 
     <!-- Row 1: brand · nav · actions -->
     <div class="max-w-[1320px] mx-auto px-6 h-12 flex items-center gap-4" style="border-bottom:1px solid var(--s4)">
-      <!-- Brand -->
       <div class="flex items-center gap-2 shrink-0">
         <svg id="iconLight" width="24" height="24" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
           <rect width="1024" height="1024" rx="220" fill="#F8FAFC"/>
@@ -228,16 +235,15 @@
         <span class="text-[14px] font-extrabold tracking-tight text-ink" style="letter-spacing:-.3px">Pesquisa</span>
       </div>
 
-      <!-- Nav (centered) -->
-      <nav class="flex gap-0.5 mx-auto">
+      <nav class="flex gap-0.5 mx-auto overflow-x-auto">
         <button class="nav-b active" data-tab="overview">Visão geral</button>
         <button class="nav-b" data-tab="novo">Nova pesquisa</button>
         <button class="nav-b" data-tab="registros">Registros</button>
         <button class="nav-b" data-tab="saidas">Saídas</button>
+        <button class="nav-b" data-tab="cadastros">Cadastros</button>
         <button class="nav-b" data-tab="relatorio">Relatório</button>
       </nav>
 
-      <!-- Actions -->
       <div class="flex items-center gap-2 shrink-0">
         <button id="themeBtn" onclick="toggleTheme()" class="btn-g p-1.5 rounded-lg" title="Alternar tema">
           <svg id="themeIconMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -248,19 +254,42 @@
     </div>
 
     <!-- Row 2: filters -->
-    <div class="max-w-[1320px] mx-auto px-6 h-10 flex items-center gap-2" style="border-bottom:1px solid var(--s4)">
-      <span class="text-xs text-mut font-medium mr-1">Período</span>
-      <select id="gMes"   onchange="renderAll()" class="ctls">
-        <option value="">Todos os meses</option>
-      </select>
-      <select id="gSetor" onchange="renderAll()" class="ctls">
-        <option value="">Todos os setores</option>
-      </select>
-      <button onclick="reload()" class="btn-g px-2" title="Atualizar">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      </button>
-      <div class="ml-auto">
-        <button onclick="downloadCSV()" class="btn-g">Exportar CSV</button>
+    <div class="max-w-[1320px] mx-auto px-6" style="border-bottom:1px solid var(--s4)">
+      <div class="h-10 flex items-center gap-2">
+        <span class="text-xs text-mut font-medium mr-1">Período</span>
+        <select id="gMes"   onchange="renderAll()" class="ctls"><option value="">Todos os meses</option></select>
+        <select id="gSetor" onchange="renderAll()" class="ctls"><option value="">Todos os setores</option></select>
+        <button id="advBtn" onclick="toggleAdv()" class="btn-g flex items-center">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:5px"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filtros<span id="advCount" class="badge" style="display:none"></span>
+        </button>
+        <button onclick="reload()" class="btn-g px-2" title="Atualizar">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <div class="ml-auto">
+          <button onclick="downloadCSV()" class="btn-g">Exportar CSV</button>
+        </div>
+      </div>
+      <!-- Advanced filters panel -->
+      <div id="advPanel" class="advp">
+        <select id="fTipo" onchange="renderAll()" class="ctls"><option value="">Tipo: todos</option></select>
+        <select id="fSexo" onchange="renderAll()" class="ctls"><option value="">Sexo: todos</option></select>
+        <select id="fEnt"  onchange="renderAll()" class="ctls"><option value="">Entrevistador: todos</option></select>
+        <select id="fNps"  onchange="renderAll()" class="ctls">
+          <option value="">NPS: todos</option>
+          <option value="P">Promotores (9–10)</option>
+          <option value="N">Neutros (7–8)</option>
+          <option value="D">Detratores (0–6)</option>
+        </select>
+        <select id="fManif" onchange="renderAll()" class="ctls">
+          <option value="">Manifestação: todas</option>
+          <option value="any">Com manifestação</option>
+          <option value="reclamacoes">Com reclamação</option>
+          <option value="sugestoes">Com sugestão</option>
+          <option value="elogios">Com elogio</option>
+          <option value="comentarios">Com comentário</option>
+        </select>
+        <button onclick="clearAdv()" class="btn-g">Limpar filtros</button>
       </div>
     </div>
   </header>
@@ -390,12 +419,13 @@
           </div>
           <datalist id="setoresList"></datalist>
           <datalist id="tiposList"></datalist>
+          <datalist id="entList"></datalist>
         </div>
 
         <!-- Rating blocks -->
         <div class="grid g-rates gap-3 mb-3" id="rateBlocks" style="grid-template-columns:repeat(3,1fr)"></div>
 
-        <!-- Manifestações + extras -->
+        <!-- Manifestações + encerramento -->
         <div class="card">
           <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Manifestações e encerramento</h4>
           <div class="grid g-form gap-3" style="grid-template-columns:repeat(2,1fr)">
@@ -403,8 +433,12 @@
             <div><label class="fl">Reclamações</label><textarea id="reclamacoes" class="fta"></textarea></div>
             <div><label class="fl">Comentários</label><textarea id="comentarios" class="fta"></textarea></div>
             <div><label class="fl">Elogios</label><textarea id="elogios" class="fta"></textarea></div>
-            <div><label class="fl">NPS 0–10</label><input id="nps" type="number" min="0" max="10" class="fi" placeholder="Nota de 0 a 10 — recomendaria?"></div>
-            <div><label class="fl">Entrevistador</label><input id="entrevistador" class="fi"></div>
+            <div>
+              <label class="fl">Recomendação do usuário (0–10)</label>
+              <input id="nps" type="number" min="0" max="10" class="fi" placeholder="0 a 10">
+              <p class="text-[11px] text-mut mt-1.5 leading-relaxed">Pergunte: "De 0 a 10, o quanto você recomendaria o hospital?" O indicador NPS é calculado automaticamente a partir dessas notas.</p>
+            </div>
+            <div><label class="fl">Entrevistador</label><input id="entrevistador" list="entList" class="fi" placeholder="Assistente social"></div>
             <div style="grid-column:span 2"><label class="fl">Encaminhamentos</label><input id="encaminhamentos" class="fi"></div>
           </div>
         </div>
@@ -414,12 +448,12 @@
     <!-- ══ REGISTROS ════════════════════════════════ -->
     <section id="registros" class="section">
       <div class="ph">
-        <div><h2 class="pt">Registros</h2><p class="text-xs text-mut mt-0.5">Pesquisas salvas na MATRIZ</p></div>
+        <div><h2 class="pt">Registros</h2><p class="text-xs text-mut mt-0.5" id="regSub">Pesquisas salvas na MATRIZ</p></div>
         <input id="q" class="ctl" placeholder="Buscar…" oninput="renderTable()" style="min-width:200px">
       </div>
       <div class="card p-0 overflow-auto">
         <table class="tbl" style="min-width:960px">
-          <thead><tr><th>Data</th><th>Setor</th><th>Pront.</th><th>Tipo</th><th>Sexo</th><th>Satisfação</th><th>NPS</th><th>Manifestação</th><th></th></tr></thead>
+          <thead><tr><th>Data</th><th>Setor</th><th>Pront.</th><th>Tipo</th><th>Sexo</th><th>Satisfação</th><th>NPS</th><th>Entrevistador</th><th>Manifestação</th><th></th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
@@ -450,10 +484,38 @@
       </div>
     </section>
 
+    <!-- ══ CADASTROS ═════════════════════════════════ -->
+    <section id="cadastros" class="section">
+      <div class="ph">
+        <div><h2 class="pt">Cadastros</h2><p class="text-xs text-mut mt-0.5">Setores e entrevistadores disponíveis nas listas dos formulários · salvos na aba CADASTROS</p></div>
+      </div>
+      <div class="grid g-cad gap-3" style="grid-template-columns:1fr 1fr;align-items:start">
+        <div class="card">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Setores</h4>
+          <form onsubmit="saveCad(event,'SETOR')" class="flex gap-2 mb-5">
+            <input id="cadSetor" class="fi" placeholder="Nome do setor (ex.: CLÍNICA ORTOPÉDICA)" required>
+            <button class="btn-p shrink-0">Adicionar</button>
+          </form>
+          <div id="listSetores"></div>
+        </div>
+        <div class="card">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Entrevistadores · Assistentes sociais</h4>
+          <form onsubmit="saveCad(event,'ENTREVISTADOR')" class="flex gap-2 mb-5">
+            <input id="cadEnt" class="fi" placeholder="Nome da assistente social" required>
+            <button class="btn-p shrink-0">Adicionar</button>
+          </form>
+          <div id="listEnts"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ══ RELATÓRIO ═════════════════════════════════ -->
     <section id="relatorio" class="section">
       <div class="ph no-print">
-        <div><h2 class="pt">Relatório mensal</h2><p class="text-xs text-mut mt-0.5">Formato institucional · pronto para imprimir</p></div>
+        <div>
+          <h2 class="pt">Relatório mensal</h2>
+          <p class="text-xs text-mut mt-0.5" id="repSub">Formato institucional · pronto para imprimir</p>
+        </div>
         <div class="flex gap-2">
           <select id="repMes" class="ctl" onchange="renderReport()"></select>
           <button onclick="window.print()" class="btn-p">Imprimir / PDF</button>
@@ -479,7 +541,7 @@ const RF=BLOCKS.flatMap(b=>b[2].map(c=>c[0]));
 const RATINGS=['ÓTIMO','BOM','REGULAR','RUIM','N/A'];
 const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const MA=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-let ST={records:[],saidas:[],lookups:{setores:[],tipos:[],sexos:[]}};
+let ST={records:[],saidas:[],cadastros:[],lookups:{setores:[],tipos:[],sexos:[],entrevistadores:[]}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
@@ -503,12 +565,48 @@ function toggleTheme(){
 }
 applyThemeUI();
 
+/* ── Datalist fix: campo preenchido mostra todas as opções ao focar ── */
+function fixDatalist(inp){
+  inp.addEventListener('focus',function(){if(this.value){this.dataset.prev=this.value;this.value=''}});
+  inp.addEventListener('blur',function(){if(!this.value&&this.dataset.prev)this.value=this.dataset.prev;delete this.dataset.prev});
+  inp.addEventListener('input',function(){delete this.dataset.prev});
+}
+document.querySelectorAll('input[list]').forEach(fixDatalist);
+
+/* ── Filtros avançados ── */
+const ADV=['fTipo','fSexo','fEnt','fNps','fManif'];
+function toggleAdv(){$('advPanel').classList.toggle('open')}
+function clearAdv(){ADV.forEach(id=>$(id).value='');renderAll()}
+function advCount(){return ADV.filter(id=>$(id).value).length}
+function adv(rr){
+  const t=$('fTipo').value,sx=$('fSexo').value,en=$('fEnt').value,nc=$('fNps').value,mf=$('fManif').value;
+  if(!t&&!sx&&!en&&!nc&&!mf)return rr;
+  return rr.filter(r=>{
+    if(t&&String(r.tipo||'').trim().toUpperCase()!==t.toUpperCase())return false;
+    if(sx&&String(r.sexo||'').trim().toUpperCase()!==sx.toUpperCase())return false;
+    if(en&&String(r.entrevistador||'').trim().toUpperCase()!==en.toUpperCase())return false;
+    if(nc){const x=+r.nps;const c=(r.nps===''||r.nps==null||isNaN(x))?'':x>=9?'P':x>=7?'N':'D';if(c!==nc)return false}
+    if(mf){
+      const M=['sugestoes','reclamacoes','comentarios','elogios'];
+      if(mf==='any'){if(!M.some(k=>String(r[k]||'').trim()))return false}
+      else if(!String(r[mf]||'').trim())return false;
+    }
+    return true;
+  });
+}
+function updateAdvUI(){
+  const n=advCount(),b=$('advCount');
+  b.style.display=n?'':'none';b.textContent=n;
+  if(n)$('advPanel').classList.add('open');
+}
+
 const mo=r=>(r.data||'').slice(0,7);
 const ml=m=>{const[y,mm]=m.split('-');return(MESES[+mm-1]||m)+' de '+y};
 const mc=m=>{const[y,mm]=m.split('-');return(MA[+mm-1]||m)+'/'+y.slice(2)};
 function pm(m){const[y,mm]=m.split('-').map(Number);const d=new Date(y,mm-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
 const fmt=(v,d=0)=>v==null||isNaN(v)?'—':v.toFixed(d).replace('.',',')+'%';
 function allM(){const s=new Set(ST.records.map(mo).filter(Boolean));ST.saidas.forEach(x=>x.mes&&s.add(x.mes));return[...s].sort()}
+
 function hydrate(){
   const m=allM().reverse(),cm=$('gMes').value;
   $('gMes').innerHTML='<option value="">Todos os meses</option>'+m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('');
@@ -519,6 +617,13 @@ function hydrate(){
   refreshSetores($('gMes').value);
   $('setoresList').innerHTML=ST.lookups.setores.map(v=>`<option value="${esc(v)}"></option>`).join('');
   $('tiposList').innerHTML=(ST.lookups.tipos||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');
+  $('entList').innerHTML=(ST.lookups.entrevistadores||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');
+  // advanced filter options (preserve selection)
+  const keep=(id,opts,lbl)=>{const c=$(id).value;$(id).innerHTML=`<option value="">${lbl}</option>`+opts.map(v=>`<option>${esc(v)}</option>`).join('');if(opts.includes(c))$(id).value=c};
+  keep('fTipo',ST.lookups.tipos||[],'Tipo: todos');
+  keep('fSexo',ST.lookups.sexos||[],'Sexo: todos');
+  keep('fEnt',ST.lookups.entrevistadores||[],'Entrevistador: todos');
+  renderCads();
 }
 function refreshSetores(mes){
   const cs=$('gSetor').value;
@@ -547,18 +652,20 @@ function renderAll(){
   const mes=$('gMes').value;
   refreshSetores(mes);
   const set=$('gSetor').value;
-  const rr=rows(mes,set),s=sum(rr);
+  updateAdvUI();
+  const rr=adv(rows(mes,set)),s=sum(rr);
   const sd=saidas(mes,set),ap=sd?s.total/sd*100:null;
-  const pv=mes?sum(rows(pm(mes),set)):null;
+  const pv=mes?sum(adv(rows(pm(mes),set))):null;
   const pvS=mes?saidas(pm(mes),set):0,pvA=pv&&pvS?pv.total/pvS*100:null;
-  $('ovTitle').textContent=(mes?ml(mes):'Todos os meses')+(set?' · '+set:'');
+  const af=advCount();
+  $('ovTitle').textContent=(mes?ml(mes):'Todos os meses')+(set?' · '+set:'')+(af?' · '+af+' filtro'+(af>1?'s':''):'');
   kpi('Aplic',ap,META_A,pvA,sd?`${s.total} / ${sd} saídas`:'cadastre as saídas');
   kpi('Sat',s.sat,META_S,pv?pv.sat:null,'');
   kpi('Nps',s.nps,META_N,pv?pv.nps:null,s.nps!=null?zona(s.nps):'');
   $('kTotal').textContent=s.total;
   $('pTotal').textContent=s.mn+' manifest.';
   $('dTotal').innerHTML=pv&&mes?dt(s.total-pv.total,' vs '+mc(pm(mes)),0):'';
-  $('tTotal').style.width=Math.min(100,s.total/Math.max(1,...allM().map(m=>rows(m,set).length))*100)+'%';
+  $('tTotal').style.width=Math.min(100,s.total/Math.max(1,...allM().map(m=>adv(rows(m,set)).length))*100)+'%';
   rHist(set);rDist(s);rDonut(s);rSetores(mes);rManif(rr);renderTable();rSaidas();renderReport();
 }
 function kpi(k,v,meta,pv,foot){
@@ -574,28 +681,36 @@ function dt(d,sf,dc){if(Math.abs(d)<.05)return`<span style="color:var(--gTxt)">�
 function rHist(set){
   const m=allM().slice(-12),el=$('histChart');
   if(m.length<2){el.innerHTML='<div class="empty">Registre dois meses para ver a evolução.</div>';return}
-  const sa=[],np=[];m.forEach(x=>{const s=sum(rows(x,set));sa.push(s.sat);np.push(s.nps)});
-  const W=760,H=210,P={l:32,r:48,t:24,b:22};
+  const sa=[],np=[];m.forEach(x=>{const s=sum(adv(rows(x,set)));sa.push(s.sat);np.push(s.nps)});
+  const W=760,H=216,P={l:32,r:54,t:26,b:22};
   const X=i=>P.l+i*(W-P.l-P.r)/(m.length-1);
   const Y=v=>P.t+(100-Math.max(0,Math.min(100,v)))*(H-P.t-P.b)/100;
   let g='';
   [0,25,50,75,100].forEach(v=>{g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" style="stroke:var(--grid)" stroke-width="1"/><text x="${P.l-6}" y="${Y(v)+4}" font-size="9.5" style="fill:var(--gTxt)" text-anchor="end">${v}</text>`});
   g+=`<line x1="${P.l}" y1="${Y(90)}" x2="${W-P.r}" y2="${Y(90)}" style="stroke:var(--gTxt)" stroke-dasharray="3 4" stroke-width="1"/>`;
   m.forEach((x,i)=>{g+=`<text x="${X(i)}" y="${H-4}" font-size="9.5" style="fill:var(--gTxt)" text-anchor="middle">${mc(x)}</text>`});
-  // Determine label placement: if both end values are close, stagger vertically
-  const saLast=[...sa].reverse().find(v=>v!=null)??0;
-  const npLast=[...np].reverse().find(v=>v!=null)??0;
-  const saBelow=saLast>=npLast; // put sa label below when sa >= np (both high → stagger)
-  const line=(vals,color,lblBelow)=>{
+  const mk=(vals,color)=>{
     const pts=vals.map((v,i)=>v==null?null:[X(i),Y(v)]);
     let path='',st=false;pts.forEach(p=>{if(!p){st=false;return}path+=(st?'L':'M')+p[0]+' '+p[1]+' ';st=true});
     const dots=pts.map((p,i)=>p?`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}"><title>${ml(m[i])}: ${fmt(vals[i],1)}</title></circle>`:'').join('');
     const last=[...pts].reverse().find(Boolean),lv=[...vals].reverse().find(v=>v!=null);
-    const lblY=last?(lblBelow?last[1]+13:Math.max(P.t+10,last[1]-7)):0;
-    const lbl=last?`<text x="${Math.min(last[0]+6,W-6)}" y="${lblY}" font-size="10.5" font-weight="700" style="fill:${color}">${fmt(lv,0)}</text>`:'';
-    return`<path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`+dots+lbl;
+    return{svg:`<path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`+dots,last,lv,color};
   };
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${line(sa,'#3b82f6',saBelow)}${line(np,'#a78bfa',!saBelow)}</svg>`;
+  const A=mk(sa,'#3b82f6'),B=mk(np,'#a78bfa');
+  // Posiciona os rótulos finais evitando colisão (afasta verticalmente se necessário)
+  const place=[A,B].filter(L=>L.last).map(L=>({x:L.last[0],y:L.last[1],v:L.lv,c:L.color}));
+  if(place.length===2&&Math.abs(place[0].y-place[1].y)<14){
+    const top=place[0].y<=place[1].y?place[0]:place[1];
+    const bot=top===place[0]?place[1]:place[0];
+    const mid=(place[0].y+place[1].y)/2;
+    top.y=mid-8;bot.y=mid+8;
+  }
+  let lbls='';
+  place.forEach(p=>{
+    const y=Math.max(10,Math.min(H-P.b-2,p.y));
+    lbls+=`<text x="${Math.min(p.x+7,W-8)}" y="${y+3.5}" font-size="10.5" font-weight="700" style="fill:${p.c}">${fmt(p.v,0)}</text>`;
+  });
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${A.svg}${B.svg}${lbls}</svg>`;
 }
 function rDist(s){
   const tot=s.ot+s.bo+s.re+s.ru+s.na;
@@ -616,7 +731,7 @@ function rDonut(s){
   $('npsLegend').innerHTML=[['Promotores',s.p,'#22c55e'],['Neutros',s.n,'#f59e0b'],['Detratores',s.d,'#ef4444']].map(([l,v,c])=>`<div style="display:flex;justify-content:space-between;font-size:12px"><span><span style="display:inline-block;width:7px;height:7px;border-radius:99px;background:${c};margin-right:7px;vertical-align:1px"></span><span style="color:var(--sub)">${l}</span></span><b style="color:var(--ink)">${v}</b></div>`).join('');
 }
 function rSetores(mes){
-  const map={};rows(mes,'').forEach(r=>{const k=r.setor||'Sem setor';(map[k]=map[k]||[]).push(r)});
+  const map={};adv(rows(mes,'')).forEach(r=>{const k=r.setor||'Sem setor';(map[k]=map[k]||[]).push(r)});
   $('setorBody').innerHTML=Object.entries(map).sort((a,b)=>b[1].length-a[1].length).map(([k,v])=>{
     const s=sum(v),sd=saidas(mes,k),ap=sd?s.total/sd*100:null;
     const fd=s.sat==null?'d-mt':s.sat>=META_S?'d-ok':s.sat>=META_S-10?'d-w':'d-bd';
@@ -634,11 +749,12 @@ function rManif(rr){
 }
 function renderTable(){
   const q=($('q')?.value||'').toLowerCase();
-  const rr=rows($('gMes').value,$('gSetor').value).filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();
+  const rr=adv(rows($('gMes').value,$('gSetor').value)).filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();
+  $('regSub').textContent=rr.length+' registro'+(rr.length===1?'':'s')+' no filtro atual';
   $('tbody').innerHTML=rr.length?rr.map(r=>{
     const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
-    return`<tr><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
-  }).join(''):'<tr><td colspan="9" class="empty">Sem registros.</td></tr>';
+    return`<tr><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
+  }).join(''):'<tr><td colspan="10" class="empty">Sem registros para os filtros atuais.</td></tr>';
 }
 function rSaidas(){
   const rr=[...ST.saidas].sort((a,b)=>(b.mes+b.setor).localeCompare(a.mes+a.setor));
@@ -649,11 +765,39 @@ function rSaidas(){
     return`<tr><td>${ml(s.mes)}</td><td>${esc(s.setor)}</td><td>${s.saidas}</td><td>${p}</td><td><span class="dot ${cls}"></span>${fmt(ap)}</td><td style="white-space:nowrap"><button class="btn" style="padding:3px 9px;font-size:12px" onclick="editSaida(${s.rowNumber})">Editar</button> <button class="btn" style="padding:3px 9px;font-size:12px" onclick="rmSaida(${s.rowNumber})">Excluir</button></td></tr>`;
   }).join(''):'<tr><td colspan="6" class="empty">Nenhuma saída registrada.</td></tr>';
 }
+
+/* ── Cadastros ── */
+function renderCads(){
+  const cads=ST.cadastros||[];
+  const mk=(tipo,elid,vazio)=>{
+    const items=cads.filter(c=>c.tipo===tipo).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+    $(elid).innerHTML=items.length
+      ?items.map(c=>`<span class="chip">${esc(c.nome)}<button type="button" onclick="rmCad(${c.rowNumber})" title="Remover">×</button></span>`).join('')
+      :`<div class="empty">${vazio}</div>`;
+  };
+  mk('SETOR','listSetores','Nenhum setor cadastrado.');
+  mk('ENTREVISTADOR','listEnts','Nenhum entrevistador cadastrado.');
+}
+function saveCad(e,tipo){
+  e.preventDefault();
+  const inp=tipo==='SETOR'?$('cadSetor'):$('cadEnt');
+  const nome=inp.value.trim();if(!nome)return;
+  load(true);
+  google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);inp.value='';reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).saveCadastro({tipo,nome});
+}
+function rmCad(rn){
+  if(!confirm('Remover este cadastro? (não apaga pesquisas já registradas)'))return;
+  load(true);
+  google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).deleteCadastro(rn);
+}
+
 function renderReport(){
   const mes=$('repMes').value,out=$('reportBody');
+  const af=advCount();
+  $('repSub').textContent='Formato institucional · pronto para imprimir'+(af?' · atenção: '+af+' filtro'+(af>1?'s':'')+' ativo'+(af>1?'s':''):'');
   if(!mes){out.innerHTML='<div class="empty">Sem dados.</div>';return}
-  const rr=ST.records.filter(r=>mo(r)===mes);
-  if(!rr.length){out.innerHTML='<div class="empty">Nenhuma pesquisa em '+esc(ml(mes))+'.</div>';return}
+  const rr=adv(ST.records.filter(r=>mo(r)===mes));
+  if(!rr.length){out.innerHTML='<div class="empty">Nenhuma pesquisa em '+esc(ml(mes))+(af?' com os filtros ativos':'')+'.</div>';return}
   const sets=[...new Set(rr.map(r=>r.setor||'SEM SETOR'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const sG=sum(rr),sm=ST.saidas.filter(s=>s.mes===mes);
   const tS=sm.reduce((t,x)=>t+x.saidas,0);
@@ -672,13 +816,14 @@ function renderReport(){
       h+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
       crit.forEach(([f,lbl])=>{const c=cf(sr,f),p=wp(c),cls=p==null?'':p<80?'pbd':p<META_S?'pwn':'';
         h+=`<tr><td>${lbl.toUpperCase()}</td><td class="c">${c['ÓTIMO']}</td><td class="c">${c['BOM']}</td><td class="c">${c['REGULAR']}</td><td class="c">${c['RUIM']}</td><td class="c">${c['N/A']}</td><td class="c">${sr.length}</td><td class="c ${cls}">${p==null?'—':fmt(p,2)}</td></tr>`});
-      h+='</tbody></table>';
+      // Linha final com todas as observações do bloco
       const ob=sr.map(r=>String(r[obs]||'').trim()).filter(Boolean);
-      if(ob.length)h+='<div class="mn"><b>Observações:</b></div>'+ob.map((o,i)=>`<div class="mn">${i+1} - ${esc(o)}</div>`).join('');
+      h+=`<tr><td class="orow" colspan="8"><b>OBSERVAÇÕES</b>${ob.length?ob.map((o,i)=>`<div>${i+1} — ${esc(o)} (SIC)</div>`).join(''):'<div>Sem observações no período.</div>'}</td></tr>`;
+      h+='</tbody></table>';
     });
     [['RECLAMAÇÃO','reclamacoes'],['SUGESTÃO','sugestoes'],['ELOGIO','elogios'],['COMENTÁRIO','comentarios']].forEach(([t,f])=>{
       const it=sr.map(r=>String(r[f]||'').trim()).filter(Boolean);
-      if(it.length)h+=`<div class="mn"><b>${t}:</b></div>`+it.map((x,i)=>`<div class="mn">${i+1} - ${esc(x)}</div>`).join('');
+      if(it.length)h+=`<div class="mn"><b>${t}:</b></div>`+it.map((x,i)=>`<div class="mn">${i+1} — ${esc(x)} (SIC)</div>`).join('');
     });
   });
   h+=`<br><br><p style="text-align:center;color:var(--sub)">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
@@ -689,11 +834,11 @@ function renderReport(){
 function buildForm(){
   $('rateBlocks').innerHTML=BLOCKS.map(([titulo,,crit,obs],bi)=>`
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <h4 class="text-xs font-semibold uppercase tracking-widest text-mut">${titulo}</h4>
         <button type="button" class="btn-g" onclick="markAllOtimo(${bi})">Tudo Ótimo</button>
       </div>
-      ${crit.map(([f,l])=>`<div class="crit-row"><span class="crit-lbl">${l}</span><span class="seg">${RATINGS.map((r,i)=>`<input type="radio" name="${f}" id="${f}_${i}" value="${r}" ${i===0?'checked':''}><label for="${f}_${i}">${r==='ÓTIMO'?'Ótimo':r==='BOM'?'Bom':r==='REGULAR'?'Regular':r==='RUIM'?'Ruim':'N/A'}</label>`).join('')}</span></div>`).join('')}
+      ${crit.map(([f,l])=>`<div class="crit"><span class="crit-lbl">${l}</span><div class="seg">${RATINGS.map((r,i)=>`<input type="radio" name="${f}" id="${f}_${i}" value="${r}" ${i===0?'checked':''}><label for="${f}_${i}">${r==='ÓTIMO'?'Ótimo':r==='BOM'?'Bom':r==='REGULAR'?'Regular':r==='RUIM'?'Ruim':'N/A'}</label>`).join('')}</div></div>`).join('')}
       <div style="margin-top:14px"><label class="fl">Observações</label><textarea id="${obs}" class="fta"></textarea></div>
     </div>`).join('');
 }
@@ -714,7 +859,8 @@ function reload(){
   load(true);
   google.script.run
     .withSuccessHandler(data=>{
-      ST=data;ST.saidas=ST.saidas||[];
+      ST=data;ST.saidas=ST.saidas||[];ST.cadastros=ST.cadastros||[];
+      ST.lookups.entrevistadores=ST.lookups.entrevistadores||[];
       try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
       hydrate();renderAll();load(false);
     })
@@ -729,7 +875,7 @@ function rmSaida(rn){if(!confirm('Excluir?'))return;load(true);google.script.run
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
 buildForm();
 // Show cached data immediately while fresh data loads
-try{const c=sessionStorage.getItem('psq');if(c){ST=JSON.parse(c);ST.saidas=ST.saidas||[];hydrate();renderAll()}}catch(e){}
+try{const c=sessionStorage.getItem('psq');if(c){ST=JSON.parse(c);ST.saidas=ST.saidas||[];ST.cadastros=ST.cadastros||[];ST.lookups.entrevistadores=ST.lookups.entrevistadores||[];hydrate();renderAll()}}catch(e){}
 reload();
 </script>
 </body>

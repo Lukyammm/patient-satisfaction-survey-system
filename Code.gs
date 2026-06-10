@@ -3,6 +3,7 @@ const FIRST_DATA_ROW = 5;
 const LAST_COL = 43; // A:AQ
 const SAIDAS_SHEET = 'SAIDAS';
 const SAIDAS_FIRST_ROW = 2;
+const CADASTROS_SHEET = 'CADASTROS';
 
 const COL = {
   setor:1, pront:2, data:3, tipo:4, dn:5, idade:6, sexo:7,
@@ -28,21 +29,76 @@ function getInitialData() {
   ensureHeader_(sheet);
   const lastRow = Math.max(sheet.getLastRow(), FIRST_DATA_ROW - 1);
   const numRows = Math.max(0, lastRow - FIRST_DATA_ROW + 1);
-  if (!numRows) return { records: [], lookups: { setores: [], tipos: [], sexos: [] } };
-
-  const values = sheet.getRange(FIRST_DATA_ROW, 1, numRows, LAST_COL).getDisplayValues();
+  const values = numRows ? sheet.getRange(FIRST_DATA_ROW, 1, numRows, LAST_COL).getDisplayValues() : [];
   const records = values.map((row, i) => rowToObject_(row, FIRST_DATA_ROW + i))
     .filter(r => hasContent_(r));
+
+  const cadastros = getCadastros();
+  const cadSetores = cadastros.filter(c => c.tipo === 'SETOR').map(c => c.nome);
+  const cadEnts = cadastros.filter(c => c.tipo === 'ENTREVISTADOR').map(c => c.nome);
 
   return {
     records,
     saidas: getSaidas(),
+    cadastros,
     lookups: {
-      setores: unique_(records.map(r => r.setor)),
+      setores: unique_(records.map(r => r.setor).concat(cadSetores)),
       tipos: unique_(records.map(r => r.tipo)),
-      sexos: unique_(records.map(r => r.sexo))
+      sexos: unique_(records.map(r => r.sexo)),
+      entrevistadores: unique_(records.map(r => r.entrevistador).concat(cadEnts))
     }
   };
+}
+
+function getCadastros() {
+  const sheet = getCadastrosSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+  return sheet.getRange(2, 1, lastRow - 1, 2).getDisplayValues()
+    .map((row, i) => ({ rowNumber: i + 2, tipo: String(row[0] || '').trim().toUpperCase(), nome: String(row[1] || '').trim() }))
+    .filter(c => c.nome);
+}
+
+function saveCadastro(payload) {
+  const tipo = String(payload.tipo || '').trim().toUpperCase();
+  const nome = String(payload.nome || '').trim();
+  if (tipo !== 'SETOR' && tipo !== 'ENTREVISTADOR') throw new Error('Tipo inválido.');
+  if (!nome) throw new Error('Informe o nome.');
+  const exists = getCadastros().some(c => c.tipo === tipo && c.nome.toUpperCase() === nome.toUpperCase());
+  if (exists) throw new Error(tipo === 'SETOR' ? 'Setor já cadastrado.' : 'Entrevistador já cadastrado.');
+  getCadastrosSheet_().appendRow([tipo, nome]);
+  return { ok: true, message: tipo === 'SETOR' ? 'Setor cadastrado.' : 'Entrevistador cadastrado.' };
+}
+
+function deleteCadastro(rowNumber) {
+  rowNumber = Number(rowNumber);
+  if (!rowNumber || rowNumber < 2) throw new Error('Linha inválida.');
+  getCadastrosSheet_().deleteRow(rowNumber);
+  return { ok: true, message: 'Cadastro removido.' };
+}
+
+function getCadastrosSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(CADASTROS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(CADASTROS_SHEET);
+    sheet.getRange(1, 1, 1, 2).setValues([['TIPO', 'NOME']]).setFontWeight('bold').setBackground('#eaf2ff');
+    sheet.setFrozenRows(1);
+    seedCadastros_(sheet);
+  }
+  return sheet;
+}
+
+// Popula a aba CADASTROS com os setores e entrevistadores já presentes na MATRIZ
+function seedCadastros_(sheet) {
+  const m = getSheet_();
+  const lastRow = m.getLastRow();
+  if (lastRow < FIRST_DATA_ROW) return;
+  const n = lastRow - FIRST_DATA_ROW + 1;
+  const setores = unique_(m.getRange(FIRST_DATA_ROW, COL.setor, n, 1).getDisplayValues().flat());
+  const ents = unique_(m.getRange(FIRST_DATA_ROW, COL.entrevistador, n, 1).getDisplayValues().flat());
+  const rows = setores.map(s => ['SETOR', s]).concat(ents.map(e => ['ENTREVISTADOR', e]));
+  if (rows.length) sheet.getRange(2, 1, rows.length, 2).setValues(rows);
 }
 
 function getSaidas() {
