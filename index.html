@@ -4,111 +4,286 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pesquisa de Satisfação HUC</title>
+  <title>HUC · Pesquisa de Satisfação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#f6f8fc;--panel:#ffffff;--ink:#102033;--muted:#64748b;--line:#e2e8f0;
-      --brand:#2563eb;--brand2:#7c3aed;--ok:#16a34a;--warn:#f59e0b;--bad:#dc2626;--soft:#eef4ff;
-      --shadow:0 20px 45px rgba(15,23,42,.10);--radius:24px;
+      --ink:#0b1220;--mut:#667085;--soft:#98a2b3;--line:#e7eaf0;--bg:#f6f7f9;--card:#ffffff;
+      --accent:#1a56db;--accent-soft:#eef3fe;
+      --ok:#047857;--ok-bg:#ecfdf3;--warn:#b45309;--warn-bg:#fffaeb;--bad:#b91c1c;--bad-bg:#fef3f2;
+      --r:14px;
     }
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#eef4ff 0%,#f8fafc 45%,#f5f3ff 100%);color:var(--ink)}
-    button,input,select,textarea{font:inherit} button{cursor:pointer;border:0}
-    .app{min-height:100vh;display:grid;grid-template-columns:280px 1fr}.sidebar{padding:24px;background:rgba(255,255,255,.75);backdrop-filter:blur(18px);border-right:1px solid var(--line);position:sticky;top:0;height:100vh}.logo{display:flex;gap:12px;align-items:center;margin-bottom:28px}.mark{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:var(--shadow)}.logo h1{font-size:18px;margin:0}.logo p{font-size:12px;color:var(--muted);margin:3px 0 0}.nav{display:grid;gap:8px}.nav button{padding:13px 14px;border-radius:16px;background:transparent;color:var(--muted);text-align:left}.nav button.active,.nav button:hover{background:#fff;color:var(--brand);box-shadow:0 8px 24px rgba(37,99,235,.12)}.side-card{margin-top:26px;padding:16px;border-radius:20px;background:linear-gradient(135deg,#dbeafe,#ede9fe);font-size:13px;color:#334155}.main{padding:28px;overflow:hidden}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:22px}.title h2{font-size:30px;margin:0}.title p{color:var(--muted);margin:8px 0 0}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{padding:12px 16px;border-radius:15px;background:#fff;color:var(--ink);box-shadow:0 8px 22px rgba(15,23,42,.08)}.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}.btn.ghost{box-shadow:none;border:1px solid var(--line)}.grid{display:grid;gap:18px}.cards{grid-template-columns:repeat(5,minmax(0,1fr))}.card{background:rgba(255,255,255,.88);border:1px solid rgba(226,232,240,.8);box-shadow:var(--shadow);border-radius:var(--radius);padding:20px}.kpi small{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}.kpi strong{display:block;font-size:30px;margin-top:8px}.kpi span{color:var(--muted);font-size:12px;display:block;margin-top:4px}.kpi .meta-ok{color:var(--ok);font-weight:800}.kpi .meta-bad{color:var(--bad);font-weight:800}.panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}.panel-title h3{margin:0;font-size:18px}.filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 13px;outline:none}.field textarea{min-height:88px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(37,99,235,.10)}.section{display:none}.section.active{display:block}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.span2{grid-column:span 2}.span4{grid-column:1/-1}.ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.rating-group{border:1px solid var(--line);border-radius:20px;padding:16px;background:#fbfdff}.rating-group h4{margin:0 0 12px}.table-wrap{overflow:auto;border-radius:20px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{position:sticky;top:0;background:#f8fafc;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}tr:hover td{background:#f8fbff}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800}.promotor{background:#dcfce7;color:#166534}.neutro{background:#fef3c7;color:#92400e}.detrator{background:#fee2e2;color:#991b1b}.muted{color:var(--muted)}.charts{grid-template-columns:1.2fr .8fr}.bars{display:grid;gap:12px}.bar-row{display:grid;grid-template-columns:120px 1fr 58px;gap:12px;align-items:center;font-size:13px}.bar{height:13px;background:#e5e7eb;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:99px}.bar i.c-otimo{background:#16a34a}.bar i.c-bom{background:#84cc16}.bar i.c-regular{background:#f59e0b}.bar i.c-ruim{background:#dc2626}.bar i.c-na{background:#94a3b8}.donut{width:210px;height:210px;border-radius:50%;margin:10px auto;background:conic-gradient(var(--ok) 0deg,var(--ok) 120deg,var(--warn) 120deg,var(--warn) 240deg,var(--bad) 240deg 360deg);position:relative}.donut:after{content:"";position:absolute;inset:38px;background:#fff;border-radius:50%}.toast{position:fixed;right:24px;bottom:24px;background:#0f172a;color:#fff;padding:14px 16px;border-radius:16px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;z-index:50}.toast.show{opacity:1;transform:none}.loading{opacity:.55;pointer-events:none}.empty{text-align:center;color:var(--muted);padding:28px}.mobile-menu{display:none}
-    .below-meta{color:var(--bad);font-weight:800}.near-meta{color:#b45309;font-weight:800}.on-meta{color:var(--ok);font-weight:800}
-    /* Relatório mensal */
-    .report{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow)}
-    .report h2{text-align:center;font-size:20px;margin:0 0 18px;text-transform:uppercase}
-    .report h3{font-size:16px;margin:30px 0 10px;text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:6px}
-    .report h4{font-size:13px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em}
-    .report p{font-size:13.5px;line-height:1.65;text-align:justify}
-    .report table{min-width:0;border:1px solid #94a3b8;margin-bottom:14px}
-    .report th,.report td{border:1px solid #cbd5e1;padding:7px 9px;font-size:12.5px;position:static;text-transform:none}
-    .report th{background:#e2e8f0;color:var(--ink);text-align:center;font-weight:800}
-    .report td.num{text-align:center}
-    .report .manif{font-size:13px;margin:4px 0 4px 0;line-height:1.55}
-    .report .manif b{text-transform:uppercase}
-    .report .pct-bad{background:#fee2e2}.report .pct-warn{background:#fef3c7}
-    @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.cards,.filters,.form-grid,.ratings,.charts{grid-template-columns:1fr}.span2,.span4{grid-column:auto}.mobile-menu{display:block}.nav{grid-template-columns:repeat(2,1fr)}.main{padding:18px}.topbar{display:grid}.title h2{font-size:24px}}
+    *{box-sizing:border-box}
+    html{-webkit-font-smoothing:antialiased}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer;border:0;background:none}
+    .num{font-variant-numeric:tabular-nums}
+
+    /* ── Header ─────────────────────────────── */
+    .top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .top-in{max-width:1240px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:22px}
+    .brand{display:flex;align-items:center;gap:11px;white-space:nowrap}
+    .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+    .brand b{font-size:14.5px;letter-spacing:-.01em}
+    .brand small{display:block;font-size:11px;color:var(--mut);font-weight:500;margin-top:-2px}
+    .nav{display:flex;gap:2px;margin:0 auto}
+    .nav button{padding:8px 13px;border-radius:9px;font-size:13.5px;font-weight:500;color:var(--mut)}
+    .nav button:hover{color:var(--ink);background:#f1f3f6}
+    .nav button.active{color:var(--ink);background:#eef0f4;font-weight:600}
+    .top-act{display:flex;gap:8px;align-items:center}
+    .ctl{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-size:13px;font-weight:500;outline:none}
+    .ctl:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;font-size:13px;font-weight:600;transition:.15s}
+    .btn:hover{border-color:#cdd3dd}
+    .btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .btn.pri:hover{background:#1c2840}
+
+    .wrap{max-width:1240px;margin:0 auto;padding:26px 28px 60px}
+    .section{display:none}.section.active{display:block;animation:fade .25s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+    .page-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:2px 0 20px;flex-wrap:wrap}
+    .page-head h2{margin:0;font-size:21px;font-weight:700;letter-spacing:-.02em}
+    .page-head p{margin:0;color:var(--mut);font-size:13px}
+
+    /* ── Cards / grid ───────────────────────── */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+    .grid{display:grid;gap:14px}
+    .g4{grid-template-columns:repeat(4,1fr)}
+    .g84{grid-template-columns:2fr 1fr}
+    .g48{grid-template-columns:1fr 2fr}
+    .card h3{margin:0 0 4px;font-size:14px;font-weight:600}
+    .card .sub{color:var(--mut);font-size:12px;margin:0 0 14px}
+
+    /* ── KPI ────────────────────────────────── */
+    .kpi-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .kpi-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--soft)}
+    .pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+    .pill.ok{background:var(--ok-bg);color:var(--ok)}
+    .pill.bad{background:var(--bad-bg);color:var(--bad)}
+    .pill.warn{background:var(--warn-bg);color:var(--warn)}
+    .pill.mut{background:#f1f3f6;color:var(--mut)}
+    .kpi-value{font-size:31px;font-weight:800;letter-spacing:-.03em;margin:10px 0 2px}
+    .kpi-foot{font-size:12px;color:var(--mut);min-height:18px}
+    .delta-up{color:var(--ok);font-weight:700}
+    .delta-down{color:var(--bad);font-weight:700}
+    .track{position:relative;height:5px;background:#eef0f4;border-radius:99px;margin-top:12px;overflow:visible}
+    .track i{display:block;height:100%;border-radius:99px;background:var(--ink);transition:width .5s ease}
+    .track i.ok{background:var(--ok)} .track i.bad{background:var(--bad)} .track i.warn{background:var(--warn)}
+    .track b{position:absolute;top:-3.5px;width:2px;height:12px;background:var(--ink);opacity:.45;border-radius:2px}
+
+    /* ── Charts ─────────────────────────────── */
+    svg text{font-family:Inter,sans-serif}
+    .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:8px}
+    .legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+    .stack{display:flex;height:12px;border-radius:99px;overflow:hidden;margin:14px 0 16px;background:#eef0f4}
+    .stack i{height:100%}
+    .dist{display:grid;gap:9px}
+    .dist-row{display:grid;grid-template-columns:64px 1fr auto auto;gap:12px;align-items:center;font-size:13px}
+    .dist-row .bar{height:6px;background:#eef0f4;border-radius:99px;overflow:hidden}
+    .dist-row .bar i{display:block;height:100%;border-radius:99px}
+    .dist-row .pc{color:var(--mut);font-size:12px;width:48px;text-align:right}
+    .c-otimo{background:#047857}.c-bom{background:#34d399}.c-regular{background:#fbbf24}.c-ruim{background:#ef4444}.c-na{background:#cbd5e1}
+
+    /* ── Tables ─────────────────────────────── */
+    .tbl{width:100%;border-collapse:collapse}
+    .tbl th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+    .tbl td{padding:11px 10px;border-bottom:1px solid #f0f2f5;font-size:13.5px;vertical-align:middle}
+    .tbl tr:last-child td{border-bottom:0}
+    .tbl tr:hover td{background:#fafbfc}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:99px;margin-right:8px;vertical-align:0}
+    .dot.ok{background:var(--ok)}.dot.warn{background:#f59e0b}.dot.bad{background:var(--bad)}.dot.mut{background:#d0d5dd}
+    .mini-bar{display:inline-block;width:74px;height:5px;background:#eef0f4;border-radius:99px;overflow:hidden;margin-right:9px;vertical-align:2px}
+    .mini-bar i{display:block;height:100%;border-radius:99px;background:var(--ink)}
+    .empty{text-align:center;color:var(--soft);padding:34px 10px;font-size:13px}
+
+    /* ── Manifestações ──────────────────────── */
+    .manif-list{display:grid;gap:10px}
+    .manif-item{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:12px}
+    .tag{font-size:10.5px;font-weight:800;letter-spacing:.05em;padding:3px 8px;border-radius:6px;white-space:nowrap;margin-top:1px}
+    .tag.rec{background:var(--bad-bg);color:var(--bad)}
+    .tag.sug{background:var(--warn-bg);color:var(--warn)}
+    .tag.elo{background:var(--ok-bg);color:var(--ok)}
+    .tag.com{background:#f1f3f6;color:var(--mut)}
+    .manif-item p{margin:0;font-size:13.5px}
+    .manif-item small{color:var(--soft);font-size:11.5px;display:block;margin-top:3px}
+
+    /* ── Forms ──────────────────────────────── */
+    .fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .span2{grid-column:span 2}.span4{grid-column:1/-1}
+    .field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+    .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;outline:none;transition:.15s}
+    .field textarea{min-height:76px;resize:vertical}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+    .rate-block{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fcfcfd}
+    .rate-block h4{margin:0 0 12px;font-size:13px;font-weight:700}
+    .rate-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f2f5;flex-wrap:wrap}
+    .rate-row:last-child{border-bottom:0}
+    .rate-row span{font-size:13px}
+    .seg{display:flex;gap:4px}
+    .seg input{position:absolute;opacity:0;pointer-events:none}
+    .seg label{padding:5px 9px;border:1px solid var(--line);border-radius:8px;font-size:11.5px;font-weight:600;color:var(--mut);cursor:pointer;transition:.12s;user-select:none}
+    .seg label:hover{border-color:#cdd3dd}
+    .seg input:checked+label{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .seg input:focus-visible+label{box-shadow:0 0 0 3px rgba(26,86,219,.25)}
+
+    /* ── Relatório ──────────────────────────── */
+    .report{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:46px 52px;max-width:880px;margin:0 auto}
+    .report h2{text-align:center;font-size:17px;margin:0 0 22px;text-transform:uppercase;letter-spacing:.02em}
+    .report h3{font-size:14px;margin:34px 0 10px;text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:6px;letter-spacing:.02em}
+    .report h4{font-size:12px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.05em}
+    .report p{font-size:13px;line-height:1.7;text-align:justify}
+    .report table{width:100%;border-collapse:collapse;margin-bottom:14px}
+    .report th,.report td{border:1px solid #cbd5e1;padding:6px 9px;font-size:12px}
+    .report th{background:#f1f3f6;text-align:center;font-weight:700}
+    .report td.c{text-align:center}
+    .report .pct-bad{background:var(--bad-bg)}.report .pct-warn{background:var(--warn-bg)}
+    .report .mn{font-size:12.5px;margin:4px 0;line-height:1.6}
+    .report .mn b{text-transform:uppercase}
+    .footnote{color:var(--mut);font-size:11px}
+
+    .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,12px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;opacity:0;transition:.25s;z-index:60;box-shadow:0 12px 32px rgba(11,18,32,.25)}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .loading{opacity:.5;pointer-events:none}
+
+    @media(max-width:1080px){
+      .g4{grid-template-columns:repeat(2,1fr)} .g84,.g48{grid-template-columns:1fr}
+      .top-in{flex-wrap:wrap;height:auto;padding:10px 16px;gap:10px}
+      .nav{order:3;width:100%;overflow:auto}
+      .wrap{padding:18px 16px 50px}
+      .fgrid{grid-template-columns:1fr 1fr}.span2{grid-column:1/-1}
+      .report{padding:24px}
+    }
+    @media(max-width:640px){.g4{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
     @media print{
       body{background:#fff}
-      .sidebar,.topbar,.no-print,.toast{display:none!important}
-      .app{display:block}.main{padding:0;overflow:visible}
-      .section{display:none}.section.active{display:block}
-      .report{border:0;box-shadow:none;border-radius:0;padding:0}
+      .top,.no-print,.toast{display:none!important}
+      .wrap{max-width:none;padding:0}
+      .section{display:none}.section.active{display:block;animation:none}
+      .report{border:0;border-radius:0;padding:0;max-width:none}
       .report table{page-break-inside:avoid}
       .report h3{page-break-after:avoid}
     }
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <aside class="sidebar">
-      <div class="logo"><div class="mark"></div><div><h1>HUC Satisfação</h1><p>Dashboard + MATRIZ</p></div></div>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand"><div class="mark">H</div><div><b>HUC</b><small>Pesquisa de Satisfação</small></div></div>
       <nav class="nav">
-        <button class="active" data-tab="dashboard">Dashboard</button>
+        <button class="active" data-tab="overview">Visão geral</button>
         <button data-tab="novo">Nova pesquisa</button>
         <button data-tab="registros">Registros</button>
         <button data-tab="saidas">Saídas</button>
-        <button data-tab="relatorio">Relatório mensal</button>
+        <button data-tab="relatorio">Relatório</button>
       </nav>
-      <div class="side-card"><b>Metas institucionais:</b><br>Aplicação da pesquisa ≥ <b>60%</b> das saídas hospitalares.<br>Satisfação ≥ <b>90%</b>.<br><br><b>Fonte:</b> abas MATRIZ e SAIDAS da planilha.</div>
-    </aside>
+      <div class="top-act no-print">
+        <select id="gMes" class="ctl" onchange="renderAll()"></select>
+        <select id="gSetor" class="ctl" onchange="renderAll()"><option value="">Todos os setores</option></select>
+        <button class="btn" onclick="reload()" title="Atualizar dados">↻</button>
+        <button class="btn pri" onclick="showTab('novo')">+ Pesquisa</button>
+      </div>
+    </div>
+  </header>
 
-    <main class="main">
-      <div class="topbar">
-        <div class="title"><h2 id="pageTitle">Dashboard</h2><p>Pesquisa de satisfação, NPS, clínicas, manifestações e tabulação em tempo real.</p></div>
-        <div class="actions"><button class="btn ghost" onclick="reload()">Atualizar</button><button class="btn" onclick="downloadCSV()">Exportar CSV</button><button class="btn primary" onclick="showTab('novo')">Novo registro</button></div>
+  <div class="wrap" id="app">
+
+    <!-- ════ VISÃO GERAL ════ -->
+    <section id="overview" class="section active">
+      <div class="page-head">
+        <div><h2 id="ovTitle">Visão geral</h2><p id="ovSub">Indicadores do período · metas: 60% de aplicação · 90% de satisfação</p></div>
+        <button class="btn" onclick="downloadCSV()">Exportar CSV</button>
       </div>
 
-      <section id="dashboard" class="section active">
-        <div class="grid cards">
-          <div class="card kpi"><small>Pesquisas aplicadas</small><strong id="kTotal">0</strong><span>linhas válidas na MATRIZ</span></div>
-          <div class="card kpi"><small>% de aplicação</small><strong id="kAplic">—</strong><span id="kAplicMeta">meta: 60% das saídas</span></div>
-          <div class="card kpi"><small>Taxa satisfação</small><strong id="kSat">0%</strong><span id="kSatMeta">Ótimo + Bom / considerados · meta 90%</span></div>
-          <div class="card kpi"><small>NPS</small><strong id="kNps">0%</strong><span id="kNpsZona">Promotores − Detratores</span></div>
-          <div class="card kpi"><small>Manifestações</small><strong id="kManif">0</strong><span>sugestões, reclamações, comentários e elogios</span></div>
+      <div class="grid g4">
+        <div class="card">
+          <div class="kpi-top"><span class="kpi-label">% de aplicação</span><span class="pill" id="pAplic">—</span></div>
+          <div class="kpi-value num" id="kAplic">—</div>
+          <div class="kpi-foot" id="dAplic"></div>
+          <div class="track"><i id="tAplic" style="width:0"></i><b style="left:60%"></b></div>
         </div>
-        <div class="card" style="margin-top:18px">
-          <div class="panel-title"><h3>Filtros</h3><button class="btn ghost" onclick="clearFilters()">Limpar</button></div>
-          <div class="filters">
-            <div class="field"><label>Setor</label><select id="fSetor" onchange="renderAll()"><option value="">Todos</option></select></div>
-            <div class="field"><label>Tipo</label><select id="fTipo" onchange="renderAll()"><option value="">Todos</option></select></div>
-            <div class="field"><label>Sexo</label><select id="fSexo" onchange="renderAll()"><option value="">Todos</option></select></div>
-            <div class="field"><label>De</label><input type="date" id="fIni" onchange="renderAll()"></div>
-            <div class="field"><label>Até</label><input type="date" id="fFim" onchange="renderAll()"></div>
-          </div>
+        <div class="card">
+          <div class="kpi-top"><span class="kpi-label">Taxa de satisfação</span><span class="pill" id="pSat">—</span></div>
+          <div class="kpi-value num" id="kSat">—</div>
+          <div class="kpi-foot" id="dSat"></div>
+          <div class="track"><i id="tSat" style="width:0"></i><b style="left:90%"></b></div>
         </div>
-        <div class="grid charts" style="margin-top:18px">
-          <div class="card"><div class="panel-title"><h3>Tabulação das avaliações</h3><span class="muted" style="font-size:12px">todas as 16 perguntas somadas</span></div><div id="tabulacao" class="bars"></div></div>
-          <div class="card"><div class="panel-title"><h3>Classificação NPS</h3></div><div id="donut" class="donut"></div><div id="legendNps" class="muted" style="text-align:center"></div></div>
+        <div class="card">
+          <div class="kpi-top"><span class="kpi-label">NPS</span><span class="pill" id="pNps">—</span></div>
+          <div class="kpi-value num" id="kNps">—</div>
+          <div class="kpi-foot" id="dNps"></div>
+          <div class="track"><i id="tNps" style="width:0"></i><b style="left:75%"></b></div>
         </div>
-        <div class="card" style="margin-top:18px">
-          <div class="panel-title"><h3>Indicadores por setor</h3></div>
-          <div class="table-wrap"><table><thead><tr><th>Setor</th><th>Pesquisas</th><th>Saídas</th><th>% aplicação</th><th>Satisfação</th><th>NPS</th><th>Manif.</th></tr></thead><tbody id="setorReport"></tbody></table></div>
+        <div class="card">
+          <div class="kpi-top"><span class="kpi-label">Pesquisas aplicadas</span><span class="pill mut" id="pTotal">—</span></div>
+          <div class="kpi-value num" id="kTotal">0</div>
+          <div class="kpi-foot" id="dTotal"></div>
+          <div class="track"><i id="tTotal" style="width:0;background:#98a2b3"></i></div>
         </div>
-      </section>
+      </div>
 
-      <section id="novo" class="section">
-        <form class="card" id="form" onsubmit="saveRecord(event)">
-          <div class="panel-title"><h3>Nova pesquisa na MATRIZ</h3><button class="btn primary" type="submit">Salvar</button></div>
-          <input type="hidden" id="rowNumber">
-          <div class="form-grid">
-            <div class="field"><label>Setor</label><input id="setor" required list="setoresList"></div>
+      <div class="grid g84" style="margin-top:14px">
+        <div class="card">
+          <h3>Série histórica</h3>
+          <p class="sub">Evolução mensal da satisfação e do NPS · linha pontilhada = meta de 90%</p>
+          <div id="histChart"></div>
+          <div class="legend"><span><i style="background:var(--accent)"></i>Satisfação</span><span><i style="background:#7c3aed"></i>NPS</span></div>
+        </div>
+        <div class="card">
+          <h3>Avaliações do período</h3>
+          <p class="sub" id="distSub">distribuição das respostas nos 16 critérios</p>
+          <div class="stack" id="distStack"></div>
+          <div class="dist" id="distRows"></div>
+        </div>
+      </div>
+
+      <div class="grid g48" style="margin-top:14px">
+        <div class="card">
+          <h3>NPS · composição</h3>
+          <p class="sub">promotores (9–10), neutros (7–8), detratores (0–6)</p>
+          <div id="npsDonut" style="display:grid;place-items:center"></div>
+          <div class="legend" style="justify-content:center" id="npsLegend"></div>
+        </div>
+        <div class="card">
+          <h3>Setores</h3>
+          <p class="sub">desempenho por setor no período · farol pela meta de satisfação</p>
+          <div style="overflow:auto"><table class="tbl"><thead><tr><th>Setor</th><th>Pesquisas</th><th>Aplicação</th><th>Satisfação</th><th>NPS</th></tr></thead><tbody id="setorBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>Manifestações do período</h3>
+        <p class="sub">reclamações primeiro — são as mais acionáveis para o serviço</p>
+        <div class="manif-list" id="manifList"></div>
+      </div>
+    </section>
+
+    <!-- ════ NOVA PESQUISA ════ -->
+    <section id="novo" class="section">
+      <form id="form" onsubmit="saveRecord(event)">
+        <div class="page-head">
+          <div><h2>Nova pesquisa</h2><p>Registro direto na aba MATRIZ · toque nas opções para avaliar</p></div>
+          <button class="btn pri" type="submit">Salvar pesquisa</button>
+        </div>
+        <input type="hidden" id="rowNumber">
+        <div class="card">
+          <div class="fgrid">
+            <div class="field"><label>Setor</label><input id="setor" required list="setoresList" placeholder="Ex.: CLÍNICA ORTOPÉDICA"></div>
             <div class="field"><label>Prontuário</label><input id="pront"></div>
             <div class="field"><label>Data</label><input id="data" type="date"></div>
-            <div class="field"><label>Tipo</label><input id="tipo"></div>
+            <div class="field"><label>Tipo</label><input id="tipo" list="tiposList" placeholder="PAC, ACOMP, PAC+ACOMP"></div>
             <div class="field"><label>Data nasc.</label><input id="dn" type="date"></div>
             <div class="field"><label>Idade</label><input id="idade" type="number" min="0"></div>
             <div class="field"><label>Sexo</label><select id="sexo"><option></option><option>F</option><option>M</option><option>Outro</option></select></div>
-            <div class="field"><label>NPS 0 a 10</label><input id="nps" type="number" min="0" max="10"></div>
+            <div class="field"><label>NPS · 0 a 10</label><input id="nps" type="number" min="0" max="10" placeholder="Recomendaria o hospital?"></div>
           </div>
           <datalist id="setoresList"></datalist>
-          <div class="ratings" style="margin-top:18px">
-            <div class="rating-group"><h4>1. Acolhimento</h4><div id="grpAcolhimento"></div></div>
-            <div class="rating-group"><h4>2. Assistência</h4><div id="grpAssistencia"></div></div>
-            <div class="rating-group"><h4>3. Serviços prestados</h4><div id="grpServicos"></div></div>
-          </div>
-          <div class="form-grid" style="margin-top:18px">
+          <datalist id="tiposList"></datalist>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr 1fr;margin-top:14px" id="rateBlocks"></div>
+        <div class="card" style="margin-top:14px">
+          <div class="fgrid">
             <div class="field span2"><label>Sugestões</label><textarea id="sugestoes"></textarea></div>
             <div class="field span2"><label>Reclamações</label><textarea id="reclamacoes"></textarea></div>
             <div class="field span2"><label>Comentários</label><textarea id="comentarios"></textarea></div>
@@ -116,213 +291,312 @@
             <div class="field"><label>Entrevistador</label><input id="entrevistador"></div>
             <div class="field span2"><label>Encaminhamentos</label><input id="encaminhamentos"></div>
           </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- ════ REGISTROS ════ -->
+    <section id="registros" class="section">
+      <div class="page-head">
+        <div><h2>Registros</h2><p>Pesquisas salvas na MATRIZ, respeitando o período e setor selecionados acima</p></div>
+        <input id="q" class="ctl" placeholder="Buscar…" oninput="renderTable()" style="min-width:240px">
+      </div>
+      <div class="card" style="padding:6px 16px;overflow:auto">
+        <table class="tbl" style="min-width:960px"><thead><tr><th>Data</th><th>Setor</th><th>Pront.</th><th>Tipo</th><th>Sexo</th><th>Satisfação</th><th>NPS</th><th>Manifestação</th><th></th></tr></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- ════ SAÍDAS ════ -->
+    <section id="saidas" class="section">
+      <div class="page-head">
+        <div><h2>Saídas hospitalares</h2><p>Altas, transferências externas e óbitos · alimentam a % de aplicação (meta 60%)</p></div>
+      </div>
+      <div class="grid" style="grid-template-columns:340px 1fr;align-items:start">
+        <form class="card" id="formSaida" onsubmit="saveSaida(event)">
+          <h3 style="margin-bottom:14px">Registrar saídas do mês</h3>
+          <input type="hidden" id="sRowNumber">
+          <div class="grid" style="gap:12px">
+            <div class="field"><label>Mês/Ano</label><input id="sMes" type="month" required></div>
+            <div class="field"><label>Setor</label><input id="sSetor" required list="setoresList"></div>
+            <div class="field"><label>Nº de saídas</label><input id="sSaidas" type="number" min="0" required></div>
+            <button class="btn pri" type="submit" style="width:100%">Salvar</button>
+          </div>
         </form>
-      </section>
-
-      <section id="registros" class="section">
-        <div class="card"><div class="panel-title"><h3>Registros da MATRIZ</h3><input id="q" placeholder="Buscar..." oninput="renderTable()" style="max-width:320px;border:1px solid var(--line);border-radius:14px;padding:12px"></div><div class="table-wrap"><table style="min-width:1050px"><thead><tr><th>Data</th><th>Setor</th><th>Pront.</th><th>Tipo</th><th>Sexo</th><th>Satisfação</th><th>NPS</th><th>Manifestação</th><th>Ações</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
-      </section>
-
-      <section id="saidas" class="section">
-        <div class="grid" style="grid-template-columns:.9fr 1.1fr">
-          <form class="card" id="formSaida" onsubmit="saveSaida(event)">
-            <div class="panel-title"><h3>Saídas do mês por setor</h3><button class="btn primary" type="submit">Salvar</button></div>
-            <input type="hidden" id="sRowNumber">
-            <p class="muted" style="font-size:13px;margin-top:0">Saídas = altas, transferências externas e óbitos. Usadas para calcular a <b>% de aplicação</b> (meta 60%).</p>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr">
-              <div class="field"><label>Mês/Ano</label><input id="sMes" type="month" required></div>
-              <div class="field"><label>Nº de saídas</label><input id="sSaidas" type="number" min="0" required></div>
-              <div class="field span2"><label>Setor</label><input id="sSetor" required list="setoresList"></div>
-            </div>
-          </form>
-          <div class="card">
-            <div class="panel-title"><h3>Saídas registradas</h3></div>
-            <div class="table-wrap"><table><thead><tr><th>Mês/Ano</th><th>Setor</th><th>Saídas</th><th>Pesquisas</th><th>% aplicação</th><th>Ações</th></tr></thead><tbody id="saidasBody"></tbody></table></div>
-          </div>
+        <div class="card" style="padding:6px 16px;overflow:auto">
+          <table class="tbl"><thead><tr><th>Mês/Ano</th><th>Setor</th><th>Saídas</th><th>Pesquisas</th><th>Aplicação</th><th></th></tr></thead><tbody id="saidasBody"></tbody></table>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="relatorio" class="section">
-        <div class="card no-print" style="margin-bottom:18px">
-          <div class="panel-title">
-            <h3>Relatório mensal de satisfação</h3>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <select id="repMes" onchange="renderReport()" style="border:1px solid var(--line);border-radius:14px;padding:11px 13px"></select>
-              <button class="btn primary" onclick="window.print()">Imprimir / PDF</button>
-            </div>
-          </div>
-          <p class="muted" style="font-size:13px;margin:0">Gera o relatório no formato institucional: tabela geral por setor, tabelas de critérios (com a porcentagem ponderada) e manifestações. Use Imprimir/PDF ou copie o conteúdo para o documento assinado.</p>
+    <!-- ════ RELATÓRIO ════ -->
+    <section id="relatorio" class="section">
+      <div class="page-head no-print">
+        <div><h2>Relatório mensal</h2><p>Formato institucional, pronto para imprimir, salvar em PDF ou copiar para o documento assinado</p></div>
+        <div style="display:flex;gap:8px">
+          <select id="repMes" class="ctl" onchange="renderReport()"></select>
+          <button class="btn pri" onclick="window.print()">Imprimir / PDF</button>
         </div>
-        <div class="report" id="reportBody"><div class="empty">Sem dados para o período selecionado.</div></div>
-      </section>
-    </main>
+      </div>
+      <div class="report" id="reportBody"><div class="empty">Sem dados para o período selecionado.</div></div>
+    </section>
+
   </div>
   <div id="toast" class="toast"></div>
 
 <script>
-const RATINGS=['ÓTIMO','BOM','REGULAR','RUIM','N/A'];
-const META_APLICACAO=60, META_SATISFACAO=90;
-const GROUPS={
-  grpAcolhimento:[['gentilezaAcolhimento','Gentileza e atenção'],['agilidade','Agilidade'],['clareza','Clareza'],['obsAcolhimento','Observações','textarea']],
-  grpAssistencia:[['gentilezaAssistencia','Gentileza e atenção'],['identificacao','Identificação'],['intimidade','Intimidade/privacidade'],['horarioDescanso','Horário de descanso'],['esclarecimento','Esclarecimento'],['cuidados','Cuidados prestados'],['confianca','Confiança e segurança'],['obsAssistencia','Observações','textarea']],
-  grpServicos:[['acesso','Acesso'],['acomodacao','Acomodação'],['limpeza','Limpeza'],['enxoval','Enxoval'],['alimentacao','Alimentação'],['locomocao','Locomoção'],['obsServicos','Observações','textarea']]
-};
-// Blocos e rótulos no formato do relatório institucional
+const META_APLICACAO=60, META_SATISFACAO=90, META_NPS=75;
 const REPORT_BLOCKS=[
-  ['ACOLHIMENTO',[['gentilezaAcolhimento','GENTILEZA E ATENÇÃO'],['agilidade','AGILIDADE'],['clareza','CLAREZA']],'obsAcolhimento'],
-  ['ASSISTÊNCIA',[['gentilezaAssistencia','GENTILEZA E ATENÇÃO'],['identificacao','IDENTIFICAÇÃO'],['intimidade','INTIMIDADE E PRIVACIDADE'],['horarioDescanso','HORÁRIO DE DESCANSO'],['esclarecimento','ESCLARECIMENTO'],['cuidados','CUIDADOS PRESTADOS'],['confianca','CONFIANÇA E SEGURANÇA']],'obsAssistencia'],
-  ['SERVIÇOS PRESTADOS',[['acesso','ACESSO AOS SERVIÇOS'],['acomodacao','ACOMODAÇÃO'],['limpeza','LIMPEZA'],['enxoval','ENXOVAL'],['alimentacao','ALIMENTAÇÃO'],['locomocao','LOCOMOÇÃO']],'obsServicos']
+  ['1. Acolhimento','ACOLHIMENTO',[['gentilezaAcolhimento','Gentileza e atenção'],['agilidade','Agilidade'],['clareza','Clareza']],'obsAcolhimento'],
+  ['2. Assistência','ASSISTÊNCIA',[['gentilezaAssistencia','Gentileza e atenção'],['identificacao','Identificação'],['intimidade','Intimidade e privacidade'],['horarioDescanso','Horário de descanso'],['esclarecimento','Esclarecimento'],['cuidados','Cuidados prestados'],['confianca','Confiança e segurança']],'obsAssistencia'],
+  ['3. Serviços prestados','SERVIÇOS PRESTADOS',[['acesso','Acesso aos serviços'],['acomodacao','Acomodação'],['limpeza','Limpeza'],['enxoval','Enxoval'],['alimentacao','Alimentação'],['locomocao','Locomoção']],'obsServicos']
 ];
-const RATING_FIELDS=REPORT_BLOCKS.flatMap(([,crit])=>crit.map(([k])=>k));
+const RATING_FIELDS=REPORT_BLOCKS.flatMap(b=>b[2].map(c=>c[0]));
+const RATINGS=['ÓTIMO','BOM','REGULAR','RUIM','N/A'];
 const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MES_ABREV=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 let state={records:[],saidas:[],lookups:{setores:[],tipos:[],sexos:[]}};
-function $(id){return document.getElementById(id)}
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
 function setLoading(v){$('app').classList.toggle('loading',v)}
-function showTab(tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(tab).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('pageTitle').textContent={dashboard:'Dashboard',novo:'Nova pesquisa',registros:'Registros',saidas:'Saídas hospitalares',relatorio:'Relatório mensal'}[tab]}
+function showTab(tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(tab).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-function buildRatingFields(){Object.entries(GROUPS).forEach(([container,fields])=>{$(container).innerHTML=fields.map(([id,label,type])=>type==='textarea'?`<div class="field"><label>${label}</label><textarea id="${id}"></textarea></div>`:`<div class="field"><label>${label}</label><select id="${id}">${RATINGS.map(r=>`<option>${r}</option>`).join('')}</select></div>`).join('')})}
-function reload(){setLoading(true);google.script.run.withSuccessHandler(data=>{state=data;state.saidas=state.saidas||[];hydrateLookups();hydrateMeses();renderAll();setLoading(false);toast('Dados atualizados')}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).getInitialData()}
-function hydrateLookups(){['Setor','Tipo','Sexo'].forEach(name=>{const id='f'+name, key=name.toLowerCase()+'s';$(id).innerHTML='<option value="">Todos</option>'+((state.lookups[key]||[]).map(v=>`<option>${escapeHtml(v)}</option>`).join(''))});$('setoresList').innerHTML=(state.lookups.setores||[]).map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function monthOf(r){return (r.data||'').slice(0,7)}
-function hydrateMeses(){const set=new Set(state.records.map(monthOf).filter(Boolean));state.saidas.forEach(s=>s.mes&&set.add(s.mes));const meses=[...set].sort().reverse();const cur=$('repMes').value;$('repMes').innerHTML=meses.map(m=>`<option value="${m}">${mesLabel(m)}</option>`).join('')||'<option value="">Sem dados</option>';if(meses.includes(cur))$('repMes').value=cur}
-function mesLabel(m){const [y,mm]=m.split('-');return (MESES[+mm-1]||m)+' de '+y}
-function filtered(){const setor=$('fSetor').value,tipo=$('fTipo').value,sexo=$('fSexo').value,ini=$('fIni').value,fim=$('fFim').value;return state.records.filter(r=>(!setor||r.setor===setor)&&(!tipo||r.tipo===tipo)&&(!sexo||r.sexo===sexo)&&(!ini||r.data>=ini)&&(!fim||r.data<=fim))}
 
-// Contagens de um critério específico num conjunto de registros
-function countsFor(rows,field){const c={'ÓTIMO':0,'BOM':0,'REGULAR':0,'RUIM':0,'N/A':0};rows.forEach(r=>{const v=String(r[field]||'').trim().toUpperCase();if(v in c)c[v]++});return c}
-// Score ponderado (a "fórmula do peso"): coluna PORCENTAGEM do relatório institucional
-function weightedPct(c){const valid=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM'];if(!valid)return null;return (c['ÓTIMO']*3+c['BOM']*2+c['REGULAR']*1+c['RUIM']*-1)/(valid*3)*100}
+const monthOf=r=>(r.data||'').slice(0,7);
+const mesLabel=m=>{const[y,mm]=m.split('-');return(MESES[+mm-1]||m)+' de '+y};
+const mesCurto=m=>{const[y,mm]=m.split('-');return(MES_ABREV[+mm-1]||m)+'/'+y.slice(2)};
+function prevMonth(m){const[y,mm]=m.split('-').map(Number);const d=new Date(y,mm-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+const fmt=(v,dec=0)=>v==null||isNaN(v)?'—':v.toFixed(dec).replace('.',',')+'%';
+
+function allMonths(){const s=new Set(state.records.map(monthOf).filter(Boolean));state.saidas.forEach(x=>x.mes&&s.add(x.mes));return[...s].sort()}
+function hydrateControls(){
+  const meses=allMonths().reverse();
+  const cur=$('gMes').value;
+  $('gMes').innerHTML='<option value="">Todos os meses</option>'+meses.map(m=>`<option value="${m}">${mesLabel(m)}</option>`).join('');
+  $('gMes').value=meses.includes(cur)?cur:(meses[0]||'');
+  const curR=$('repMes').value;
+  $('repMes').innerHTML=meses.map(m=>`<option value="${m}">${mesLabel(m)}</option>`).join('')||'<option value="">Sem dados</option>';
+  if(meses.includes(curR))$('repMes').value=curR;
+  const curS=$('gSetor').value;
+  $('gSetor').innerHTML='<option value="">Todos os setores</option>'+state.lookups.setores.map(v=>`<option>${esc(v)}</option>`).join('');
+  if(state.lookups.setores.includes(curS))$('gSetor').value=curS;
+  $('setoresList').innerHTML=state.lookups.setores.map(v=>`<option value="${esc(v)}"></option>`).join('');
+  $('tiposList').innerHTML=(state.lookups.tipos||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');
+}
+function rowsFor(mes,setor){return state.records.filter(r=>(!mes||monthOf(r)===mes)&&(!setor||r.setor===setor))}
+function saidasFor(mes,setor){return state.saidas.filter(s=>(!mes||s.mes===mes)&&(!setor||s.setor===setor)).reduce((t,x)=>t+x.saidas,0)}
+
 function summary(rows){
-  let total=rows.length, ot=0,bom=0,reg=0,ruim=0,na=0,man=0,p=0,n=0,d=0;
+  let ot=0,bom=0,reg=0,ruim=0,na=0,man=0,p=0,n=0,d=0;
   rows.forEach(r=>{
-    RATING_FIELDS.forEach(f=>{const v=String(r[f]||'').trim().toUpperCase();if(v==='ÓTIMO')ot++;else if(v==='BOM')bom++;else if(v==='REGULAR')reg++;else if(v==='RUIM')ruim++;else if(v==='N/A')na++});
+    RATING_FIELDS.forEach(f=>{const v=String(r[f]||'').trim().toUpperCase();
+      if(v==='ÓTIMO')ot++;else if(v==='BOM')bom++;else if(v==='REGULAR')reg++;else if(v==='RUIM')ruim++;else if(v==='N/A')na++});
     man+=['sugestoes','reclamacoes','comentarios','elogios'].filter(k=>String(r[k]||'').trim()).length;
-    if(r.nps!==''&&r.nps!=null){let x=+r.nps;if(x>=9)p++;else if(x>=7)n++;else d++;}
+    if(r.nps!==''&&r.nps!=null){const x=+r.nps;if(x>=9)p++;else if(x>=7)n++;else d++}
   });
-  const cons=ot+bom+reg+ruim;
-  return{total,ot,bom,reg,ruim,na,man,p,n,d,
-    sat:cons?((ot+bom)/cons*100):0,
-    nps:(p+n+d)?((p-d)/(p+n+d)*100):0,
-    hasNps:(p+n+d)>0};
+  const cons=ot+bom+reg+ruim, resp=p+n+d;
+  return{total:rows.length,ot,bom,reg,ruim,na,man,p,n,d,
+    sat:cons?(ot+bom)/cons*100:null,
+    nps:resp?(p-d)/resp*100:null};
 }
-function npsZona(nps){if(nps>=75)return 'zona de excelência';if(nps>=50)return 'zona de qualidade';if(nps>=0)return 'zona de aperfeiçoamento';return 'zona crítica'}
+function countsFor(rows,field){const c={'ÓTIMO':0,'BOM':0,'REGULAR':0,'RUIM':0,'N/A':0};rows.forEach(r=>{const v=String(r[field]||'').trim().toUpperCase();if(v in c)c[v]++});return c}
+function weightedPct(c){const valid=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM'];if(!valid)return null;return(c['ÓTIMO']*3+c['BOM']*2+c['REGULAR']-c['RUIM'])/(valid*3)*100}
+const npsZona=v=>v>=75?'zona de excelência':v>=50?'zona de qualidade':v>=0?'zona de aperfeiçoamento':'zona crítica';
 
-// Saídas que casam com os filtros ativos (setor + meses do período)
-function saidasFiltradas(setor,ini,fim){return state.saidas.filter(s=>(!setor||s.setor===setor)&&(!ini||s.mes>=ini.slice(0,7))&&(!fim||s.mes<=fim.slice(0,7)))}
-function aplicacaoPct(pesquisas,saidas){return saidas?pesquisas/saidas*100:null}
-function fmtPct(v,dec=0){return v==null?'—':v.toFixed(dec).replace('.',',')+'%'}
-function metaClass(v,meta){return v==null?'':v>=meta?'on-meta':v>=meta-10?'near-meta':'below-meta'}
-
+/* ── Render: visão geral ── */
 function renderAll(){
-  const rows=filtered(),s=summary(rows);
-  const saidas=saidasFiltradas($('fSetor').value,$('fIni').value,$('fFim').value).reduce((t,x)=>t+x.saidas,0);
-  const aplic=aplicacaoPct(s.total,saidas);
-  $('kTotal').textContent=s.total;
-  $('kAplic').textContent=fmtPct(aplic);
-  $('kAplic').className=metaClass(aplic,META_APLICACAO);
-  $('kAplicMeta').innerHTML=saidas?`${s.total} pesquisas / ${saidas} saídas · meta 60%`:'cadastre as saídas na aba Saídas';
-  $('kSat').textContent=fmtPct(s.sat,1);
-  $('kSat').className=metaClass(s.sat,META_SATISFACAO);
-  $('kNps').textContent=s.hasNps?fmtPct(s.nps):'—';
-  $('kNpsZona').textContent=s.hasNps?npsZona(s.nps):'Promotores − Detratores';
-  $('kManif').textContent=s.man;
-  renderTabulacao(s);renderDonut(s);renderTable();renderSetores(rows);renderSaidas();renderReport();
-}
-function renderTabulacao(s){
-  const max=Math.max(1,s.ot,s.bom,s.reg,s.ruim,s.na);
-  $('tabulacao').innerHTML=[['Ótimo',s.ot,'c-otimo'],['Bom',s.bom,'c-bom'],['Regular',s.reg,'c-regular'],['Ruim',s.ruim,'c-ruim'],['N/A',s.na,'c-na']].map(([k,v,c])=>`<div class="bar-row"><b>${k}</b><div class="bar"><i class="${c}" style="width:${v/max*100}%"></i></div><span>${v}</span></div>`).join('');
-}
-function renderDonut(s){const tot=s.p+s.n+s.d;let a=tot?s.p/tot*360:0,b=tot?s.n/tot*360:0;$('donut').style.background=`conic-gradient(var(--ok) 0deg ${a}deg,var(--warn) ${a}deg ${a+b}deg,var(--bad) ${a+b}deg 360deg)`;$('legendNps').innerHTML=`Promotores: <b>${s.p}</b> · Neutros: <b>${s.n}</b> · Detratores: <b>${s.d}</b>`}
-function renderSetores(rows){
-  const ini=$('fIni').value,fim=$('fFim').value;
-  const map={};rows.forEach(r=>{map[r.setor]=map[r.setor]||[];map[r.setor].push(r)});
-  $('setorReport').innerHTML=Object.entries(map).sort((a,b)=>b[1].length-a[1].length).map(([k,v])=>{
-    const s=summary(v);
-    const sd=saidasFiltradas(k,ini,fim).reduce((t,x)=>t+x.saidas,0);
-    const ap=aplicacaoPct(s.total,sd);
-    return `<tr><td>${escapeHtml(k||'Sem setor')}</td><td>${s.total}</td><td>${sd||'—'}</td><td class="${metaClass(ap,META_APLICACAO)}">${fmtPct(ap)}</td><td class="${metaClass(s.sat,META_SATISFACAO)}">${fmtPct(s.sat,1)}</td><td>${s.hasNps?fmtPct(s.nps):'—'}</td><td>${s.man}</td></tr>`;
-  }).join('')||'<tr><td colspan="7" class="empty">Sem dados.</td></tr>';
-}
-function renderTable(){const q=($('q')?.value||'').toLowerCase();const rows=filtered().filter(r=>JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();$('tbody').innerHTML=rows.length?rows.map(r=>`<tr><td>${r.data||''}</td><td>${escapeHtml(r.setor)}</td><td>${escapeHtml(r.pront)}</td><td>${escapeHtml(r.tipo)}</td><td>${escapeHtml(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1)}%</td><td>${npsBadge(r.nps)}</td><td>${escapeHtml([r.reclamacoes,r.sugestoes,r.comentarios,r.elogios].filter(Boolean)[0]||'')}</td><td><button class="btn ghost" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`).join(''):'<tr><td colspan="9" class="empty">Nenhum registro encontrado.</td></tr>'}
-function npsBadge(v){if(v===''||v==null)return '';let c=+v>=9?'promotor':+v>=7?'neutro':'detrator';let label=+v>=9?'Promotor':+v>=7?'Neutro':'Detrator';return `<span class="badge ${c}">${v} · ${label}</span>`}
+  const mes=$('gMes').value, setor=$('gSetor').value;
+  const rows=rowsFor(mes,setor), s=summary(rows);
+  const saidas=saidasFor(mes,setor);
+  const aplic=saidas?s.total/saidas*100:null;
+  const prev=mes?summary(rowsFor(prevMonth(mes),setor)):null;
+  const prevSaidas=mes?saidasFor(prevMonth(mes),setor):0;
+  const prevAplic=prev&&prevSaidas?prev.total/prevSaidas*100:null;
 
-// ---- Saídas ----
-function renderSaidas(){
+  $('ovTitle').textContent=(mes?mesLabel(mes):'Todos os meses')+(setor?' · '+setor:'');
+  kpi('Aplic',aplic,META_APLICACAO,prevAplic,saidas?`${s.total} pesquisas / ${saidas} saídas`:'cadastre as saídas do mês');
+  kpi('Sat',s.sat,META_SATISFACAO,prev?prev.sat:null,'');
+  kpi('Nps',s.nps,META_NPS,prev?prev.nps:null,s.nps!=null?npsZona(s.nps):'');
+  $('kTotal').textContent=s.total;
+  $('pTotal').textContent=s.man+' manifestações';
+  $('dTotal').innerHTML=prev&&mes?deltaTxt(s.total-prev.total,' pesquisas vs '+mesCurto(prevMonth(mes)),0):'';
+  $('tTotal').style.width=Math.min(100,s.total/Math.max(1,...allMonths().map(m=>rowsFor(m,setor).length))*100)+'%';
+
+  renderHist(setor); renderDist(s); renderDonut(s); renderSetores(mes); renderManif(rows); renderTable(); renderSaidasTbl(); renderReport();
+}
+function kpi(key,val,meta,prevVal,foot){
+  const pill=$('p'+key), v=$('k'+key), track=$('t'+key), dl=$('d'+key);
+  v.textContent=fmt(val,key==='Sat'?1:0);
+  if(val==null){pill.className='pill mut';pill.textContent='sem dados';track.style.width='0';track.className=''}
+  else{
+    const ok=val>=meta;
+    pill.className='pill '+(ok?'ok':val>=meta-10?'warn':'bad');
+    pill.textContent=ok?'Meta '+meta+'% ✓':'Meta '+meta+'%';
+    track.style.width=Math.max(0,Math.min(100,val))+'%';
+    track.className=ok?'ok':val>=meta-10?'warn':'bad';
+  }
+  let d='';
+  if(prevVal!=null&&val!=null&&$('gMes').value)d=deltaTxt(val-prevVal,' pp vs '+mesCurto(prevMonth($('gMes').value)),1);
+  dl.innerHTML=[d,esc(foot)].filter(Boolean).join(' · ');
+}
+function deltaTxt(d,suffix,dec){if(Math.abs(d)<.05)return'<span style="color:var(--soft)">— estável'+suffix+'</span>';const up=d>0;return`<span class="${up?'delta-up':'delta-down'}">${up?'▲':'▼'} ${Math.abs(d).toFixed(dec).replace('.',',')}${suffix}</span>`}
+
+function renderHist(setor){
+  const meses=allMonths().slice(-12);
+  const el=$('histChart');
+  if(meses.length<2){el.innerHTML='<div class="empty">Registre pelo menos dois meses para ver a evolução.</div>';return}
+  const sat=[],nps=[];
+  meses.forEach(m=>{const s=summary(rowsFor(m,setor));sat.push(s.sat);nps.push(s.nps)});
+  const W=760,H=230,P={l:36,r:42,t:12,b:26};
+  const X=i=>P.l+i*(W-P.l-P.r)/(meses.length-1);
+  const Y=v=>P.t+(100-Math.max(0,Math.min(100,v)))*(H-P.t-P.b)/100;
+  let g='';
+  [0,25,50,75,100].forEach(v=>{g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="#eef0f4"/><text x="${P.l-8}" y="${Y(v)+4}" font-size="10" fill="#98a2b3" text-anchor="end">${v}</text>`});
+  g+=`<line x1="${P.l}" y1="${Y(90)}" x2="${W-P.r}" y2="${Y(90)}" stroke="#0b1220" stroke-dasharray="3 5" opacity=".35"/>`;
+  meses.forEach((m,i)=>{g+=`<text x="${X(i)}" y="${H-7}" font-size="10" fill="#98a2b3" text-anchor="middle">${mesCurto(m)}</text>`});
+  const line=(vals,color)=>{
+    const pts=vals.map((v,i)=>v==null?null:[X(i),Y(v)]);
+    let path='',started=false;
+    pts.forEach(p=>{if(!p){started=false;return}path+=(started?'L':'M')+p[0]+' '+p[1]+' ';started=true});
+    let dots=pts.map((p,i)=>p?`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}"><title>${mesLabel(meses[i])}: ${fmt(vals[i],1)}</title></circle>`:'').join('');
+    const last=[...pts].reverse().find(Boolean), lastV=[...vals].reverse().find(v=>v!=null);
+    const lbl=last?`<text x="${Math.min(last[0]+6,W-4)}" y="${last[1]-7}" font-size="11" font-weight="700" fill="${color}">${fmt(lastV,0)}</text>`:'';
+    return`<path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`+dots+lbl;
+  };
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${line(sat,'#1a56db')}${line(nps,'#7c3aed')}</svg>`;
+}
+function renderDist(s){
+  const tot=s.ot+s.bom+s.reg+s.ruim+s.na;
+  $('distSub').textContent=tot?tot+' respostas nos 16 critérios':'distribuição das respostas nos 16 critérios';
+  if(!tot){$('distStack').innerHTML='';$('distRows').innerHTML='<div class="empty">Sem avaliações no período.</div>';return}
+  const items=[['Ótimo',s.ot,'c-otimo'],['Bom',s.bom,'c-bom'],['Regular',s.reg,'c-regular'],['Ruim',s.ruim,'c-ruim'],['N/A',s.na,'c-na']];
+  $('distStack').innerHTML=items.map(([,v,c])=>`<i class="${c}" style="width:${v/tot*100}%"></i>`).join('');
+  const max=Math.max(...items.map(i=>i[1]),1);
+  $('distRows').innerHTML=items.map(([k,v,c])=>`<div class="dist-row"><span>${k}</span><div class="bar"><i class="${c}" style="width:${v/max*100}%"></i></div><b class="num">${v}</b><span class="pc num">${(v/tot*100).toFixed(1).replace('.',',')}%</span></div>`).join('');
+}
+function renderDonut(s){
+  const tot=s.p+s.n+s.d;
+  if(!tot){$('npsDonut').innerHTML='<div class="empty">Sem respostas NPS.</div>';$('npsLegend').innerHTML='';return}
+  const R=56,C=2*Math.PI*R;
+  const segs=[[s.p,'#047857'],[s.n,'#f59e0b'],[s.d,'#ef4444']];
+  let off=0,arcs='';
+  segs.forEach(([v,c])=>{const len=v/tot*C;if(v)arcs+=`<circle r="${R}" cx="70" cy="70" fill="none" stroke="${c}" stroke-width="14" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`;off+=len});
+  $('npsDonut').innerHTML=`<svg viewBox="0 0 140 140" style="width:170px">${arcs}<text x="70" y="66" text-anchor="middle" font-size="24" font-weight="800" fill="#0b1220">${fmt(s.nps)}</text><text x="70" y="84" text-anchor="middle" font-size="10" fill="#98a2b3">NPS</text></svg>`;
+  $('npsLegend').innerHTML=`<span><i style="background:#047857"></i>Promotores <b class="num">${s.p}</b></span><span><i style="background:#f59e0b"></i>Neutros <b class="num">${s.n}</b></span><span><i style="background:#ef4444"></i>Detratores <b class="num">${s.d}</b></span>`;
+}
+function renderSetores(mes){
+  const map={};
+  rowsFor(mes,'').forEach(r=>{const k=r.setor||'Sem setor';(map[k]=map[k]||[]).push(r)});
+  const body=Object.entries(map).sort((a,b)=>b[1].length-a[1].length).map(([k,v])=>{
+    const s=summary(v), sd=saidasFor(mes,k), ap=sd?s.total/sd*100:null;
+    const farol=s.sat==null?'mut':s.sat>=META_SATISFACAO?'ok':s.sat>=META_SATISFACAO-10?'warn':'bad';
+    return`<tr><td><span class="dot ${farol}"></span>${esc(k)}</td><td class="num">${s.total}</td>
+      <td><span class="mini-bar"><i style="width:${Math.min(100,ap||0)}%;${ap!=null&&ap<META_APLICACAO?'background:var(--bad)':''}"></i></span><span class="num">${fmt(ap)}</span></td>
+      <td><span class="mini-bar"><i style="width:${Math.min(100,s.sat||0)}%;${s.sat!=null&&s.sat<META_SATISFACAO?'background:var(--bad)':''}"></i></span><span class="num">${fmt(s.sat,1)}</span></td>
+      <td class="num">${fmt(s.nps)}</td></tr>`;
+  }).join('');
+  $('setorBody').innerHTML=body||'<tr><td colspan="5" class="empty">Sem dados no período.</td></tr>';
+}
+function renderManif(rows){
+  const cats=[['rec','RECLAMAÇÃO','reclamacoes'],['sug','SUGESTÃO','sugestoes'],['elo','ELOGIO','elogios'],['com','COMENTÁRIO','comentarios']];
+  const items=[];
+  cats.forEach(([cls,label,field])=>rows.forEach(r=>{const t=String(r[field]||'').trim();if(t)items.push({cls,label,t,setor:r.setor,data:r.data})}));
+  $('manifList').innerHTML=items.length?items.map(i=>`<div class="manif-item"><span class="tag ${i.cls}">${i.label}</span><div><p>${esc(i.t)}</p><small>${esc(i.setor||'')}${i.data?' · '+i.data.split('-').reverse().join('/'):''}</small></div></div>`).join(''):'<div class="empty">Nenhuma manifestação no período. 🎉</div>';
+}
+function renderTable(){
+  const q=($('q')?.value||'').toLowerCase();
+  const rows=rowsFor($('gMes').value,$('gSetor').value).filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();
+  $('tbody').innerHTML=rows.length?rows.map(r=>{
+    const x=+r.nps, cls=isNaN(x)?'mut':x>=9?'ok':x>=7?'warn':'bad';
+    return`<tr><td class="num">${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td class="num">${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td class="num">${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span><span class="num">${r.nps??''}</span></td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:5px 10px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
+  }).join(''):'<tr><td colspan="9" class="empty">Nenhum registro no período selecionado.</td></tr>';
+}
+function renderSaidasTbl(){
   const rows=[...state.saidas].sort((a,b)=>(b.mes+b.setor).localeCompare(a.mes+a.setor));
   $('saidasBody').innerHTML=rows.length?rows.map(s=>{
     const pesq=state.records.filter(r=>monthOf(r)===s.mes&&r.setor===s.setor).length;
-    const ap=aplicacaoPct(pesq,s.saidas);
-    return `<tr><td>${mesLabel(s.mes)}</td><td>${escapeHtml(s.setor)}</td><td>${s.saidas}</td><td>${pesq}</td><td class="${metaClass(ap,META_APLICACAO)}">${fmtPct(ap)}</td><td><button class="btn ghost" onclick="editSaida(${s.rowNumber})">Editar</button> <button class="btn ghost" onclick="removeSaida(${s.rowNumber})">Excluir</button></td></tr>`;
-  }).join(''):'<tr><td colspan="6" class="empty">Nenhuma saída registrada. Cadastre as saídas mensais de cada setor.</td></tr>';
+    const ap=s.saidas?pesq/s.saidas*100:null;
+    const cls=ap==null?'mut':ap>=META_APLICACAO?'ok':ap>=META_APLICACAO-10?'warn':'bad';
+    return`<tr><td>${mesLabel(s.mes)}</td><td>${esc(s.setor)}</td><td class="num">${s.saidas}</td><td class="num">${pesq}</td><td><span class="dot ${cls}"></span><span class="num">${fmt(ap)}</span></td><td style="white-space:nowrap"><button class="btn" style="padding:5px 10px;font-size:12px" onclick="editSaida(${s.rowNumber})">Editar</button> <button class="btn" style="padding:5px 10px;font-size:12px" onclick="removeSaida(${s.rowNumber})">Excluir</button></td></tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty">Nenhuma saída registrada ainda.</td></tr>';
 }
-function saveSaida(e){e.preventDefault();const payload={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:$('sSaidas').value};if(!payload.mes||!payload.setor)return toast('Informe mês e setor.');setLoading(true);google.script.run.withSuccessHandler(res=>{setLoading(false);toast(res.message);$('sRowNumber').value='';$('formSaida').reset();reload()}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).saveSaida(payload)}
-function editSaida(rowNumber){const s=state.saidas.find(x=>x.rowNumber===rowNumber);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
-function removeSaida(rowNumber){if(!confirm('Excluir este registro de saídas?'))return;setLoading(true);google.script.run.withSuccessHandler(res=>{setLoading(false);toast(res.message);reload()}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).deleteSaida(rowNumber)}
 
-// ---- Relatório mensal ----
+/* ── Relatório mensal ── */
 function renderReport(){
-  const mes=$('repMes').value;
-  const out=$('reportBody');
+  const mes=$('repMes').value, out=$('reportBody');
   if(!mes){out.innerHTML='<div class="empty">Sem dados para o período selecionado.</div>';return}
   const rows=state.records.filter(r=>monthOf(r)===mes);
-  if(!rows.length){out.innerHTML='<div class="empty">Nenhuma pesquisa registrada em '+escapeHtml(mesLabel(mes))+'.</div>';return}
+  if(!rows.length){out.innerHTML='<div class="empty">Nenhuma pesquisa registrada em '+esc(mesLabel(mes))+'.</div>';return}
   const setores=[...new Set(rows.map(r=>r.setor||'SEM SETOR'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  const sGeral=summary(rows);
-  const saidasMes=state.saidas.filter(s=>s.mes===mes);
-  const totSaidas=saidasMes.reduce((t,x)=>t+x.saidas,0);
-  const apGeral=aplicacaoPct(sGeral.total,totSaidas);
-
-  let html=`<h2>Pesquisa de Satisfação — ${escapeHtml(mesLabel(mes))}</h2>
+  const sG=summary(rows), saidasMes=state.saidas.filter(s=>s.mes===mes);
+  const totS=saidasMes.reduce((t,x)=>t+x.saidas,0), apG=totS?sG.total/totS*100:null;
+  let h=`<h2>Pesquisa de Satisfação — ${esc(mesLabel(mes))}</h2>
   <p>A pesquisa de satisfação tem por objetivo avaliar a satisfação dos usuários atendidos no Hospital Universitário do Ceará – HUC, priorizando a percepção do cuidado centrado no paciente e as oportunidades de melhorias na prestação dos serviços ofertados. A meta de aplicação da pesquisa de satisfação é de 60% (sessenta por cento), considerando as saídas hospitalares (altas, transferências externas e óbitos) do mês de referência. O indicador de satisfação tem como meta alcançar 90% de satisfação.</p>
   <p>Os dados quantitativos descritos por setor encontram-se de forma detalhada na tabela abaixo:</p>
   <table><thead><tr><th>SETOR</th><th>SAÍDAS</th><th>PESQUISAS APLICADAS</th><th>% DE APLICAÇÃO</th><th>SATISFAÇÃO OBTIDA</th><th>NPS</th></tr></thead><tbody>`;
-  setores.forEach(setor=>{
-    const sr=rows.filter(r=>(r.setor||'SEM SETOR')===setor);
-    const s=summary(sr);
-    const sd=saidasMes.filter(x=>x.setor===setor).reduce((t,x)=>t+x.saidas,0);
-    const ap=aplicacaoPct(s.total,sd);
-    html+=`<tr><td>${escapeHtml(setor)}</td><td class="num">${sd||'—'}</td><td class="num">${s.total}</td><td class="num ${ap!=null&&ap<META_APLICACAO?'pct-bad':''}">${fmtPct(ap)}</td><td class="num ${s.sat<META_SATISFACAO?'pct-bad':''}">${fmtPct(s.sat)}</td><td class="num">${s.hasNps?fmtPct(s.nps):'—'}</td></tr>`;
-  });
-  html+=`<tr style="font-weight:800"><td>HUC</td><td class="num">${totSaidas||'—'}</td><td class="num">${sGeral.total}</td><td class="num ${apGeral!=null&&apGeral<META_APLICACAO?'pct-bad':''}">${fmtPct(apGeral)}</td><td class="num ${sGeral.sat<META_SATISFACAO?'pct-bad':''}">${fmtPct(sGeral.sat)}</td><td class="num">${sGeral.hasNps?fmtPct(sGeral.nps):'—'}</td></tr></tbody></table>
-  <p class="muted" style="font-size:11.5px">*SAÍDAS: altas, transferências externas e óbitos. PORCENTAGEM dos critérios: score ponderado (ÓTIMO×3 + BOM×2 + REGULAR×1 + RUIM×−1) / (avaliações válidas × 3).</p>`;
-
-  setores.forEach(setor=>{
-    const sr=rows.filter(r=>(r.setor||'SEM SETOR')===setor);
-    const s=summary(sr);
-    const sd=saidasMes.filter(x=>x.setor===setor).reduce((t,x)=>t+x.saidas,0);
-    const ap=aplicacaoPct(s.total,sd);
-    html+=`<h3>${escapeHtml(setor)}</h3>
-    <p>No setor ${escapeHtml(setor)}, ${sd?`ocorreram ${sd} saídas, com `:''}${s.total} pesquisas de satisfação realizadas${ap!=null?`, totalizando ${fmtPct(ap)} de aplicação`:''}. A satisfação dos usuários no setor foi de ${fmtPct(s.sat)}.${s.hasNps?` O NPS foi de ${fmtPct(s.nps)}, sendo classificado na ${npsZona(s.nps)}.`:''} As pesquisas são respondidas pelo paciente, pelo acompanhante ou de forma colaborativa (paciente + acompanhante).</p>`;
-    REPORT_BLOCKS.forEach(([titulo,criterios,obsField])=>{
-      html+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
-      criterios.forEach(([field,label])=>{
-        const c=countsFor(sr,field);
-        const pct=weightedPct(c);
-        const cls=pct==null?'':pct<META_SATISFACAO?(pct<80?'pct-bad':'pct-warn'):'';
-        html+=`<tr><td>${label}</td><td class="num">${c['ÓTIMO']}</td><td class="num">${c['BOM']}</td><td class="num">${c['REGULAR']}</td><td class="num">${c['RUIM']}</td><td class="num">${c['N/A']}</td><td class="num">${sr.length}</td><td class="num ${cls}">${pct==null?'—':fmtPct(pct,2)}</td></tr>`;
+  const linha=(nome,sd,s,bold)=>{const ap=sd?s.total/sd*100:null;return`<tr${bold?' style="font-weight:700"':''}><td>${esc(nome)}</td><td class="c num">${sd||'—'}</td><td class="c num">${s.total}</td><td class="c num ${ap!=null&&ap<META_APLICACAO?'pct-bad':''}">${fmt(ap)}</td><td class="c num ${s.sat!=null&&s.sat<META_SATISFACAO?'pct-bad':''}">${fmt(s.sat)}</td><td class="c num">${fmt(s.nps)}</td></tr>`};
+  setores.forEach(st=>{const sr=rows.filter(r=>(r.setor||'SEM SETOR')===st);h+=linha(st,saidasMes.filter(x=>x.setor===st).reduce((t,x)=>t+x.saidas,0),summary(sr))});
+  h+=linha('HUC',totS,sG,true)+`</tbody></table>
+  <p class="footnote">*SAÍDAS: altas, transferências externas e óbitos. PORCENTAGEM dos critérios: score ponderado (ÓTIMO×3 + BOM×2 + REGULAR×1 + RUIM×(−1)) ÷ (avaliações válidas × 3).</p>`;
+  setores.forEach(st=>{
+    const sr=rows.filter(r=>(r.setor||'SEM SETOR')===st), s=summary(sr);
+    const sd=saidasMes.filter(x=>x.setor===st).reduce((t,x)=>t+x.saidas,0), ap=sd?s.total/sd*100:null;
+    h+=`<h3>${esc(st)}</h3><p>No setor ${esc(st)}, ${sd?`ocorreram ${sd} saídas, com `:''}${s.total} pesquisas de satisfação realizadas${ap!=null?`, totalizando ${fmt(ap)} de aplicação`:''}. A satisfação dos usuários no setor foi de ${fmt(s.sat)}.${s.nps!=null?` O NPS foi de ${fmt(s.nps)}, sendo classificado na ${npsZona(s.nps)}.`:''} As pesquisas são respondidas pelo paciente, pelo acompanhante ou de forma colaborativa (paciente + acompanhante).</p>`;
+    REPORT_BLOCKS.forEach(([,titulo,criterios,obsField])=>{
+      h+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
+      criterios.forEach(([f,label])=>{
+        const c=countsFor(sr,f), pct=weightedPct(c);
+        const cls=pct==null?'':pct<80?'pct-bad':pct<META_SATISFACAO?'pct-warn':'';
+        h+=`<tr><td>${label.toUpperCase()}</td><td class="c num">${c['ÓTIMO']}</td><td class="c num">${c['BOM']}</td><td class="c num">${c['REGULAR']}</td><td class="c num">${c['RUIM']}</td><td class="c num">${c['N/A']}</td><td class="c num">${sr.length}</td><td class="c num ${cls}">${pct==null?'—':fmt(pct,2)}</td></tr>`;
       });
-      html+=`</tbody></table>`;
+      h+='</tbody></table>';
       const obs=sr.map(r=>String(r[obsField]||'').trim()).filter(Boolean);
-      if(obs.length)html+=`<div class="manif"><b>Observações:</b></div>`+obs.map((o,i)=>`<div class="manif">${i+1} - ${escapeHtml(o)}</div>`).join('');
+      if(obs.length)h+='<div class="mn"><b>Observações:</b></div>'+obs.map((o,i)=>`<div class="mn">${i+1} - ${esc(o)}</div>`).join('');
     });
-    const manifs=[['RECLAMAÇÃO','reclamacoes'],['SUGESTÃO','sugestoes'],['ELOGIO','elogios'],['COMENTÁRIO','comentarios']];
-    manifs.forEach(([titulo,field])=>{
-      const itens=sr.map(r=>String(r[field]||'').trim()).filter(Boolean);
-      if(itens.length)html+=`<div class="manif"><b>${titulo}:</b></div>`+itens.map((t,i)=>`<div class="manif">${i+1} - ${escapeHtml(t)}</div>`).join('');
+    [['RECLAMAÇÃO','reclamacoes'],['SUGESTÃO','sugestoes'],['ELOGIO','elogios'],['COMENTÁRIO','comentarios']].forEach(([titulo,f])=>{
+      const itens=sr.map(r=>String(r[f]||'').trim()).filter(Boolean);
+      if(itens.length)h+=`<div class="mn"><b>${titulo}:</b></div>`+itens.map((t,i)=>`<div class="mn">${i+1} - ${esc(t)}</div>`).join('');
     });
   });
-  html+=`<br><br><p style="text-align:center">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
-  out.innerHTML=html;
+  h+=`<br><br><p style="text-align:center">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
+  out.innerHTML=h;
 }
 
-function getForm(){const ids=['setor','pront','data','tipo','dn','idade','sexo','nps','gentilezaAcolhimento','agilidade','clareza','obsAcolhimento','gentilezaAssistencia','identificacao','intimidade','horarioDescanso','esclarecimento','cuidados','confianca','obsAssistencia','acesso','acomodacao','limpeza','enxoval','alimentacao','locomocao','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'];let o={rowNumber:$('rowNumber').value};ids.forEach(id=>o[id]=$(id).value);return o}
-function setForm(r={}){Object.keys(getForm()).forEach(id=>{if($(id))$(id).value=r[id]||''});$('rowNumber').value=r.rowNumber||''}
+/* ── Formulário ── */
+function buildRatingFields(){
+  $('rateBlocks').innerHTML=REPORT_BLOCKS.map(([titulo,,criterios,obsField])=>`
+    <div class="rate-block"><h4>${titulo}</h4>
+      ${criterios.map(([f,label])=>`<div class="rate-row"><span>${label}</span><span class="seg">${RATINGS.map((r,i)=>`<input type="radio" name="${f}" id="${f}_${i}" value="${r}" ${i===0?'checked':''}><label for="${f}_${i}">${r==='ÓTIMO'?'Ótimo':r==='BOM'?'Bom':r==='REGULAR'?'Regular':r==='RUIM'?'Ruim':'N/A'}</label>`).join('')}</span></div>`).join('')}
+      <div class="field" style="margin-top:12px"><label>Observações</label><textarea id="${obsField}"></textarea></div>
+    </div>`).join('');
+}
+function getForm(){
+  const ids=['setor','pront','data','tipo','dn','idade','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'];
+  const o={rowNumber:$('rowNumber').value};
+  ids.forEach(id=>o[id]=$(id).value);
+  RATING_FIELDS.forEach(f=>{o[f]=document.querySelector(`input[name="${f}"]:checked`)?.value||''});
+  return o;
+}
+function setForm(r={}){
+  ['setor','pront','data','tipo','dn','idade','sexo','nps','obsAcolhimento','obsAssistencia','obsServicos','sugestoes','reclamacoes','comentarios','elogios','entrevistador','encaminhamentos'].forEach(id=>{if($(id))$(id).value=r[id]||''});
+  RATING_FIELDS.forEach(f=>{
+    const v=String(r[f]||'ÓTIMO').toUpperCase();
+    const el=document.querySelector(`input[name="${f}"][value="${CSS.escape(v)}"]`)||document.querySelector(`input[name="${f}"]`);
+    if(el)el.checked=true;
+  });
+  $('rowNumber').value=r.rowNumber||'';
+}
+
+/* ── Backend ── */
+function reload(){setLoading(true);google.script.run.withSuccessHandler(data=>{state=data;state.saidas=state.saidas||[];hydrateControls();renderAll();setLoading(false)}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).getInitialData()}
 function saveRecord(e){e.preventDefault();setLoading(true);google.script.run.withSuccessHandler(res=>{setLoading(false);toast(res.message);setForm({});reload();showTab('registros')}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).saveRecord(getForm())}
 function editRecord(rowNumber){const r=state.records.find(x=>x.rowNumber===rowNumber);if(!r)return;setForm(r);showTab('novo')}
-function clearFilters(){['fSetor','fTipo','fSexo','fIni','fFim'].forEach(id=>$(id).value='');renderAll()}
+function saveSaida(e){e.preventDefault();const payload={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:$('sSaidas').value};if(!payload.mes||!payload.setor)return toast('Informe mês e setor.');setLoading(true);google.script.run.withSuccessHandler(res=>{setLoading(false);toast(res.message);$('sRowNumber').value='';$('formSaida').reset();reload()}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).saveSaida(payload)}
+function editSaida(rowNumber){const s=state.saidas.find(x=>x.rowNumber===rowNumber);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
+function removeSaida(rowNumber){if(!confirm('Excluir este registro de saídas?'))return;setLoading(true);google.script.run.withSuccessHandler(res=>{setLoading(false);toast(res.message);reload()}).withFailureHandler(err=>{setLoading(false);toast(err.message||err)}).deleteSaida(rowNumber)}
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_satisfacao_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
+
 buildRatingFields();reload();
 </script>
 </body>
