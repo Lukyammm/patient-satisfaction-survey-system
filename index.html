@@ -261,14 +261,16 @@
       .npsleg{font-size:9.5px}
     }
     @media(max-width:420px){.g4{grid-template-columns:1fr!important}}
+    @page{margin:0}
     @media print{
+      body{background:#fff!important;color:#000!important;padding:1.8cm 2cm!important}
       header,.no-print{display:none!important}
-      body{background:#fff!important;color:#000!important}
       .section{display:none!important}.section.active{display:block!important;animation:none!important}
       .rpt{color:#000!important;background:#fff!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;box-shadow:none!important}
       .rpt *{color:#000!important;border-color:#9ca3af!important}
       .rpt th,.rpt td.orow{background:#f3f4f6!important}
       .rpt table{page-break-inside:avoid}.rpt h3{page-break-after:avoid;border-color:#000!important}
+      .rpt svg text{fill:#000!important}
     }
   </style>
   <script>(function(){if(localStorage.getItem('pesquisa-theme')==='dark')document.documentElement.classList.add('dark')})()</script>
@@ -1112,8 +1114,47 @@ function renderReport(){
       if(it.length)h+=`<div class="mn"><b>${t}:</b></div>`+it.map((x,i)=>`<div class="mn">${i+1} — ${esc(x)} (SIC)</div>`).join('');
     });
   });
+  // Gráfico 1: Satisfação e NPS por setor (incl. total HUC)
+  const gSet=sets.map(st=>{const s=sum(rr.filter(r=>(r.setor||'SEM SETOR')===st));return{label:st,values:[s.sat,s.nps]}});
+  gSet.push({label:'TOTAL',values:[sG.sat,sG.nps]});
+  h+=svgBarChart('SATISFAÇÃO E NPS POR SETOR',gSet);
+  // Gráfico 2: Série histórica mensal do ano (respeita filtros avançados)
+  const yr=mes.slice(0,4),MN=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const gMes=MN.map((nm,i)=>{const m=yr+'-'+String(i+1).padStart(2,'0');const s=sum(adv(ST.records.filter(r=>mo(r)===m)));return{label:nm,values:[s.total?s.sat:null,s.total?s.nps:null]}});
+  h+=svgBarChart('SÉRIE HISTÓRICA MENSAL — '+yr,gMes);
   h+=`<br><br><p style="text-align:center;color:var(--sub)">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
   out.innerHTML=h;
+}
+
+/* ── Gráfico de barras agrupadas (Satisfação verde + NPS azul) em SVG puro ── */
+function svgBarChart(title,groups){
+  const W=760,H=300,P={t:34,r:14,b:64,l:40};
+  const iw=W-P.l-P.r,ih=H-P.t-P.b,n=groups.length;
+  const gw=iw/n,bw=Math.min(16,gw/3);
+  const COLORS=['#16a34a','#2563eb'],LBL=['Satisfação','NPS'];
+  const y=v=>P.t+ih-(Math.max(0,Math.min(100,v))/100)*ih;
+  let s=`<div style="margin-top:26px;page-break-inside:avoid"><h3>${esc(title)}</h3>
+  <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">`;
+  // grid + eixo Y
+  [0,25,50,75,100].forEach(v=>{s+=`<line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="var(--s4)" stroke-width="1"/><text x="${P.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--gTxt)">${v}%</text>`});
+  // linha de meta 90%
+  s+=`<line x1="${P.l}" y1="${y(META_S)}" x2="${W-P.r}" y2="${y(META_S)}" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/><text x="${W-P.r}" y="${y(META_S)-4}" text-anchor="end" font-size="9" fill="#dc2626">meta ${META_S}%</text>`;
+  groups.forEach((g,i)=>{
+    const cx=P.l+gw*i+gw/2;
+    g.values.forEach((v,si)=>{
+      if(v==null)return;
+      const x=si===0?cx-bw-2:cx+2;
+      s+=`<rect x="${x}" y="${y(v)}" width="${bw}" height="${P.t+ih-y(v)}" rx="2" fill="${COLORS[si]}"/>`;
+      s+=`<text x="${x+bw/2}" y="${y(v)-3}" text-anchor="middle" font-size="9" fill="var(--ink)">${Math.round(v)}</text>`;
+    });
+    const lbl=g.label.length>13?g.label.slice(0,12)+'…':g.label;
+    s+=`<text x="${cx}" y="${P.t+ih+12}" text-anchor="middle" font-size="9" fill="var(--gTxt)" transform="rotate(-32 ${cx} ${P.t+ih+12})">${esc(lbl)}</text>`;
+  });
+  // legenda
+  const lx=P.l;
+  s+=`<rect x="${lx}" y="${H-16}" width="10" height="10" rx="2" fill="${COLORS[0]}"/><text x="${lx+14}" y="${H-7}" font-size="10" fill="var(--sub)">${LBL[0]}</text>`;
+  s+=`<rect x="${lx+90}" y="${H-16}" width="10" height="10" rx="2" fill="${COLORS[1]}"/><text x="${lx+104}" y="${H-7}" font-size="10" fill="var(--sub)">${LBL[1]}</text>`;
+  return s+'</svg></div>';
 }
 
 /* ── Form ── */
