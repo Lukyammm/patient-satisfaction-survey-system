@@ -1578,7 +1578,7 @@ function applyData(data){
   ST=data;ST.records=ST.records||[];ST.saidas=ST.saidas||[];ST.cadastros=ST.cadastros||[];
   ST.lookups=ST.lookups||{};ST.lookups.entrevistadores=ST.lookups.entrevistadores||[];
   PENDING.forEach(rec=>{if(!ST.records.some(x=>x.rowNumber===rec.rowNumber))ST.records.push(rec)});
-  try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
+  try{localStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
 }
 function reload(){
   load(true);
@@ -1629,7 +1629,7 @@ function saveRecord(e){
   const prev=prevIdx>=0?ST.records[prevIdx]:null;
   if(prevIdx>=0) ST.records[prevIdx]=rec; else ST.records.push(rec);
   PENDING.push(rec); // protege contra reloads em andamento sobrescreverem ST
-  try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+  try{localStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
 
   // Instant feedback — clear form, jump to registros, confirm
   setForm({});
@@ -1656,7 +1656,7 @@ function saveRecord(e){
         if(res&&res.record){res.record._saving=false;ST.records[i]=res.record;}
         else if(res&&res.rowNumber){ST.records[i].rowNumber=res.rowNumber;delete ST.records[i]._saving;}
         else delete ST.records[i]._saving;
-        try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+        try{localStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
         renderAll();
       }
     })
@@ -1664,7 +1664,7 @@ function saveRecord(e){
       PENDING=PENDING.filter(x=>x!==rec);
       const i=ST.records.findIndex(x=>x.rowNumber===tempId);
       if(i>=0){if(prev)ST.records[i]=prev;else ST.records.splice(i,1);}
-      try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+      try{localStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
       renderAll();
       toast('Não foi possível salvar: '+(err.message||err));
     })
@@ -1707,7 +1707,7 @@ function saveSaida(e){
   google.script.run
     .withSuccessHandler(res=>{
       const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
-      if(i>=0){if(res&&res.saida){res.saida._saving=false;ST.saidas[i]=res.saida;}else{ST.saidas[i].rowNumber=res.rowNumber||tempId;delete ST.saidas[i]._saving;}try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}renderAll();}
+      if(i>=0){if(res&&res.saida){res.saida._saving=false;ST.saidas[i]=res.saida;}else{ST.saidas[i].rowNumber=res.rowNumber||tempId;delete ST.saidas[i]._saving;}try{localStorage.setItem('psq',JSON.stringify(ST))}catch(_){}renderAll();}
     })
     .withFailureHandler(err=>{
       const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
@@ -1733,7 +1733,7 @@ function confirmOcrImport(){if(!window.ocrData){toast('Nenhum dado extraído');r
 
 buildForm();buildNps();buildQuickPeriods();setupFormValidation();
 // Show cached data immediately while fresh data loads
-try{const c=sessionStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
+try{const c=localStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
 reload();
 window.addEventListener('scroll',()=>{const vis=window.scrollY>300&&!!document.querySelector('#relatorio.active');document.getElementById('rptFab').classList.toggle('vis',vis);},{passive:true});
 </script>
