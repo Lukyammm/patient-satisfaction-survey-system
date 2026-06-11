@@ -920,7 +920,7 @@ function renderTable(){
   $('regSub').textContent=rr.length+' registro'+(rr.length===1?'':'s')+' no filtro atual';
   $('tbody').innerHTML=rr.length?rr.map(r=>{
     const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
-    return`<tr><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
+    return`<tr${r._saving?' style="opacity:.55"':''}><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
   }).join(''):'<tr><td colspan="10" class="empty">Sem registros para os filtros atuais.</td></tr>';
 }
 function rSaidas(){
@@ -1074,27 +1074,51 @@ function reload(){
 }
 function saveRecord(e){
   e.preventDefault();
-  load(true);
   const payload=getForm();
+  const editing=!!(payload.rowNumber&&Number(payload.rowNumber));
+
+  // Build the record locally so the UI can update INSTANTLY (no server wait)
+  const rec=Object.assign({},payload);
+  let ot=0,bo=0,re=0,ru=0,na=0;
+  RF.forEach(f=>{const v=String(payload[f]||'').toUpperCase();if(v==='ÓTIMO')ot++;else if(v==='BOM')bo++;else if(v==='REGULAR')re++;else if(v==='RUIM')ru++;else if(v==='N/A')na++});
+  const tot=ot+bo+re+ru;
+  rec.otimo=ot;rec.bom=bo;rec.regular=re;rec.ruim=ru;rec.na=na;rec.totalConsiderado=tot;
+  rec.taxaSatisfacao=tot?(ot+bo)/tot*100:0;
+  const tempId=editing?Number(payload.rowNumber):'tmp_'+Date.now();
+  rec.rowNumber=tempId;
+  rec._saving=true;
+
+  // Snapshot for rollback if the background save fails
+  const prevIdx=ST.records.findIndex(x=>x.rowNumber===tempId);
+  const prev=prevIdx>=0?ST.records[prevIdx]:null;
+  if(prevIdx>=0) ST.records[prevIdx]=rec; else ST.records.push(rec);
+  try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+
+  // Instant feedback — clear form, jump to registros, confirm
+  setForm({});
+  renderAll();
+  showTab('registros');
+  toast(editing?'Registro atualizado.':'Registro salvo.');
+
+  // Persist in the background; reconcile the real row number when it returns
   google.script.run
     .withSuccessHandler(res=>{
-      load(false);
-      toast(res.message);
-      // Optimistic in-memory update — no full reload needed
-      if(res.record){
-        const idx=ST.records.findIndex(x=>x.rowNumber===res.rowNumber);
-        if(idx>=0) ST.records[idx]=res.record; else ST.records.push(res.record);
-        try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
+      const i=ST.records.findIndex(x=>x.rowNumber===tempId);
+      if(i>=0){
+        if(res&&res.record){res.record._saving=false;ST.records[i]=res.record;}
+        else if(res&&res.rowNumber){ST.records[i].rowNumber=res.rowNumber;delete ST.records[i]._saving;}
+        else delete ST.records[i]._saving;
+        try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+        renderAll();
       }
-      setForm({});
-      renderAll();
-      showTab('registros');
-      // Silent background refresh to catch any server-side discrepancies
-      google.script.run
-        .withSuccessHandler(data=>{ST=data;ST.saidas=ST.saidas||[];ST.cadastros=ST.cadastros||[];ST.lookups.entrevistadores=ST.lookups.entrevistadores||[];try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}hydrate();renderAll();})
-        .getInitialData();
     })
-    .withFailureHandler(err=>{load(false);toast(err.message||err)})
+    .withFailureHandler(err=>{
+      const i=ST.records.findIndex(x=>x.rowNumber===tempId);
+      if(i>=0){if(prev)ST.records[i]=prev;else ST.records.splice(i,1);}
+      try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}
+      renderAll();
+      toast('Não foi possível salvar: '+(err.message||err));
+    })
     .saveRecord(payload);
 }
 function editRecord(rn){const r=ST.records.find(x=>x.rowNumber===rn);if(!r)return;setForm(r);showTab('novo')}
