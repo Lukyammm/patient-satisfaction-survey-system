@@ -384,7 +384,7 @@
           <span id="advClearLabel">Limpar filtros</span>
         </button>
         <div id="savedFiltersContainer" style="display:inline-flex;gap:4px;align-items:center"></div>
-        <button onclick="reload(this)" class="advBtn px-2.5" title="Atualizar dados">
+        <button onclick="reload()" class="advBtn px-2.5" title="Atualizar dados">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
         <div class="ml-auto hide-sm">
@@ -1619,12 +1619,11 @@ function applyData(data){
   PENDING.forEach(rec=>{if(!ST.records.some(x=>x.rowNumber===rec.rowNumber))ST.records.push(rec)});
   try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
 }
-function reload(btn){
+function reload(){
   load(true);
-  if(btn){btn.style.opacity='0.5';btn.style.pointerEvents='none';}
   google.script.run
-    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false);if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}toast('Dados atualizados!')})
-    .withFailureHandler(err=>{load(false);if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}toast(err.message||err)})
+    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false)})
+    .withFailureHandler(err=>{load(false);toast(err.message||err)})
     .getInitialData();
 }
 function saveRecord(e){
