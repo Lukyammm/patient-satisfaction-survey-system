@@ -497,7 +497,7 @@
           <p class="ch3s mb-3">farol verde ≥ 90% satisfação</p>
           <div class="overflow-auto">
             <table class="tbl"><thead><tr>
-              <th>Setor</th><th>Pesquisas</th><th>Aplicação</th><th>Satisfação</th><th>NPS</th>
+              <th>Setor</th><th>Pesquisas</th><th>Aplicação</th><th>Satisfação</th><th>Num.</th><th>Den.</th><th>NPS</th>
             </tr></thead><tbody id="setorBody"></tbody></table>
           </div>
         </div>
@@ -1014,11 +1014,16 @@ function rSetores(){
     const s=sum(v),sd=scopedSaidas(k),ap=sd?s.total/sd*100:null;
     const fd=s.sat==null?'d-mt':s.sat>=META_S?'d-ok':s.sat>=META_S-10?'d-w':'d-bd';
     const abd=ap!=null&&ap<META_A,sbd=s.sat!=null&&s.sat<META_S;
+    // Cálculo de numerador e denominador da satisfação
+    const satNum=s.ot+s.bo;  // Ótimo + Bom
+    const satDen=s.ot+s.bo+s.re+s.ru;  // Ótimo + Bom + Regular + Ruim (exclui N/A)
     return`<tr><td><span class="dot ${fd}"></span>${esc(k)}</td><td>${s.total}</td>
     <td><span class="mbar"><i style="width:${Math.min(100,ap||0)}%;${abd?'background:#ef4444':''}"></i></span><span style="color:${abd?'#ef4444':'var(--ink)'}">${fmt(ap)}</span></td>
     <td><span class="mbar"><i style="width:${Math.min(100,s.sat||0)}%;${sbd?'background:#ef4444':''}"></i></span><span style="color:${sbd?'#ef4444':'var(--ink)'}">${fmt(s.sat,1)}</span></td>
+    <td style="text-align:center;color:var(--sub);font-size:13px">${satNum}</td>
+    <td style="text-align:center;color:var(--sub);font-size:13px">${satDen}</td>
     <td>${fmt(s.nps)}</td></tr>`;
-  }).join('')||'<tr><td colspan="5" class="empty">Sem dados.</td></tr>';
+  }).join('')||'<tr><td colspan="7" class="empty">Sem dados.</td></tr>';
 }
 function rManif(rr){
   const cats=[['t-rc','RECLAMAÇÃO','reclamacoes'],['t-sg','SUGESTÃO','sugestoes'],['t-el','ELOGIO','elogios'],['t-cm','COMENTÁRIO','comentarios']];
