@@ -397,3 +397,141 @@ function backfillSatisfacaoBlocks() {
   Logger.log(msg);
   return msg;
 }
+
+// ── OCR via Google Vision API ──
+
+function ocrPdfViaVisionApi(base64Content) {
+  const props = PropertiesService.getUserProperties();
+  const keyJson = props.getProperty('GOOGLE_CLOUD_KEY');
+  if (!keyJson) throw new Error('Chave Google Cloud não configurada.');
+
+  const key = JSON.parse(keyJson);
+  const accessToken = getGoogleAccessToken_(key);
+
+  const payload = {
+    requests: [{
+      image: { content: base64Content },
+      features: [{ type: 'DOCUMENT_TEXT_DETECTION' }]
+    }]
+  };
+
+  const response = UrlFetchApp.fetch('https://vision.googleapis.com/v1/images:annotate', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + accessToken },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('Erro Vision API: ' + response.getContentText());
+  }
+
+  const result = JSON.parse(response.getContentText());
+  return parseOcrResult_(result);
+}
+
+function getGoogleAccessToken_(serviceAccountKey) {
+  const now = Math.floor(Date.now() / 1000);
+  const expiration = now + 3600;
+
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const claim = {
+    iss: serviceAccountKey.client_email,
+    scope: 'https://www.googleapis.com/auth/cloud-platform',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: expiration,
+    iat: now
+  };
+
+  const headerEncoded = Utilities.base64Encode(JSON.stringify(header), true).replace(/=/g, '');
+  const claimEncoded = Utilities.base64Encode(JSON.stringify(claim), true).replace(/=/g, '');
+  const signatureInput = headerEncoded + '.' + claimEncoded;
+
+  const signature = Utilities.computeRsaSha256Signature(signatureInput, serviceAccountKey.private_key);
+  const signatureEncoded = Utilities.base64Encode(signature, true).replace(/=/g, '');
+
+  const jwt = signatureInput + '.' + signatureEncoded;
+
+  const response = UrlFetchApp.fetch('https://oauth2.googleapis.com/token', {
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    payload: 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=' + jwt,
+    muteHttpExceptions: true
+  });
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('Erro OAuth: ' + response.getContentText());
+  }
+
+  return JSON.parse(response.getContentText()).access_token;
+}
+
+function parseOcrResult_(visionResponse) {
+  const responses = visionResponse.responses || [];
+  if (!responses.length || responses[0].error) {
+    throw new Error('Erro OCR: ' + JSON.stringify(responses[0]?.error || 'Sem resposta'));
+  }
+
+  const fullText = responses[0].fullAnnotation?.text || '';
+  const lines = fullText.split('\n');
+
+  // Parsing básico — tenta extrair campos-chave
+  const getText = (pattern) => {
+    const regex = new RegExp(pattern, 'i');
+    const match = fullText.match(regex);
+    return match ? match[1]?.trim() || '' : '';
+  };
+
+  const findRating = (fieldName) => {
+    const lines2 = fullText.split('\n');
+    for (let i = 0; i < lines2.length; i++) {
+      if (lines2[i].toLowerCase().includes(fieldName.toLowerCase())) {
+        const nextLines = lines2.slice(i, Math.min(i + 3, lines2.length)).join(' ');
+        if (/ótimo|excelente/i.test(nextLines)) return 'ÓTIMO';
+        if (/bom|boa/i.test(nextLines)) return 'BOM';
+        if (/regular|razoável/i.test(nextLines)) return 'REGULAR';
+        if (/ruim|péssimo/i.test(nextLines)) return 'RUIM';
+        if (/n\/a|na|não/i.test(nextLines)) return 'N/A';
+      }
+    }
+    return '';
+  };
+
+  const findNps = () => {
+    const match = fullText.match(/\b([0-9]|10)\b/);
+    return match ? parseInt(match[1]) : '';
+  };
+
+  const findType = () => {
+    if (/\bpaciente\b/i.test(fullText)) return 'PACIENTE';
+    if (/\bacompanhante\b/i.test(fullText)) return 'ACOMPANHANTE';
+    if (/\bcolaborad|colaborador\b/i.test(fullText)) return 'COLABORADA';
+    return '';
+  };
+
+  return {
+    setor: getText(/UNIDADE[:\s]+([^\n]+)/),
+    tipo: findType(),
+    sexo: /\bf\b/i.test(fullText) ? 'F' : /\bm\b/i.test(fullText) ? 'M' : '',
+    data: getText(/DATA[:\s]+([^\n]+)/),
+    pront: getText(/PRONT[:\s]+([^\n]+)/),
+    gentilezaAcolhimento: findRating('Gentileza'),
+    agilidade: findRating('Agilidade'),
+    clareza: findRating('Clareza'),
+    gentilezaAssistencia: findRating('Assistência'),
+    identificacao: findRating('Identificação'),
+    intimidade: findRating('Intimidade'),
+    horarioDescanso: findRating('Horário'),
+    esclarecimento: findRating('Esclarecimento'),
+    cuidados: findRating('Cuidados'),
+    confianca: findRating('Confiança'),
+    acesso: findRating('Acesso'),
+    acomodacao: findRating('Acomodação'),
+    limpeza: findRating('Limpeza'),
+    enxoval: findRating('Enxoval'),
+    alimentacao: findRating('Alimentação'),
+    locomocao: findRating('Locomoção'),
+    nps: findNps()
+  };
+}
