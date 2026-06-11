@@ -321,3 +321,71 @@ function numberFromPercent_(v) {
   if (isNaN(n)) return 0;
   return n <= 1 ? n * 100 : n;
 }
+
+/**
+ * Preenche as colunas K (SATISFAÇÃO I), T (SATISFAÇÃO II) e AB (SATISFAÇÃO III)
+ * para todos os registros históricos que estejam com esses valores vazios.
+ * Execute uma única vez pelo editor de script: Funções > backfillSatisfacaoBlocks
+ */
+function backfillSatisfacaoBlocks() {
+  const sheet = getSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < FIRST_DATA_ROW) { Logger.log('Nenhum registro encontrado.'); return; }
+
+  const numRows = lastRow - FIRST_DATA_ROW + 1;
+  const range = sheet.getRange(FIRST_DATA_ROW, 1, numRows, LAST_COL);
+  const values = range.getValues();
+
+  const blockSatFromRow = (row, keys) => {
+    let ob = 0, valid = 0;
+    keys.forEach(k => {
+      const v = String(row[COL[k] - 1] || '').toUpperCase();
+      if (v === 'ÓTIMO' || v === 'BOM') { ob++; valid++; }
+      else if (v === 'REGULAR' || v === 'RUIM') valid++;
+    });
+    return valid ? ob / valid : null; // null = sem dados válidos, não sobrescreve
+  };
+
+  let updated = 0;
+  const rangeListAddrs = [];
+
+  values.forEach((row, i) => {
+    const rowNum = FIRST_DATA_ROW + i;
+    const isEmpty = v => v === '' || v === null || v === undefined;
+
+    const s1 = row[COL.satisfacao1 - 1];
+    const s2 = row[COL.satisfacao2 - 1];
+    const s3 = row[COL.satisfacao3 - 1];
+
+    // Só processa linhas com conteúdo e pelo menos uma sub-taxa vazia
+    if (!hasContent_(rowToObject_(row.map(v => String(v || '')), rowNum))) return;
+    if (!isEmpty(s1) && !isEmpty(s2) && !isEmpty(s3)) return;
+
+    let changed = false;
+    if (isEmpty(s1)) {
+      const v = blockSatFromRow(row, BLOCO_ACOLHIMENTO);
+      if (v !== null) { row[COL.satisfacao1 - 1] = v; rangeListAddrs.push(`K${rowNum}`); changed = true; }
+    }
+    if (isEmpty(s2)) {
+      const v = blockSatFromRow(row, BLOCO_ASSISTENCIA);
+      if (v !== null) { row[COL.satisfacao2 - 1] = v; rangeListAddrs.push(`T${rowNum}`); changed = true; }
+    }
+    if (isEmpty(s3)) {
+      const v = blockSatFromRow(row, BLOCO_SERVICOS);
+      if (v !== null) { row[COL.satisfacao3 - 1] = v; rangeListAddrs.push(`AB${rowNum}`); changed = true; }
+    }
+
+    if (changed) {
+      sheet.getRange(rowNum, 1, 1, LAST_COL).setValues([row]);
+      updated++;
+    }
+  });
+
+  if (rangeListAddrs.length) {
+    sheet.getRangeList(rangeListAddrs).setNumberFormat('0.00%');
+  }
+
+  const msg = `backfillSatisfacaoBlocks: ${updated} linha(s) atualizada(s).`;
+  Logger.log(msg);
+  return msg;
+}
