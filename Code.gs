@@ -112,9 +112,11 @@ function getSaidas() {
 
 function saveSaida(payload) {
   const sheet = getSaidasSheet_();
-  const rowNumber = Number(payload.rowNumber) || sheet.getLastRow() + 1;
-  sheet.getRange(rowNumber, 1, 1, 3).setValues([[payload.mes || '', payload.setor || '', Number(payload.saidas) || 0]]);
-  return { ok: true, rowNumber, message: Number(payload.rowNumber) ? 'Saídas atualizadas.' : 'Saídas registradas.' };
+  const isEdit = !!Number(payload.rowNumber);
+  const rowNumber = isEdit ? Number(payload.rowNumber) : sheet.getLastRow() + 1;
+  const mes = payload.mes || '', setor = payload.setor || '', saidas = Number(payload.saidas) || 0;
+  sheet.getRange(rowNumber, 1, 1, 3).setValues([[mes, setor, saidas]]);
+  return { ok: true, rowNumber, saida: { rowNumber, mes, setor, saidas }, message: isEdit ? 'Saídas atualizadas.' : 'Saídas registradas.' };
 }
 
 function deleteSaida(rowNumber) {

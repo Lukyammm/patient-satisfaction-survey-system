@@ -341,6 +341,10 @@
           Mais filtros<span id="advCount" class="badge" style="display:none"></span>
           <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
+        <button id="advClearChip" onclick="clearAdv()" class="advBtn" style="display:none;color:var(--blue);border-color:var(--blue)">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span id="advClearLabel">Limpar filtros</span>
+        </button>
         <button onclick="reload()" class="advBtn px-2.5" title="Atualizar dados">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
@@ -475,14 +479,22 @@
     <!-- ══ NOVA PESQUISA ═══════════════════════════ -->
     <section id="novo" class="section">
       <form id="form" onsubmit="saveRecord(event)">
+        <!-- Faixa de modo edição — visível só quando editando -->
+        <div id="editBanner" style="display:none;background:var(--s3);border-left:3px solid var(--blue);padding:10px 20px;margin-bottom:8px;border-radius:8px;display:none;align-items:center;justify-content:space-between">
+          <span style="font-size:13px;color:var(--ink)">
+            <svg style="display:inline;vertical-align:-2px;margin-right:6px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editando pesquisa <b id="editRowLabel"></b>
+          </span>
+          <button type="button" class="btn" onclick="cancelEdit()">Cancelar edição</button>
+        </div>
         <div class="ph">
           <div>
-            <h2 class="pt">Nova pesquisa</h2>
+            <h2 class="pt" id="novoTitle">Nova pesquisa</h2>
             <p class="text-xs text-mut mt-0.5">Registro na aba MATRIZ</p>
           </div>
           <div class="flex gap-2">
             <button type="button" class="btn" onclick="setForm({})">Limpar</button>
-            <button class="btn-p" type="submit">Salvar pesquisa</button>
+            <button class="btn-p" type="submit" id="submitBtn">Salvar pesquisa</button>
           </div>
         </div>
         <input type="hidden" id="rowNumber">
@@ -640,7 +652,10 @@
 
   <!-- Toast -->
   <div id="toast" class="fixed bottom-6 left-1/2 bg-s2 border border-s4 text-ink px-4 py-2.5 rounded-xl text-sm font-medium opacity-0 z-50"
-       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12)"></div>
+       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px">
+    <span id="toastMsg"></span>
+    <button onclick="closeToast()" style="margin-left:2px;background:none;border:none;cursor:pointer;color:var(--gTxt);font-size:16px;line-height:1;padding:0 2px" title="Fechar">×</button>
+  </div>
 
 <script>
 const META_A=60,META_S=90,META_N=75;
@@ -657,7 +672,9 @@ let ST={records:[],saidas:[],cadastros:[],lookups:{setores:[],tipos:[],sexos:[],
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-function toast(msg){const t=$('toast');t.textContent=msg;t.style.opacity='1';t.style.transform='translate(-50%,0)';setTimeout(()=>{t.style.opacity='0';t.style.transform='translate(-50%,8px)'},2500)}
+let _toastTimer=null;
+function toast(msg){const t=$('toast');$('toastMsg').textContent=msg;t.style.opacity='1';t.style.transform='translate(-50%,0)';clearTimeout(_toastTimer);_toastTimer=setTimeout(closeToast,3000)}
+function closeToast(){const t=$('toast');t.style.opacity='0';t.style.transform='translate(-50%,8px)'}
 function load(v){$('topbar').classList.toggle('on',v)}
 function showTab(tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(tab).classList.add('active');document.querySelectorAll('.nav-b').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 document.querySelectorAll('.nav-b').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
@@ -709,6 +726,8 @@ function adv(rr){
 function updateAdvUI(){
   const n=advCount(),b=$('advCount');
   b.style.display=n?'':'none';b.textContent=n;
+  const chip=$('advClearChip');
+  if(chip){chip.style.display=n?'':'none';$('advClearLabel').textContent=n===1?'1 filtro ativo · Limpar':n+' filtros ativos · Limpar';}
   if(n&&!$('advPanel').classList.contains('open'))toggleAdv();
 }
 
@@ -920,8 +939,8 @@ function renderTable(){
   $('regSub').textContent=rr.length+' registro'+(rr.length===1?'':'s')+' no filtro atual';
   $('tbody').innerHTML=rr.length?rr.map(r=>{
     const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
-    return`<tr${r._saving?' style="opacity:.55"':''}><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button></td></tr>`;
-  }).join(''):'<tr><td colspan="10" class="empty">Sem registros para os filtros atuais.</td></tr>';
+    return`<tr${r._saving?' style="opacity:.55"':''}><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><div style="display:flex;gap:4px"><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button><button class="btn" style="padding:3px 9px;font-size:12px;color:#ef4444;border-color:#ef4444" onclick='rmRecord(${JSON.stringify(r.rowNumber)})'>Excluir</button></div></td></tr>`;
+  }).join(''):(q||advCount()?'<tr><td colspan="10" class="empty">Sem registros para os filtros atuais.</td></tr>':'<tr><td colspan="10" class="empty">Nenhuma pesquisa registrada ainda. <a href="#" onclick="showTab(\'novo\');return false" style="color:var(--blue)">Criar nova pesquisa →</a></td></tr>');
 }
 function rSaidas(){
   const rr=[...ST.saidas].sort((a,b)=>(b.mes+b.setor).localeCompare(a.mes+a.setor));
@@ -985,7 +1004,8 @@ function renderReport(){
   const sets=[...new Set(rr.map(r=>r.setor||'SEM SETOR'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const sG=sum(rr),sm=ST.saidas.filter(s=>s.mes===mes);
   const tS=sm.reduce((t,x)=>t+x.saidas,0);
-  let h=`<h2>Pesquisa de Satisfação — ${esc(ml(mes))}</h2>
+  const warnSaidas=!tS?`<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#92400e" class="no-print"><svg style="display:inline;vertical-align:-2px;margin-right:6px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Saídas de ${esc(ml(mes))} não cadastradas. A % de aplicação não pode ser calculada. <a href="#" onclick="showTab('saidas');return false" style="color:#92400e;font-weight:600">Cadastrar saídas →</a></div>`:'';
+  let h=warnSaidas+`<h2>Pesquisa de Satisfação — ${esc(ml(mes))}</h2>
   <p>A pesquisa de satisfação tem por objetivo avaliar a satisfação dos usuários atendidos no Hospital Universitário do Ceará – HUC, priorizando a percepção do cuidado centrado no paciente e as oportunidades de melhorias na prestação dos serviços ofertados. A meta de aplicação é de 60%, considerando as saídas hospitalares (altas, transferências externas e óbitos). O indicador de satisfação tem meta de 90%.</p>
   <p>Dados quantitativos por setor:</p>
   <table><thead><tr><th>SETOR</th><th>SAÍDAS</th><th>PESQUISAS APLIC.</th><th>% APLICAÇÃO</th><th>SATISFAÇÃO</th><th>NPS</th></tr></thead><tbody>`;
@@ -1059,6 +1079,7 @@ function setForm(r={}){
   syncNps(r.nps!==''&&r.nps!=null?r.nps:null);
   RF.forEach(f=>{const v=String(r[f]||'ÓTIMO').toUpperCase();const el=document.querySelector(`input[name="${f}"][value="${CSS.escape(v)}"]`)||document.querySelector(`input[name="${f}"]`);if(el)el.checked=true});
   $('rowNumber').value=r.rowNumber||'';
+  if(!r.rowNumber)setEditMode(false);
 }
 // Registros otimistas ainda não confirmados pelo servidor — re-mesclados
 // sempre que dados frescos substituem ST, para nunca sumirem da tela
@@ -1138,8 +1159,52 @@ function saveRecord(e){
     })
     .saveRecord(payload);
 }
-function editRecord(rn){const r=ST.records.find(x=>x.rowNumber===rn);if(!r)return;setForm(r);showTab('novo')}
-function saveSaida(e){e.preventDefault();const p={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:$('sSaidas').value};if(!p.mes||!p.setor)return toast('Informe mês e setor.');load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);$('sRowNumber').value='';$('formSaida').reset();reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).saveSaida(p)}
+function editRecord(rn){const r=ST.records.find(x=>x.rowNumber===rn);if(!r)return;setForm(r);showTab('novo');setEditMode(true,rn)}
+function rmRecord(rn){
+  if(!confirm('Excluir este registro? Esta ação não pode ser desfeita.'))return;
+  const idx=ST.records.findIndex(x=>x.rowNumber===rn);
+  const backup=idx>=0?ST.records[idx]:null;
+  if(idx>=0)ST.records.splice(idx,1);
+  renderAll();
+  toast('Registro excluído.');
+  if(String(rn).startsWith('tmp_'))return; // ainda não persistido, só remove localmente
+  google.script.run
+    .withFailureHandler(err=>{if(backup&&idx>=0)ST.records.splice(idx,0,backup);renderAll();toast('Erro ao excluir: '+(err.message||err));})
+    .deleteRecord(rn);
+}
+function setEditMode(on,rn){
+  const banner=$('editBanner'),title=$('novoTitle'),btn=$('submitBtn');
+  if(banner)banner.style.display=on?'flex':'none';
+  if(title)title.textContent=on?'Editando pesquisa':'Nova pesquisa';
+  if(btn)btn.textContent=on?'Atualizar pesquisa':'Salvar pesquisa';
+  if($('editRowLabel'))$('editRowLabel').textContent=rn?'#'+rn:'';
+}
+function cancelEdit(){setForm({});setEditMode(false);showTab('registros')}
+function saveSaida(e){
+  e.preventDefault();
+  const p={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:Number($('sSaidas').value)||0};
+  if(!p.mes||!p.setor)return toast('Informe mês e setor.');
+  const editing=!!(p.rowNumber&&Number(p.rowNumber));
+  const tempId=editing?Number(p.rowNumber):'tmp_s'+Date.now();
+  const rec={rowNumber:tempId,mes:p.mes,setor:p.setor,saidas:p.saidas,_saving:true};
+  const prevIdx=ST.saidas.findIndex(x=>x.rowNumber===tempId);
+  const prev=prevIdx>=0?ST.saidas[prevIdx]:null;
+  if(prevIdx>=0)ST.saidas[prevIdx]=rec;else ST.saidas.push(rec);
+  $('sRowNumber').value='';$('formSaida').reset();
+  renderAll();
+  toast(editing?'Saídas atualizadas.':'Saídas registradas.');
+  google.script.run
+    .withSuccessHandler(res=>{
+      const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
+      if(i>=0){if(res&&res.saida){res.saida._saving=false;ST.saidas[i]=res.saida;}else{ST.saidas[i].rowNumber=res.rowNumber||tempId;delete ST.saidas[i]._saving;}try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(_){}renderAll();}
+    })
+    .withFailureHandler(err=>{
+      const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
+      if(i>=0){if(prev)ST.saidas[i]=prev;else ST.saidas.splice(i,1);}
+      renderAll();toast('Erro ao salvar: '+(err.message||err));
+    })
+    .saveSaida(p);
+}
 function editSaida(rn){const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
 function rmSaida(rn){if(!confirm('Excluir?'))return;load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).deleteSaida(rn)}
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
