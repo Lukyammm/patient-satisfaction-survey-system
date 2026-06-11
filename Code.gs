@@ -155,7 +155,6 @@ function saveRecord(payload) {
   row[COL.taxaSatisfacao - 1] = total ? (otimo + bom) / total : 0;
 
   sheet.getRange(rowNumber, 1, 1, LAST_COL).setValues([row]);
-  SpreadsheetApp.flush();
 
   const saved = rowToObject_(row.map(v => v === '' ? '' : String(v)), rowNumber);
   return { ok: true, rowNumber, record: saved, message: isEdit ? 'Registro atualizado.' : 'Registro salvo.' };
