@@ -242,7 +242,6 @@
 
     /* ── Bottom Navigation (Mobile) ── */
     #bottomNav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s2);border-top:1px solid var(--s4);height:64px;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:25;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 -2px 12px rgba(0,0,0,.08)}
-    #bottomNav{display:grid;grid-template-columns:repeat(6,1fr);gap:0}
     .bottom-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;color:var(--mut);cursor:pointer;transition:all .2s ease;border-top:3px solid transparent;text-decoration:none;font-size:11px;font-weight:500}
     .bottom-nav-item:hover{color:var(--ink)}
     .bottom-nav-item.active{color:#2563eb;border-top-color:#2563eb}
@@ -1582,9 +1581,15 @@ function applyData(data){
 }
 function reload(){
   load(true);
+  const reloadBtn=event?.target;
+  if(reloadBtn){
+    reloadBtn.style.opacity='0.5';
+    reloadBtn.style.pointerEvents='none';
+  }
+  toast('Atualizando dados...');
   google.script.run
-    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false)})
-    .withFailureHandler(err=>{load(false);toast(err.message||err)})
+    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false);if(reloadBtn){reloadBtn.style.opacity='1';reloadBtn.style.pointerEvents='auto'}toast('Dados atualizados!')})
+    .withFailureHandler(err=>{load(false);if(reloadBtn){reloadBtn.style.opacity='1';reloadBtn.style.pointerEvents='auto'}toast(err.message||err)})
     .getInitialData();
 }
 function saveRecord(e){
