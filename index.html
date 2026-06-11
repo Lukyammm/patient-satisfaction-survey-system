@@ -185,8 +185,17 @@
     .fsel select option{background:var(--s2);color:var(--ink)}
     .fsel::after{content:"";position:absolute;right:12px;top:50%;width:7px;height:7px;transform:translateY(-60%) rotate(45deg);border-right:1.5px solid var(--mut);border-bottom:1.5px solid var(--mut);pointer-events:none}
     .fsel.on{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.35)}
-    .fsel.on select,.fsel.on>svg{color:var(--blue)}
-    .fsel.on select{font-weight:600}
+    .fsel.on>span,.fsel.on>svg{color:var(--blue)}
+    .fsel.on>span{font-weight:600}
+    /* ── Dropdown popover ── */
+    .fdrop{position:absolute;top:100%;left:0;margin-top:6px;min-width:180px;background:var(--s2);border:1px solid var(--s4);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);z-index:50;display:none;flex-direction:column}
+    .fdrop.open{display:flex}
+    .fdrop-item{padding:8px 14px;font-size:12px;color:var(--sub);cursor:pointer;transition:all .12s ease;border:0;background:transparent;text-align:left;white-space:nowrap}
+    .fdrop-item:hover{background:var(--s3);color:var(--ink)}
+    .fdrop-item.active{background:rgba(37,99,235,.1);color:var(--blue);font-weight:600}
+    .fdrop-item:first-child{border-radius:9px 9px 0 0}
+    .fdrop-item:last-child{border-radius:0 0 9px 9px}
+    .fdrop-sep{height:1px;background:var(--s4);margin:2px 0}
     .fbar-actions{margin-left:auto;display:flex;align-items:center;gap:6px}
     .icoBtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:99px;background:var(--s3);border:1px solid transparent;color:var(--sub);cursor:pointer;transition:all .14s ease}
     .icoBtn:hover{background:var(--s4a);color:var(--ink)}
@@ -461,13 +470,21 @@
       <div class="hdr-filter min-h-[48px] flex items-center gap-2 py-2 flex-wrap">
         <!-- Quick period presets -->
         <div id="quickPeriods" class="fgrp"></div>
-        <div class="fsel" id="gMesWrap" title="Filtrar por mês">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <select id="gMes" onchange="onMesChange()"><option value="">Todos os meses</option></select>
+        <div style="position:relative">
+          <button class="fsel" id="gMesWrap" onclick="toggleFdrop(this,'gMesMenu')" title="Filtrar por mês" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="gMesLabel">Todos os meses</span>
+          </button>
+          <div class="fdrop" id="gMesMenu" onmouseleave="closeFdrop(this)"></div>
+          <input type="hidden" id="gMes">
         </div>
-        <div class="fsel" id="gSetorWrap" title="Filtrar por setor">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 8h1m4 0h1M9 12h1m4 0h1M9 16h1m4 0h1"/></svg>
-          <select id="gSetor" onchange="renderAll()"><option value="">Todos os setores</option></select>
+        <div style="position:relative">
+          <button class="fsel" id="gSetorWrap" onclick="toggleFdrop(this,'gSetorMenu')" title="Filtrar por setor" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 8h1m4 0h1M9 12h1m4 0h1M9 16h1m4 0h1"/></svg>
+            <span id="gSetorLabel">Todos os setores</span>
+          </button>
+          <div class="fdrop" id="gSetorMenu" onmouseleave="closeFdrop(this)"></div>
+          <input type="hidden" id="gSetor">
         </div>
         <span class="fbar-sep hide-sm"></span>
         <button id="advBtn" onclick="toggleAdv()" class="advBtn">
@@ -1080,6 +1097,24 @@ function fixDatalist(inp){
 }
 document.querySelectorAll('input[list]').forEach(fixDatalist);
 
+/* ── Dropdowns customizados (mês e setor) ── */
+function toggleFdrop(btn,menuId){const m=$(menuId);if(m.classList.contains('open'))closeFdrop(m);else openFdrop(m,btn)}
+function openFdrop(menu,btn){document.querySelectorAll('.fdrop.open').forEach(m=>m.classList.remove('open'));menu.classList.add('open');const r=btn.getBoundingClientRect(),mr=menu.getBoundingClientRect();if(mr.right>window.innerWidth)menu.style.left='auto',menu.style.right='0'}
+function closeFdrop(menu){menu.classList.remove('open')}
+function setMesOption(val){$('gMes').value=val;onMesChange();closeFdrop($('gMesMenu'))}
+function setSetorOption(val){$('gSetor').value=val;renderAll();closeFdrop($('gSetorMenu'))}
+function renderFdropMes(){
+  const m=$('gMesMenu'),cur=$('gMes').value,opts=['<button class="fdrop-item" onclick="setMesOption(\\'\\')">Todos os meses</button>'];
+  allM().reverse().forEach(x=>opts.push(`<button class="fdrop-item${cur===x?' active':''}" onclick="setMesOption('${esc(x)}');">${esc(ml(x))}</button>`));
+  m.innerHTML=opts.join('')
+}
+function renderFdropSetor(){
+  const m=$('gSetorMenu'),cur=$('gSetor').value,opts=['<button class="fdrop-item" onclick="setSetorOption(\\'\\')">Todos os setores</button>'];
+  const sets=new Set();ST.records.forEach(r=>sets.add(r.setor||''));ST.saidas.forEach(s=>sets.add(s.setor||''));[...sets].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(s=>opts.push(`<button class="fdrop-item${cur===s?' active':''}" onclick="setSetorOption('${esc(s)}');">${esc(s)}</button>`));
+  m.innerHTML=opts.join('')
+}
+function updateFdropLabels(){$('gMesLabel').textContent=allM().find(x=>x===$('gMes').value)?ml($('gMes').value):'Todos os meses';$('gSetorLabel').textContent=$('gSetor').value||'Todos os setores'}
+
 /* ── Filtros avançados ── */
 const ADV=['fTipo','fSexo','fEnt','fNps','fManif'];
 function toggleAdv(){const o=$('advPanel').classList.toggle('open');$('advBtn').classList.toggle('open',o)}
@@ -1159,12 +1194,12 @@ function allM(){const s=new Set(ST.records.map(mo).filter(Boolean));ST.saidas.fo
 
 function hydrate(){
   const m=allM().reverse(),cm=$('gMes').value;
-  $('gMes').innerHTML='<option value="">Todos os meses</option>'+m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('');
   $('gMes').value=m.includes(cm)?cm:(m[0]||'');
   const cr=$('repMes').value;
   $('repMes').innerHTML=m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('')||'<option value="">Sem dados</option>';
   if(m.includes(cr))$('repMes').value=cr;
   refreshSetores($('gMes').value);
+  renderFdropMes();renderFdropSetor();updateFdropLabels();
   $('setoresList').innerHTML=ST.lookups.setores.map(v=>`<option value="${esc(v)}"></option>`).join('');
   $('tiposList').innerHTML=(ST.lookups.tipos||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');
   $('entList').innerHTML=(ST.lookups.entrevistadores||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');
@@ -1179,8 +1214,8 @@ function refreshSetores(mes){
   const cs=$('gSetor').value;
   const rr=ST.records.filter(r=>!mes||mo(r)===mes);
   const sets=[...new Set(rr.map(r=>String(r.setor||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  $('gSetor').innerHTML='<option value="">Todos os setores</option>'+sets.map(v=>`<option>${esc(v)}</option>`).join('');
   if(sets.includes(cs))$('gSetor').value=cs;
+  renderFdropSetor();updateFdropLabels();
 }
 function rows(mes,setor){return ST.records.filter(r=>(!mes||mo(r)===mes)&&(!setor||r.setor===setor))}
 function saidas(mes,setor){return ST.saidas.filter(s=>(!mes||s.mes===mes)&&(!setor||s.setor===setor)).reduce((t,x)=>t+x.saidas,0)}
@@ -1217,6 +1252,7 @@ function renderAll(){
   const mes=$('gMes').value;
   refreshSetores(mes);
   syncPeriodUI();
+  updateFdropLabels();
   const set=$('gSetor').value;
   updateAdvUI();
   const rr=adv(scopedRows(set)),s=sum(rr);
@@ -1994,7 +2030,8 @@ buildForm();buildNps();buildQuickPeriods();setupFormValidation();
 // Show cached data immediately while fresh data loads
 try{const c=localStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
 reload();
-window.addEventListener('scroll',()=>{const vis=window.scrollY>300&&!!document.querySelector('#relatorio.active');document.getElementById('rptFab').classList.toggle('vis',vis);},{passive:true});
+window.addEventListener('scroll',()=>{const vis=window.scrollY>300&&!!document.querySelector('#relatorio.active');document.getElementById('rptFab').classList.toggle('vis',vis);document.querySelectorAll('.fdrop.open').forEach(m=>m.classList.remove('open'));},{passive:true});
+document.addEventListener('click',e=>{if(!e.target.closest('.fsel')&&!e.target.closest('.fdrop'))document.querySelectorAll('.fdrop.open').forEach(m=>m.classList.remove('open'))});
 </script>
 
 <div id="rptFab">
