@@ -92,6 +92,14 @@
     svg text{font-family:Inter,sans-serif}
     .card{box-shadow:var(--card-shadow);transition:box-shadow .2s ease}
 
+    /* ── Validação em tempo real ── */
+    .field-error{border-color:#ef4444!important;background:rgba(239,68,68,.03)!important}
+    .field-error:focus{ring:2px solid rgba(239,68,68,.3)!important;border-color:#ef4444!important}
+    .error-hint{display:none;color:#ef4444;font-size:11px;margin-top:4px;font-weight:500}
+    .error-hint.show{display:block;animation:slideDown .2s ease}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .field-valid{border-color:#22c55e!important}
+
     /* ── Barra de progresso no topo ── */
     #topbar{position:fixed;top:0;left:0;right:0;height:2.5px;z-index:60;background:transparent;overflow:hidden;opacity:0;transition:opacity .2s}
     #topbar.on{opacity:1}
@@ -229,6 +237,23 @@
     .empty{text-align:center;color:var(--mut);padding:36px 10px;font-size:13px}
     .toast-on{opacity:1!important;transform:translate(-50%,0)!important}
 
+    /* ── Bottom Navigation (Mobile) ── */
+    #bottomNav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s2);border-top:1px solid var(--s4);height:64px;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:25;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+    #bottomNav{display:grid;grid-template-columns:repeat(6,1fr);gap:0}
+    .bottom-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;color:var(--mut);cursor:pointer;transition:all .2s ease;border-top:3px solid transparent;text-decoration:none;font-size:11px;font-weight:500}
+    .bottom-nav-item:hover{color:var(--ink)}
+    .bottom-nav-item.active{color:#2563eb;border-top-color:#2563eb}
+    .bottom-nav-item svg{width:20px;height:20px}
+
+    /* ── Tabela em Cards (Mobile) ── */
+    .tbl-cards{display:none}
+    .tbl-card{background:var(--s2);border:1px solid var(--s4);border-radius:12px;padding:14px;margin-bottom:10px;display:grid;gap:10px}
+    .tbl-card-row{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start}
+    .tbl-card-label{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+    .tbl-card-value{font-size:13px;color:var(--ink);font-weight:500}
+    .tbl-card-actions{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--s4)}
+    .tbl-card-actions button{flex:1;padding:8px 12px!important;font-size:12px!important}
+
     /* ══ Responsivo ══ */
     /* Tablet */
     @media(max-width:1080px){
@@ -240,11 +265,12 @@
     }
     /* Mobile */
     @media(max-width:720px){
-      #app{padding-left:16px;padding-right:16px;padding-top:14px}
+      #app{padding-left:16px;padding-right:16px;padding-top:14px;padding-bottom:80px}
       .hdr-row{padding-left:16px;padding-right:16px}
-      .hdr-nav{order:3;width:100%;margin:0;padding-bottom:4px;border-top:1px solid var(--s4);padding-top:4px}
+      .hdr-nav{display:none}
       .hdr-r1{height:auto!important;flex-wrap:wrap;padding-top:8px;padding-bottom:4px;row-gap:6px}
       .hdr-filter{height:auto!important;flex-wrap:wrap;row-gap:8px;padding:10px 0}
+      #bottomNav{display:grid}
       .pt{font-size:18px}
       .card{padding:16px;border-radius:18px}
       .nps label{min-width:0;padding:7px 0 5px}
@@ -254,6 +280,8 @@
       .crit-lbl{font-size:13px}
       .qp{padding:5px 12px}
       .hide-sm{display:none!important}
+      .tbl{display:none}
+      .tbl-cards{display:block}
     }
     @media(max-width:560px){
       .g4{grid-template-columns:1fr 1fr!important}
@@ -499,8 +527,14 @@
             <h2 class="pt" id="novoTitle">Nova pesquisa</h2>
             <p class="text-xs text-mut mt-0.5">Registro na aba MATRIZ</p>
           </div>
-          <div class="flex gap-2">
+          <div class="flex gap-2 items-center">
             <button type="button" class="btn" onclick="setForm({})">Limpar</button>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="color:var(--mut)" id="formProgress"></span>
+              <div style="width:60px;height:3px;background:var(--s3);border-radius:99px;overflow:hidden">
+                <div id="formProgressBar" style="height:100%;width:0%;background:#2563eb;border-radius:99px;transition:width .3s ease"></div>
+              </div>
+            </div>
             <button class="btn-p" type="submit" id="submitBtn">Salvar pesquisa</button>
           </div>
         </div>
@@ -580,6 +614,8 @@
           <tbody id="tbody"></tbody>
         </table>
       </div>
+      <!-- Cards para mobile -->
+      <div class="tbl-cards" id="tblCards"></div>
     </section>
 
     <!-- ══ SAÍDAS ════════════════════════════════════ -->
@@ -665,10 +701,38 @@
 
   <!-- Toast -->
   <div id="toast" class="fixed bottom-6 left-1/2 bg-s2 border border-s4 text-ink px-4 py-2.5 rounded-xl text-sm font-medium opacity-0 z-50"
-       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px">
+       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;@media (max-width:720px){bottom:80px}">
     <span id="toastMsg"></span>
     <button onclick="closeToast()" style="margin-left:2px;background:none;border:none;cursor:pointer;color:var(--gTxt);font-size:16px;line-height:1;padding:0 2px" title="Fechar">×</button>
   </div>
+
+  <!-- Bottom Navigation (Mobile only) -->
+  <nav id="bottomNav">
+    <a href="#" class="bottom-nav-item active" data-tab="overview" onclick="showTabMobile('overview');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Visão geral</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="novo" onclick="showTabMobile('novo');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Nova</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="registros" onclick="showTabMobile('registros');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>Registros</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="saidas" onclick="showTabMobile('saidas');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7v12m8-12v12M4 13h16"/></svg>
+      <span>Saídas</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="cadastros" onclick="showTabMobile('cadastros');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Cadastros</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="relatorio" onclick="showTabMobile('relatorio');return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="13" x2="16" y2="13"/><line x1="12" y1="17" x2="16" y2="17"/></svg>
+      <span>Relatório</span>
+    </a>
+  </nav>
 
   <!-- Mini-modal: cadastro inline de setor/entrevistador -->
   <div id="inlineModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center" onclick="if(event.target===this)closeInlineModal()">
@@ -704,6 +768,7 @@ function _showToast(msg){const t=$('toast');$('toastMsg').textContent=msg;t.styl
 function closeToast(){const t=$('toast');t.style.opacity='0';t.style.transform='translate(-50%,8px)';if(_toastQ.length)setTimeout(()=>{if(_toastQ.length)_showToast(_toastQ.shift())},350);}
 function load(v){$('topbar').classList.toggle('on',v)}
 function showTab(tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(tab).classList.add('active');document.querySelectorAll('.nav-b').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
+function showTabMobile(tab){showTab(tab);document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 document.querySelectorAll('.nav-b').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
 /* ── Theme ── */
@@ -987,15 +1052,24 @@ function toggleIncFilter(){INC_ONLY=!INC_ONLY;renderTable();updateIncUI()}
 function renderTable(){
   const q=($('q')?.value||'').toLowerCase();
   let base=adv(scopedRows($('gSetor').value));
-  if(INC_ONLY)base=ST.records.filter(r=>incIssues(r).length); // ignora período: mostra todas as inconsistências
+  if(INC_ONLY)base=ST.records.filter(r=>incIssues(r).length);
   const rr=base.filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q)).slice(-300).reverse();
   $('regSub').textContent=rr.length+' registro'+(rr.length===1?'':'s')+' no filtro atual';
+
+  // Render table (desktop)
   $('tbody').innerHTML=rr.length?rr.map(r=>{
     const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
     const iss=incIssues(r);
     const trStyle=[r._saving?'opacity:.55':'',iss.length?'box-shadow:inset 3px 0 0 #f59e0b':''].filter(Boolean).join(';');
     return`<tr${trStyle?` style="${trStyle}"`:''}${iss.length?` title="Inconsistências: ${esc(iss.join('; '))}"`:''}><td>${r.data?r.data.split('-').reverse().join('/'):''}</td><td>${esc(r.setor)}</td><td>${esc(r.pront)}</td><td>${esc(r.tipo)}</td><td>${esc(r.sexo)}</td><td>${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</td><td><span class="dot ${cls}"></span>${r.nps??''}</td><td style="color:var(--sub)">${esc(r.entrevistador||'')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)">${esc([r.reclamacoes,r.sugestoes,r.elogios,r.comentarios].filter(Boolean)[0]||'')}</td><td><div style="display:flex;gap:4px"><button class="btn" style="padding:3px 9px;font-size:12px" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button><button class="btn" style="padding:3px 9px;font-size:12px;color:#ef4444;border-color:#ef4444" onclick='rmRecord(${JSON.stringify(r.rowNumber)})'>Excluir</button></div></td></tr>`;
   }).join(''):(q||advCount()?'<tr><td colspan="10" class="empty">Sem registros para os filtros atuais.</td></tr>':'<tr><td colspan="10" class="empty">Nenhuma pesquisa registrada ainda. <a href="#" onclick="showTab(\'novo\');return false" style="color:var(--blue)">Criar nova pesquisa →</a></td></tr>');
+
+  // Render cards (mobile)
+  $('tblCards').innerHTML=rr.length?rr.map(r=>{
+    const x=+r.nps,cls=isNaN(x)?'d-mt':x>=9?'d-ok':x>=7?'d-w':'d-bd';
+    const iss=incIssues(r);
+    return`<div class="tbl-card"${iss.length?` style="border-left:3px solid #f59e0b"`:''}><div class="tbl-card-row"><span class="tbl-card-label">Data</span><span class="tbl-card-value">${r.data?r.data.split('-').reverse().join('/'):''}</span></div><div class="tbl-card-row"><span class="tbl-card-label">Setor</span><span class="tbl-card-value">${esc(r.setor)}</span></div><div class="tbl-card-row"><span class="tbl-card-label">Tipo</span><span class="tbl-card-value">${esc(r.tipo)}</span></div><div class="tbl-card-row"><span class="tbl-card-label">Satisfação</span><span class="tbl-card-value">${Number(r.taxaSatisfacao||0).toFixed(1).replace('.',',')}%</span></div><div class="tbl-card-row"><span class="tbl-card-label">NPS</span><span class="tbl-card-value"><span class="dot ${cls}"></span>${r.nps??''}</span></div><div class="tbl-card-row"><span class="tbl-card-label">Entrevistador</span><span class="tbl-card-value" style="color:var(--sub)">${esc(r.entrevistador||'')}</span></div>${iss.length?`<div class="tbl-card-row"><span class="tbl-card-label" style="color:#f59e0b">⚠️ Problemas</span><span class="tbl-card-value" style="color:#f59e0b;font-size:12px">${esc(iss.join(', '))}</span></div>`:''}<div class="tbl-card-actions"><button class="btn" onclick='editRecord(${JSON.stringify(r.rowNumber)})'>Editar</button><button class="btn" style="color:#ef4444;border-color:#ef4444" onclick='rmRecord(${JSON.stringify(r.rowNumber)})'>Excluir</button></div></div>`;
+  }).join(''):(q||advCount()?'<div class="empty">Sem registros para os filtros atuais.</div>':'<div class="empty">Nenhuma pesquisa registrada ainda. <a href="#" onclick="showTabMobile(\'novo\');return false" style="color:var(--blue)">Criar nova pesquisa →</a></div>');
 }
 function rSaidas(){
   const rr=[...ST.saidas].sort((a,b)=>(b.mes+b.setor).localeCompare(a.mes+a.setor));
@@ -1199,6 +1273,94 @@ function buildNps(){
   }).join('');
   document.querySelectorAll('input[name="npsScale"]').forEach(r=>r.addEventListener('change',function(){$('nps').value=this.value}));
 }
+
+/* ── Validação em tempo real ── */
+function setupFormValidation(){
+  // Track all form changes para atualizar progresso
+  const form=$('form');
+  if(form){
+    form.addEventListener('change',updateFormProgress);
+    form.addEventListener('input',updateFormProgress);
+  }
+
+  // Data: pre-fill com hoje
+  const dataInput=$('data');
+  if(dataInput){
+    if(!dataInput.value){
+      const today=new Date().toISOString().split('T')[0];
+      dataInput.value=today;
+      updateFormProgress();
+    }
+    dataInput.addEventListener('change',()=>{
+      const val=dataInput.value.trim();
+      const isValid=val.length>0&&/^\d{4}-\d{2}-\d{2}$/.test(val);
+      showFieldValidation(dataInput,isValid,'Data deve estar no formato válido (YYYY-MM-DD)');
+    });
+  }
+
+  // Setor: validação ao sair do campo
+  const setorInput=$('setor');
+  if(setorInput){
+    setorInput.addEventListener('blur',()=>{
+      const val=setorInput.value.trim();
+      const isValid=val.length>0;
+      showFieldValidation(setorInput,isValid,'Setor é obrigatório');
+    });
+    setorInput.addEventListener('input',()=>{
+      setorInput.classList.remove('field-error','field-valid');
+      const oldHint=setorInput.parentElement?.querySelector('.error-hint');
+      if(oldHint)oldHint.remove();
+    });
+  }
+
+  // Sexo: validação
+  const sexoInput=$('sexo');
+  if(sexoInput){
+    sexoInput.addEventListener('change',()=>{
+      const val=sexoInput.value.trim();
+      if(val&&!['M','F','Outro'].includes(val)){
+        showFieldValidation(sexoInput,false,'Sexo deve ser M, F ou Outro');
+      }else{
+        sexoInput.classList.remove('field-error');
+        const oldHint=sexoInput.parentElement?.querySelector('.error-hint');
+        if(oldHint)oldHint.remove();
+      }
+    });
+  }
+
+  // NPS: validação visual quando selecionado
+  document.querySelectorAll('input[name="npsScale"]').forEach(radio=>{
+    radio.addEventListener('change',()=>{
+      const npsVal=$('nps').value;
+      const isValid=npsVal===''||npsVal===null||(Number(npsVal)>=0&&Number(npsVal)<=10);
+      const npsDisplay=document.querySelector('.nps');
+      if(npsDisplay){
+        if(isValid){
+          npsDisplay.classList.remove('field-error');
+        }else{
+          npsDisplay.classList.add('field-error');
+        }
+      }
+    });
+  });
+}
+
+function showFieldValidation(input,isValid,errorMsg){
+  const oldHint=input.parentElement?.querySelector('.error-hint');
+  if(oldHint)oldHint.remove();
+
+  if(!isValid){
+    input.classList.add('field-error');
+    input.classList.remove('field-valid');
+    const hint=document.createElement('div');
+    hint.className='error-hint show';
+    hint.textContent=errorMsg;
+    input.parentElement.appendChild(hint);
+  }else{
+    input.classList.remove('field-error');
+    input.classList.add('field-valid');
+  }
+}
 function syncNps(v){
   $('nps').value=v??'';
   document.querySelectorAll('input[name="npsScale"]').forEach(r=>r.checked=String(r.value)===String(v??'__'));
@@ -1217,6 +1379,30 @@ function setForm(r={}){
   RF.forEach(f=>{const v=String(r[f]||'ÓTIMO').toUpperCase();const el=document.querySelector(`input[name="${f}"][value="${CSS.escape(v)}"]`)||document.querySelector(`input[name="${f}"]`);if(el)el.checked=true});
   $('rowNumber').value=r.rowNumber||'';
   if(!r.rowNumber)setEditMode(false);
+  updateFormProgress();
+}
+
+function updateFormProgress(){
+  const payload=getForm();
+  const essentialFields=['setor','data'];
+  const filledEssential=essentialFields.filter(f=>payload[f]?.trim()).length;
+
+  let filledCriteria=0;
+  RF.forEach(f=>{if(payload[f]?.trim()&&payload[f]!=='N/A')filledCriteria++});
+
+  const hasManifestation=['sugestoes','reclamacoes','comentarios','elogios'].some(f=>payload[f]?.trim());
+  const hasNps=payload.nps!==''&&payload.nps!=null;
+
+  const totalPriority=essentialFields.length+RF.length+2;
+  const filled=filledEssential+filledCriteria+(hasManifestation?1:0)+(hasNps?1:0);
+  const percent=(filled/totalPriority)*100;
+
+  const progressBar=$('formProgressBar');
+  const progressText=$('formProgress');
+  if(progressBar&&progressText){
+    progressBar.style.width=percent+'%';
+    progressText.textContent=`${Math.round(percent)}% completo`;
+  }
 }
 // Registros otimistas ainda não confirmados pelo servidor — re-mesclados
 // sempre que dados frescos substituem ST, para nunca sumirem da tela
@@ -1237,6 +1423,21 @@ function reload(){
 function saveRecord(e){
   e.preventDefault();
   const payload=getForm();
+
+  // Validação: campos obrigatórios
+  const errors=[];
+  if(!payload.setor?.trim())errors.push('Setor é obrigatório');
+  if(!payload.data?.trim())errors.push('Data é obrigatória');
+  if(payload.nps!==''&&payload.nps!=null){
+    const npsVal=Number(payload.nps);
+    if(isNaN(npsVal)||npsVal<0||npsVal>10)errors.push('NPS deve ser entre 0 e 10');
+  }
+
+  if(errors.length){
+    toast(errors.join(' · '));
+    return;
+  }
+
   const editing=!!(payload.rowNumber&&Number(payload.rowNumber));
 
   // Build the record locally so the UI can update INSTANTLY (no server wait)
@@ -1345,7 +1546,7 @@ function saveSaida(e){
 function editSaida(rn){const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
 function rmSaida(rn){if(!confirm('Excluir?'))return;load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).deleteSaida(rn)}
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
-buildForm();buildNps();buildQuickPeriods();
+buildForm();buildNps();buildQuickPeriods();setupFormValidation();
 // Show cached data immediately while fresh data loads
 try{const c=sessionStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
 reload();
