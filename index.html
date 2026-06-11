@@ -533,7 +533,6 @@
             <p class="text-xs text-mut mt-0.5">Registro na aba MATRIZ</p>
           </div>
           <div class="flex gap-2 items-center">
-            <button type="button" class="btn" onclick="showImportModal()" title="Importar dados de um PDF" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</button>
             <button type="button" class="btn" onclick="setForm({})">Limpar</button>
             <div style="display:flex;align-items:center;gap:8px;font-size:12px">
               <span style="color:var(--mut)" id="formProgress"></span>
@@ -1754,70 +1753,12 @@ function editSaida(rn){const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;
 function rmSaida(rn){if(!confirm('Excluir?'))return;load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).deleteSaida(rn)}
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
 
-// ── OCR Import ──
-function showImportModal(){const m=$('ocrModal');if(m)m.style.display='grid';$('ocrFile').value=''}
-function closeImportModal(){const m=$('ocrModal');if(m)m.style.display='none';resetOcrModal()}
-function resetOcrModal(){$('ocrUpload').style.display='block';$('ocrForm').style.display='none';$('ocrFile').value='';$('ocrStatus').textContent=''}
-function handleDropFile(e){e.preventDefault();const f=e.dataTransfer?.files[0];if(f)processOcrFile(f)}
-function handleOcrFile(){const f=$('ocrFile').files[0];if(f)processOcrFile(f)}
-function processOcrFile(f){if(!f){toast('Nenhum arquivo selecionado');return}if(!/pdf/i.test(f.type)){toast('Selecione um arquivo PDF válido');return}$('ocrStatus').textContent='Processando...';const r=new FileReader();r.onerror=()=>{$('ocrStatus').textContent='Erro ao ler arquivo';toast('Erro ao ler arquivo PDF')};r.onload=e=>{try{const b64=e.target.result.split(',')[1];if(!b64){$('ocrStatus').textContent='Erro ao processar arquivo';return}google.script.run.withSuccessHandler(parsed=>{if(!parsed){$('ocrStatus').textContent='Erro: sem dados extraídos';toast('Erro ao processar OCR');return}window.ocrData=parsed;displayOcrPreview(parsed);$('ocrUpload').style.display='none';$('ocrForm').style.display='block'}).withFailureHandler(err=>{const msg=err?.message||String(err)||'Erro desconhecido';$('ocrStatus').textContent='Erro: '+msg;toast('Erro OCR: '+msg)}).ocrPdfViaVisionApi(b64)}catch(err){$('ocrStatus').textContent='Erro: '+err.message;toast('Erro: '+err.message)}};r.readAsDataURL(f)}
-function displayOcrPreview(data){const get=k=>data[k]||'—';$('ocrSetor').textContent=String(get('setor')).substring(0,40);$('ocrTipo').textContent=String(get('tipo')).substring(0,30);$('ocrSexo').textContent=String(get('sexo')).substring(0,10);$('ocrData').textContent=String(get('data')).substring(0,20);$('ocrNps').textContent=get('nps')?''+get('nps'):'—'}
-function populateFormFromOcr(data){['setor','pront','data','dn','tipo','sexo','gentilezaAcolhimento','agilidade','clareza','gentilezaAssistencia','identificacao','intimidade','horarioDescanso','esclarecimento','cuidados','confianca','acesso','acomodacao','limpeza','enxoval','alimentacao','locomocao','nps','sugestoes','reclamacoes','comentarios','elogios','entrevistador'].forEach(k=>{const e=$(k);if(!e)return;if(k==='nps'){if(data[k]){$('nps').value=data[k];const s=document.querySelectorAll('.nps input');if(s.length){const idx=Math.min(parseInt(data[k]),10);const inp=s[idx];if(inp)inp.checked=true}}}else if(data[k]){e.value=String(data[k]).trim()}})}
-function confirmOcrImport(){if(!window.ocrData){toast('Nenhum dado extraído');return}populateFormFromOcr(window.ocrData);closeImportModal();updateFormProgress();toast('✓ Formulário preenchido com dados do PDF')}
-
 buildForm();buildNps();buildQuickPeriods();setupFormValidation();
 // Show cached data immediately while fresh data loads
 try{const c=localStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
 reload();
 window.addEventListener('scroll',()=>{const vis=window.scrollY>300&&!!document.querySelector('#relatorio.active');document.getElementById('rptFab').classList.toggle('vis',vis);},{passive:true});
 </script>
-
-<!-- ── Modal OCR ── -->
-<div id="ocrModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;padding:20px">
-  <div class="card" style="max-width:550px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 25px rgba(0,0,0,.15)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 13v-2m0 4v-2"/></svg>
-        <h3 style="font-size:16px;font-weight:600;color:var(--ink);margin:0">Importar PDF</h3>
-      </div>
-      <button type="button" style="background:none;border:none;cursor:pointer;color:var(--mut);font-size:24px;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;hover:color:var(--ink)" onclick="closeImportModal()">×</button>
-    </div>
-
-    <div id="ocrUpload" style="display:block">
-      <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">Selecione um PDF do formulário físico. O sistema extrai os dados automaticamente.</p>
-      <div style="border:2px dashed var(--s4);border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer" id="dropZone" ondrop="handleDropFile(event)" ondragover="event.preventDefault();event.target.style.background=window.getComputedStyle(document.documentElement).getPropertyValue('--s3')" ondragleave="event.target.style.background=''" onclick="$('ocrFile').click()">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6;margin:0 auto 10px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <p style="font-size:13px;color:var(--ink);margin:0 0 4px;font-weight:500">Clique para selecionar ou arraste o PDF</p>
-        <p style="font-size:12px;color:var(--sub);margin:0">Apenas arquivos PDF são suportados</p>
-      </div>
-      <input id="ocrFile" type="file" accept=".pdf" style="display:none" onchange="handleOcrFile()">
-      <div id="ocrStatus" style="font-size:12px;color:var(--sub);margin-top:12px;text-align:center"></div>
-    </div>
-
-    <div id="ocrForm" style="display:none">
-      <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);padding:12px;border-radius:8px;margin-bottom:16px">
-        <div style="display:flex;align-items:flex-start;gap:8px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:#16a34a;flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
-          <div>
-            <p style="font-size:12px;color:var(--ink);margin:0;font-weight:500">Dados extraídos com sucesso</p>
-            <p style="font-size:11px;color:var(--sub);margin:4px 0 0;line-height:1.4">Revise os campos abaixo antes de importar</p>
-          </div>
-        </div>
-      </div>
-      <div style="display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-bottom:16px;padding:12px;background:var(--s3);border-radius:8px">
-        <div><span class="fl">Setor</span><span id="ocrSetor" style="font-size:13px;color:var(--ink);font-weight:500">—</span></div>
-        <div><span class="fl">Tipo</span><span id="ocrTipo" style="font-size:13px;color:var(--ink);font-weight:500">—</span></div>
-        <div><span class="fl">Sexo</span><span id="ocrSexo" style="font-size:13px;color:var(--ink);font-weight:500">—</span></div>
-        <div><span class="fl">Data</span><span id="ocrData" style="font-size:13px;color:var(--ink);font-weight:500">—</span></div>
-        <div style="grid-column:span 2"><span class="fl">NPS</span><span id="ocrNps" style="font-size:13px;color:var(--ink);font-weight:500">—</span></div>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button type="button" class="btn" onclick="resetOcrModal()">Voltar</button>
-        <button type="button" class="btn-p" onclick="confirmOcrImport()">Importar para formulário</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="rptFab">
   <button onclick="window.print()" title="Imprimir / PDF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
