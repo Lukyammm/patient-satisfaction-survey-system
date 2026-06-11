@@ -1102,8 +1102,8 @@ function renderReport(){
     h+=`<h3>${esc(st)}</h3><p>No setor ${esc(st)}, ${sd?`ocorreram ${sd} saídas, com `:''}${s.total} pesquisas realizadas${ap!=null?`, totalizando ${fmt(ap)} de aplicação`:''}. Satisfação de ${fmt(s.sat)}.${s.nps!=null?` NPS de ${fmt(s.nps)}, ${zona(s.nps)}.`:''} Respondidas pelo paciente, acompanhante ou de forma colaborativa.</p>`;
     BLOCKS.forEach(([,titulo,crit,obs])=>{
       h+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
-      crit.forEach(([f,lbl])=>{const c=cf(sr,f),p=wp(c),cls=p==null?'':p<80?'pbd':p<META_S?'pwn':'';
-        h+=`<tr><td>${lbl.toUpperCase()}</td><td class="c">${c['ÓTIMO']}</td><td class="c">${c['BOM']}</td><td class="c">${c['REGULAR']}</td><td class="c">${c['RUIM']}</td><td class="c">${c['N/A']}</td><td class="c">${sr.length}</td><td class="c ${cls}">${p==null?'—':fmt(p,2)}</td></tr>`});
+      crit.forEach(([f,lbl])=>{const c=cf(sr,f),p=wp(c),cls=p==null?'':p<80?'pbd':p<META_S?'pwn':'';const tot=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM']+c['N/A'];
+        h+=`<tr><td>${lbl.toUpperCase()}</td><td class="c">${c['ÓTIMO']}</td><td class="c">${c['BOM']}</td><td class="c">${c['REGULAR']}</td><td class="c">${c['RUIM']}</td><td class="c">${c['N/A']}</td><td class="c">${tot}</td><td class="c ${cls}">${p==null?'—':fmt(p,2)}</td></tr>`});
       // Linha final com todas as observações do bloco
       const ob=sr.map(r=>String(r[obs]||'').trim()).filter(Boolean);
       h+=`<tr><td class="orow" colspan="8"><b>OBSERVAÇÕES</b>${ob.length?ob.map((o,i)=>`<div>${i+1} — ${esc(o)} (SIC)</div>`).join(''):'<div>Sem observações no período.</div>'}</td></tr>`;
@@ -1133,22 +1133,28 @@ function svgBarChart(title,groups){
   const iw=W-P.l-P.r,ih=H-P.t-P.b;
   const gw=iw/n,bw=Math.max(10,Math.min(20,gw/3));
   const COLORS=['#16a34a','#2563eb'],LBL=['Satisfação','NPS'];
-  const y=v=>P.t+ih-(Math.max(0,Math.min(100,v))/100)*ih;
+  // Faixa do eixo: 0–100, mas estende para baixo se houver NPS negativo (zona crítica)
+  const flat=groups.flatMap(g=>g.values).filter(v=>v!=null);
+  const lo=Math.min(0,...flat),YMIN=lo<0?Math.floor(lo/25)*25:0;
+  const y=v=>{const c=Math.max(YMIN,Math.min(100,v));return P.t+ih-((c-YMIN)/(100-YMIN))*ih};
+  const ticks=[];for(let t=YMIN;t<=100;t+=25)ticks.push(t);
   let s=`<div style="margin-top:26px;page-break-inside:avoid"><h3>${esc(title)}</h3>
   <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">`;
   // grid + eixo Y
-  [0,25,50,75,100].forEach(v=>{s+=`<line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="#e5e7eb" stroke-width="1"/><text x="${P.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#9ca3af">${v}%</text>`});
-  // linha de meta 90% — label ancorado à esquerda para não flutuar em espaço vazio
-  s+=`<line x1="${P.l}" y1="${y(META_S)}" x2="${W-P.r}" y2="${y(META_S)}" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/><text x="${P.l+4}" y="${y(META_S)-4}" text-anchor="start" font-size="9" fill="#dc2626">meta ${META_S}%</text>`;
+  ticks.forEach(v=>{s+=`<line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="${v===0?'#9ca3af':'#e5e7eb'}" stroke-width="1"/><text x="${P.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#9ca3af">${v}%</text>`});
+  // linha de meta de satisfação (90%) e de NPS (75%), rotuladas na margem direita reservada
+  s+=`<line x1="${P.l}" y1="${y(META_S)}" x2="${W-P.r}" y2="${y(META_S)}" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/><text x="${W-P.r+5}" y="${y(META_S)+3}" text-anchor="start" font-size="8.5" fill="#16a34a">meta sat. ${META_S}%</text>`;
+  s+=`<line x1="${P.l}" y1="${y(META_N)}" x2="${W-P.r}" y2="${y(META_N)}" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/><text x="${W-P.r+5}" y="${y(META_N)+3}" text-anchor="start" font-size="8.5" fill="#2563eb">meta NPS ${META_N}%</text>`;
   groups.forEach((g,i)=>{
     const cx=P.l+gw*i+gw/2;
     g.values.forEach((v,si)=>{
       if(v==null)return;
+      const y0=y(0),yv=y(v),top=Math.min(y0,yv),bh=Math.abs(yv-y0);
       const x=si===0?cx-bw-2:cx+2;
-      const bh=P.t+ih-y(v);
-      s+=`<rect x="${x}" y="${y(v)}" width="${bw}" height="${bh}" rx="2" fill="${COLORS[si]}"/>`;
+      s+=`<rect x="${x}" y="${top}" width="${bw}" height="${bh}" rx="2" fill="${COLORS[si]}"/>`;
       // rótulo dentro da barra (texto branco) quando há altura suficiente
-      if(v>=8)s+=`<text x="${x+bw/2}" y="${y(v)+Math.min(13,bh-3)}" text-anchor="middle" font-size="8.5" fill="white" font-weight="600">${Math.round(v)}</text>`;
+      if(bh>=14)s+=`<text x="${x+bw/2}" y="${top+12}" text-anchor="middle" font-size="8.5" fill="white" font-weight="600">${Math.round(v)}</text>`;
+      else s+=`<text x="${x+bw/2}" y="${(v>=0?top-3:top+bh+9)}" text-anchor="middle" font-size="8.5" fill="#374151" font-weight="600">${Math.round(v)}</text>`;
     });
     // label eixo X rotacionado
     const lbl=g.label.length>16?g.label.slice(0,15)+'…':g.label;
