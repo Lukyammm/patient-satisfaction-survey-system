@@ -25,14 +25,14 @@
   <style>
     /* ── Light (default) ── */
     :root {
-      --s1:#f5f5f7; --s2:#ffffff; --s3:#f0f0f5; --s4:rgba(0,0,0,0.08);
-      --ink:#1d1d1f; --sub:#6e6e73; --mut:#aeaeb2;
-      --grid:#e8e8ed; --gTxt:#6b7280;
+      --s1:#f4f6fb; --s2:#ffffff; --s3:#edf0f7; --s4:rgba(0,0,0,0.08);
+      --ink:#111827; --sub:#4b5563; --mut:#9ca3af;
+      --grid:#e5e7eb; --gTxt:#6b7280;
       --s4a:rgba(0,0,0,0.05);
-      --header-bg:rgba(255,255,255,0.88);
-      --card-shadow:0 1px 3px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.06);
-      --sb-bg:#f0f0f5; --sb-th:#b0b0b8;
-      --seg-bg:#e8e8ed; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:0 1px 2px rgba(37,99,235,.25);
+      --header-bg:rgba(255,255,255,0.97);
+      --card-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 20px rgba(0,0,0,.07),0 0 0 1px rgba(0,0,0,.04);
+      --sb-bg:#edf0f7; --sb-th:#b0b0b8;
+      --seg-bg:#e5e8f0; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:0 1px 4px rgba(37,99,235,.3);
       --p-ok:#15803d; --p-w:#92400e; --p-bd:#991b1b;
       --du:#15803d; --dd:#991b1b;
       --t-rc:#991b1b; --t-sg:#92400e; --t-el:#15803d;
@@ -43,24 +43,24 @@
     }
     /* ── Dark ── */
     .dark {
-      --s1:#212121; --s2:#2f2f2f; --s3:#3a3a3a; --s4:#4a4a4a;
-      --ink:#ececec; --sub:#b4b4b4; --mut:#8e8ea0;
-      --grid:#3a3a3a; --gTxt:#9ca3af;
-      --s4a:rgba(74,74,74,0.5);
-      --header-bg:rgba(47,47,47,0.92);
-      --card-shadow:0 1px 3px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.04);
-      --sb-bg:#2f2f2f; --sb-th:#6a6a6a;
-      --seg-bg:#3a3a3a; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:none;
-      --p-ok:#86efac; --p-w:#fcd34d; --p-bd:#fca5a5;
-      --du:#86efac; --dd:#fca5a5;
-      --t-rc:#fca5a5; --t-sg:#fcd34d; --t-el:#86efac;
+      --s1:#0d1117; --s2:#161b22; --s3:#21262d; --s4:#30363d;
+      --ink:#c9d1d9; --sub:#8b949e; --mut:#6e7681;
+      --grid:#30363d; --gTxt:#8b949e;
+      --s4a:rgba(255,255,255,0.05);
+      --header-bg:rgba(13,17,23,0.97);
+      --card-shadow:0 1px 3px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.07);
+      --sb-bg:#161b22; --sb-th:#6e7681;
+      --seg-bg:#30363d; --seg-sel:#2563eb; --seg-sel-c:#fff; --seg-sh:none;
+      --p-ok:#7ee787; --p-w:#e3b341; --p-bd:#f85149;
+      --du:#7ee787; --dd:#f85149;
+      --t-rc:#f85149; --t-sg:#e3b341; --t-el:#7ee787;
       --shadow-sm:none;
       --shadow-md:none;
-      --p-ok-bg:rgba(134,239,172,.12);
-      --p-w-bg:rgba(252,211,77,.12);
-      --p-bd-bg:rgba(252,165,165,.12);
-      --blue:#60a5fa;
-      --color-otimo:#34d399; --color-bom:#6ee7b7; --color-regular:#fbbf24; --color-ruim:#f87171; --color-na:#9ca3af;
+      --p-ok-bg:rgba(126,231,135,.12);
+      --p-w-bg:rgba(227,179,65,.12);
+      --p-bd-bg:rgba(248,81,73,.12);
+      --blue:#58a6ff;
+      --color-otimo:#3fb950; --color-bom:#7ee787; --color-regular:#e3b341; --color-ruim:#f85149; --color-na:#8b949e;
     }
   </style>
   <style type="text/tailwindcss">
@@ -68,18 +68,18 @@
       .ctl  { @apply bg-s3 border border-s4 rounded-lg px-3 py-1.5 text-sm text-ink outline-none focus:border-blue-500 transition-colors; }
       .ctls { @apply bg-transparent border border-s4 rounded-md px-2.5 py-1 text-xs text-sub outline-none focus:border-blue-500 transition-colors; }
       .card { @apply bg-s2 rounded-2xl p-5; }
-      .btn  { @apply border border-s4 bg-s2 rounded-lg px-3 py-1.5 text-sm font-medium text-sub hover:bg-s3 hover:text-ink transition; min-height:36px; }
-      .btn-p{ @apply rounded-lg px-3.5 py-1.5 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition; min-height:36px; }
-      .btn-g{ @apply border border-s4 rounded-md px-2.5 py-1 text-xs font-medium text-mut hover:text-sub hover:bg-s3 transition; min-height:30px; }
+      .btn  { @apply border border-s4 bg-s2 rounded-xl px-3.5 py-1.5 text-sm font-medium text-sub hover:bg-s3 hover:text-ink transition; min-height:36px; }
+      .btn-p{ @apply rounded-xl px-4 py-2 text-sm font-semibold text-white transition; min-height:36px; background:linear-gradient(135deg,#2563eb,#1d4ed8); }
+      .btn-g{ @apply border border-s4 rounded-lg px-2.5 py-1 text-xs font-medium text-mut hover:text-sub hover:bg-s3 transition; min-height:30px; }
       .nav-b{ @apply px-3.5 py-1.5 rounded-lg text-sm font-medium text-sub hover:text-ink hover:bg-s3 transition; }
-      .nav-b.active { @apply bg-s3 text-ink font-semibold; }
-      .fl   { @apply block text-xs font-semibold uppercase tracking-widest text-sub mb-1.5; }
+      .nav-b.active { @apply font-semibold; }
+      .fl   { @apply block text-xs font-semibold uppercase tracking-widest text-mut mb-1.5; }
       .fi   { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-s2 transition placeholder:text-mut; }
       .fta  { @apply w-full bg-s3 border-0 rounded-xl px-3.5 py-2.5 text-sm text-ink outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-s2 transition resize-y; min-height:72px; }
       .ph   { @apply flex items-center justify-between gap-3 mb-6 flex-wrap; }
-      .pt   { @apply text-xl font-bold tracking-tight; }
-      .ch3  { @apply text-sm font-semibold text-ink; }
-      .ch3s { @apply text-xs text-mut mt-0.5; }
+      .pt   { @apply text-2xl font-extrabold; letter-spacing:-.5px; }
+      .ch3  { @apply text-sm font-bold text-ink; }
+      .ch3s { @apply text-xs text-sub mt-0.5; }
       .section { @apply hidden; }
       .section.active { @apply block; animation:fade .18s ease; }
     }
@@ -103,6 +103,35 @@
     input:disabled,textarea:disabled,select:disabled{opacity:.55;cursor:not-allowed}
     input::placeholder,textarea::placeholder{color:var(--sub)}
 
+    /* ── Form inputs: subtle border for definition ── */
+    .fi,.fta{box-shadow:0 0 0 1px rgba(0,0,0,.08) inset}
+
+    /* ── Active nav state ── */
+    .nav-b.active{background:rgba(37,99,235,.1);color:#2563eb}
+    .dark .nav-b.active{background:rgba(88,166,255,.12);color:#58a6ff}
+
+    /* ── Button: gradient primary ── */
+    .btn-p{box-shadow:0 1px 4px rgba(37,99,235,.3),0 2px 10px rgba(37,99,235,.15)}
+    .btn-p:hover{background:linear-gradient(135deg,#3b82f6,#2563eb)!important;box-shadow:0 2px 8px rgba(37,99,235,.4),0 4px 16px rgba(37,99,235,.2)!important}
+    .btn-p:active{background:linear-gradient(135deg,#1d4ed8,#1e40af)!important;box-shadow:none!important}
+
+    /* ── KPI card accent borders ── */
+    #overview .g4>.card:nth-child(1){border-top:3px solid #3b82f6}
+    #overview .g4>.card:nth-child(2){border-top:3px solid #10b981}
+    #overview .g4>.card:nth-child(3){border-top:3px solid #8b5cf6}
+    #overview .g4>.card:nth-child(4){border-top:3px solid #f59e0b}
+
+    /* ── Thicker progress bars ── */
+    .track{height:5px;margin-top:14px}
+    #overview .g4>.card:nth-child(1) .track i{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+    #overview .g4>.card:nth-child(2) .track i{background:linear-gradient(90deg,#10b981,#34d399)}
+    #overview .g4>.card:nth-child(3) .track i{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+    #overview .g4>.card:nth-child(4) .track i{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+
+    /* ── Table header subtle background ── */
+    .tbl thead tr{background:var(--s3)}
+
+    /* ── Card hover depth on dashboard cards ── */
     .card{box-shadow:var(--card-shadow);transition:box-shadow .2s ease}
 
     /* ── Tooltip para gráficos ── */
@@ -173,16 +202,16 @@
     .nps input:checked+label.nv-p{border-color:#22c55e;color:#16a34a;background:rgba(34,197,94,.07);box-shadow:0 2px 8px rgba(34,197,94,.15)}
 
     /* ── Track / progress ── */
-    .track{position:relative;height:3px;background:var(--s3);border-radius:99px;margin-top:14px;overflow:visible}
-    .track i{display:block;height:100%;border-radius:99px;transition:width .55s cubic-bezier(.4,0,.2,1)}
-    .track b{position:absolute;top:-5px;width:1.5px;height:13px;border-radius:2px;background:var(--mut);opacity:.5}
+    .track{position:relative;height:5px;background:var(--s3);border-radius:99px;margin-top:14px;overflow:visible}
+    .track i{display:block;height:100%;border-radius:99px;transition:width .55s cubic-bezier(.4,0,.2,1);background:var(--blue)}
+    .track b{position:absolute;top:-4px;width:2px;height:13px;border-radius:2px;background:var(--mut);opacity:.6}
 
     /* ── Mini bar ── */
     .mbar{display:inline-block;width:48px;height:3px;background:var(--s3);border-radius:99px;overflow:hidden;margin-right:6px;vertical-align:2px}
     .mbar i{display:block;height:100%;border-radius:99px;background:var(--ink)}
 
     /* ── Stack bar ── */
-    .sbar{display:flex;height:7px;border-radius:99px;overflow:hidden;background:var(--s3);margin:10px 0 14px}
+    .sbar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--s3);margin:10px 0 14px}
     .sbar span{height:100%}
 
     /* ── Dist rows ── */
@@ -192,11 +221,11 @@
     .c-o{background:#34d399}.c-b{background:#86efac}.c-r{background:#fbbf24}.c-ru{background:#f87171}.c-n{background:#d1d5db}
 
     /* ── Pills ── */
-    .pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;letter-spacing:.01em;transition:background .15s,color .15s}
-    .p-ok{background:rgba(34,197,94,.12);color:var(--p-ok)}
-    .p-w {background:rgba(245,158,11,.12);color:var(--p-w)}
-    .p-bd{background:rgba(239,68,68,.12);color:var(--p-bd)}
-    .p-mt{background:var(--s3);color:var(--mut)}
+    .pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;letter-spacing:.02em;transition:background .15s,color .15s}
+    .p-ok{background:rgba(34,197,94,.14);color:var(--p-ok)}
+    .p-w {background:rgba(245,158,11,.14);color:var(--p-w)}
+    .p-bd{background:rgba(239,68,68,.14);color:var(--p-bd)}
+    .p-mt{background:var(--s3);color:var(--sub)}
 
     /* ── Dots ── */
     .dot{display:inline-block;width:6px;height:6px;border-radius:99px;margin-right:7px;vertical-align:1px;transition:background .15s}
@@ -230,7 +259,8 @@
 
     /* ── Tables ── */
     .tbl{width:100%;border-collapse:collapse}
-    .tbl th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);padding:10px 14px;border-bottom:1px solid var(--s4);text-align:left}
+    .tbl thead tr{background:var(--s3)}
+    .tbl th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:11px 14px;border-bottom:1px solid var(--s4);text-align:left;white-space:nowrap}
     .tbl td{padding:11px 14px;border-bottom:1px solid var(--s4a);font-size:13px;vertical-align:middle;color:var(--ink)}
     .tbl tr:last-child td{border-bottom:0}
     .tbl tr:hover td{background:var(--s3)}
@@ -307,9 +337,18 @@
       .npsleg{font-size:9.5px}
     }
     @media(max-width:420px){.g4{grid-template-columns:1fr!important}}
+    /* ── Card section headers (form sections only, not report) ── */
+    .card>h4.mb-4{padding-left:10px;border-left:3px solid var(--blue);opacity:.9}
+
+    /* ── Form progress bar ── */
+    #formProgressBar{background:linear-gradient(90deg,#2563eb,#7c3aed)!important}
+
+    /* ── NPS legend bars ── */
+    .npsleg [style*="height:3px"]{height:5px!important}
+
     /* ── Button active states ── */
     .btn:active{background:var(--s4)!important;transform:scale(.98)}
-    .btn-p:active{background:#1d4ed8!important;transform:scale(.98)}
+    .btn-p:active{background:linear-gradient(135deg,#1d4ed8,#1e40af)!important;transform:scale(.98)}
     .btn-g:active{background:var(--s3)!important;transform:scale(.98)}
     .advBtn:active,.qp:active{transform:scale(.97)}
 
@@ -327,8 +366,8 @@
     }
     #rptFab{position:fixed;right:20px;bottom:72px;display:flex;flex-direction:column;gap:10px;z-index:var(--z-fab);opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .22s,transform .22s}
     #rptFab.vis{opacity:1;pointer-events:auto;transform:translateY(0)}
-    #rptFab button{width:48px;height:48px;border-radius:50%;border:1px solid var(--s4);background:var(--s2);color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.1);transition:background .15s,color .15s}
-    #rptFab button:hover{background:var(--s3);color:var(--ink)}
+    #rptFab button{width:48px;height:48px;border-radius:50%;border:1px solid var(--s4);background:var(--s2);color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);transition:background .15s,color .15s,box-shadow .15s}
+    #rptFab button:hover{background:var(--s3);color:var(--ink);box-shadow:0 6px 24px rgba(0,0,0,.15)}
   </style>
   <script>(function(){if(localStorage.getItem('pesquisa-theme')==='dark')document.documentElement.classList.add('dark')})()</script>
 </head>
@@ -337,7 +376,8 @@
   <div id="topbar"></div>
 
   <!-- ── HEADER ─────────────────────────────────── -->
-  <header class="sticky top-0 no-print" style="z-index:var(--z-high);background:var(--header-bg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)">
+  <header class="sticky top-0 no-print" style="z-index:var(--z-high);background:var(--header-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+    <div style="height:3px;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 50%,#06b6d4 100%)"></div>
 
     <!-- Row 1: brand · nav · actions -->
     <div class="hdr-row hdr-r1 max-w-[1320px] mx-auto px-6 h-14 flex items-center gap-4" style="border-bottom:1px solid var(--s4)">
@@ -366,7 +406,7 @@
           <circle cx="578" cy="566" r="41.2" fill="#60A5FA"/>
           <circle cx="565.8" cy="551.5" r="8.1" fill="#fff" opacity="0.50"/>
         </svg>
-        <span class="text-[18px] font-extrabold tracking-tight text-ink" style="letter-spacing:-.4px">Pesquisa</span>
+        <span class="font-extrabold text-ink" style="font-size:18px;letter-spacing:-.5px">Pesquisa <span style="color:var(--blue)">HUC</span></span>
       </div>
 
       <nav class="hdr-nav flex gap-0.5 mx-auto overflow-x-auto">
@@ -455,36 +495,36 @@
       <!-- KPIs -->
       <div class="grid g4 gap-3" style="grid-template-columns:repeat(4,1fr)">
         <div class="card">
-          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">% de aplicação</p>
+          <p class="text-[11.5px] font-bold uppercase tracking-wider text-sub mb-3">% de aplicação</p>
           <div class="flex items-end justify-between gap-2">
-            <span class="text-[28px] font-bold tracking-tight leading-none" id="kAplic">—</span>
+            <span class="text-[34px] font-extrabold tracking-tight leading-none" id="kAplic">—</span>
             <span class="pill p-mt mb-1" id="pAplic">—</span>
           </div>
           <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dAplic"></div>
           <div class="track mt-3"><i id="tAplic" style="width:0"></i><b style="left:60%"></b></div>
         </div>
         <div class="card">
-          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">Taxa de satisfação</p>
+          <p class="text-[11.5px] font-bold uppercase tracking-wider text-sub mb-3">Taxa de satisfação</p>
           <div class="flex items-end justify-between gap-2">
-            <span class="text-[28px] font-bold tracking-tight leading-none" id="kSat">—</span>
+            <span class="text-[34px] font-extrabold tracking-tight leading-none" id="kSat">—</span>
             <span class="pill p-mt mb-1" id="pSat">—</span>
           </div>
           <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dSat"></div>
           <div class="track mt-3"><i id="tSat" style="width:0"></i><b style="left:90%"></b></div>
         </div>
         <div class="card">
-          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">NPS</p>
+          <p class="text-[11.5px] font-bold uppercase tracking-wider text-sub mb-3">NPS</p>
           <div class="flex items-end justify-between gap-2">
-            <span class="text-[28px] font-bold tracking-tight leading-none" id="kNps">—</span>
+            <span class="text-[34px] font-extrabold tracking-tight leading-none" id="kNps">—</span>
             <span class="pill p-mt mb-1" id="pNps">—</span>
           </div>
           <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dNps"></div>
           <div class="track mt-3"><i id="tNps" style="width:0"></i><b style="left:75%"></b></div>
         </div>
         <div class="card">
-          <p class="text-[11px] font-semibold uppercase tracking-widest text-mut mb-3">Pesquisas aplicadas</p>
+          <p class="text-[11.5px] font-bold uppercase tracking-wider text-sub mb-3">Pesquisas aplicadas</p>
           <div class="flex items-end justify-between gap-2">
-            <span class="text-[28px] font-bold tracking-tight leading-none" id="kTotal">0</span>
+            <span class="text-[34px] font-extrabold tracking-tight leading-none" id="kTotal">0</span>
             <span class="pill p-mt mb-1" id="pTotal">—</span>
           </div>
           <div class="text-[11px] text-mut mt-2 min-h-[16px]" id="dTotal"></div>
@@ -499,8 +539,8 @@
           <p class="ch3s mb-4">Evolução mensal · linha tracejada = meta 90%</p>
           <div id="histChart"></div>
           <div class="flex gap-5 mt-3">
-            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:12px;height:2px;display:inline-block;background:#3b82f6;border-radius:2px;vertical-align:2px"></i>Satisfação</span>
-            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:12px;height:2px;display:inline-block;background:#a78bfa;border-radius:2px;vertical-align:2px"></i>NPS</span>
+            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:14px;height:3px;display:inline-block;background:#3b82f6;border-radius:2px;vertical-align:2px"></i>Satisfação</span>
+            <span class="flex items-center gap-1.5 text-xs text-mut"><i style="width:14px;height:3px;display:inline-block;background:#a78bfa;border-radius:2px;vertical-align:2px"></i>NPS</span>
           </div>
         </div>
         <div class="card">
@@ -757,7 +797,7 @@
 
   <!-- Toast -->
   <div id="toast" class="fixed bottom-6 left-1/2 bg-s2 border border-s4 text-ink px-4 py-2.5 rounded-xl text-sm font-medium opacity-0"
-       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 16px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;z-index:50">
+       style="transform:translate(-50%,8px);transition:opacity .2s,transform .2s;box-shadow:0 4px 20px rgba(0,0,0,.14),0 0 0 1px var(--s4);display:flex;align-items:center;gap:10px;z-index:50">
     <span id="toastMsg"></span>
     <button onclick="closeToast()" style="margin-left:2px;background:none;border:none;cursor:pointer;color:var(--gTxt);font-size:16px;line-height:1;padding:0 2px" title="Fechar">×</button>
   </div>
