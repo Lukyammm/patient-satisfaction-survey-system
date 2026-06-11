@@ -1362,7 +1362,7 @@ function renderReport(){
   // Gráfico 1: Satisfação e NPS por setor (incl. total HUC)
   const gSet=sets.map(st=>{const s=sum(rr.filter(r=>(r.setor||'SEM SETOR')===st));return{label:st,values:[s.sat,s.nps]}});
   gSet.push({label:'TOTAL',values:[sG.sat,sG.nps]});
-  h+=svgBarChart('SATISFAÇÃO E NPS POR SETOR',gSet);
+  h+=svgHorizontalBarChart('SATISFAÇÃO E NPS POR SETOR',gSet);
   // Gráfico 2: Série histórica mensal do ano (respeita filtros avançados)
   const yr=mes.slice(0,4),MN=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
   const gMes=MN.map((nm,i)=>{const m=yr+'-'+String(i+1).padStart(2,'0');const s=sum(adv(ST.records.filter(r=>mo(r)===m)));return{label:nm,values:[s.total?s.sat:null,s.total?s.nps:null]}});
@@ -1408,6 +1408,45 @@ function svgBarChart(title,groups){
   // legenda
   s+=`<rect x="${P.l}" y="${H-18}" width="10" height="10" rx="2" fill="${COLORS[0]}"/><text x="${P.l+14}" y="${H-9}" font-size="10" fill="#6b7280">${LBL[0]}</text>`;
   s+=`<rect x="${P.l+90}" y="${H-18}" width="10" height="10" rx="2" fill="${COLORS[1]}"/><text x="${P.l+104}" y="${H-9}" font-size="10" fill="#6b7280">${LBL[1]}</text>`;
+  return s+'</svg></div>';
+}
+
+/* ── Gráfico de barras horizontais (Satisfação verde + NPS azul) em SVG puro ── */
+function svgHorizontalBarChart(title,groups){
+  const n=groups.length;
+  const W=900,H=Math.max(300,n*50),P={t:30,r:40,b:20,l:220};
+  const iw=W-P.l-P.r,ih=H-P.t-P.b;
+  const gh=ih/n,bh=Math.max(6,Math.min(12,gh/3));
+  const COLORS=['#16a34a','#2563eb'],LBL=['Satisfação','NPS'];
+  const flat=groups.flatMap(g=>g.values).filter(v=>v!=null);
+  const lo=Math.min(0,...flat),YMIN=lo<0?Math.floor(lo/25)*25:0;
+  const x=v=>{const c=Math.max(YMIN,Math.min(100,v));return P.l+((c-YMIN)/(100-YMIN))*iw};
+  const ticks=[];for(let t=YMIN;t<=100;t+=25)ticks.push(t);
+  let s=`<div style="margin-top:26px;page-break-inside:avoid"><h3>${esc(title)}</h3>
+  <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">`;
+  // grid + eixo X
+  ticks.forEach(v=>{s+=`<line x1="${x(v)}" y1="${P.t}" x2="${x(v)}" y2="${H-P.b}" stroke="${v===0?'#9ca3af':'#e5e7eb'}" stroke-width="1"/><text x="${x(v)}" y="${P.t-8}" text-anchor="middle" font-size="10" fill="#9ca3af">${v}%</text>`});
+  // linhas de meta
+  s+=`<line x1="${x(META_S)}" y1="${P.t}" x2="${x(META_S)}" y2="${H-P.b}" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>`;
+  s+=`<line x1="${x(META_N)}" y1="${P.t}" x2="${x(META_N)}" y2="${H-P.b}" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>`;
+  groups.forEach((g,i)=>{
+    const cy=P.t+gh*i+gh/2;
+    // label setor (esquerda)
+    const lbl=g.label.length>25?g.label.slice(0,24)+'…':g.label;
+    s+=`<text x="${P.l-10}" y="${cy+4}" text-anchor="end" font-size="11" fill="#374151" font-weight="500">${esc(lbl)}</text>`;
+    // barras
+    g.values.forEach((v,si)=>{
+      if(v==null)return;
+      const x0=x(0),xv=x(v),left=Math.min(x0,xv),bw=Math.abs(xv-x0);
+      const y=si===0?cy-bh-1:cy+1;
+      s+=`<rect x="${left}" y="${y}" width="${bw}" height="${bh}" rx="2" fill="${COLORS[si]}"/>`;
+      // rótulo dentro da barra
+      if(bw>=35)s+=`<text x="${left+bw/2}" y="${y+bh/2+3}" text-anchor="middle" font-size="8.5" fill="white" font-weight="600">${Math.round(v)}%</text>`;
+    });
+  });
+  // legenda no topo
+  s+=`<rect x="${P.l}" y="${P.t-22}" width="10" height="10" rx="2" fill="${COLORS[0]}"/><text x="${P.l+14}" y="${P.t-13}" font-size="10" fill="#6b7280">${LBL[0]}</text>`;
+  s+=`<rect x="${P.l+120}" y="${P.t-22}" width="10" height="10" rx="2" fill="${COLORS[1]}"/><text x="${P.l+134}" y="${P.t-13}" font-size="10" fill="#6b7280">${LBL[1]}</text>`;
   return s+'</svg></div>';
 }
 
