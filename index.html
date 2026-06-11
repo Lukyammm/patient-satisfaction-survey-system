@@ -1121,39 +1121,42 @@ function renderReport(){
   // Gráfico 2: Série histórica mensal do ano (respeita filtros avançados)
   const yr=mes.slice(0,4),MN=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
   const gMes=MN.map((nm,i)=>{const m=yr+'-'+String(i+1).padStart(2,'0');const s=sum(adv(ST.records.filter(r=>mo(r)===m)));return{label:nm,values:[s.total?s.sat:null,s.total?s.nps:null]}});
-  h+=svgBarChart('SÉRIE HISTÓRICA MENSAL — '+yr,gMes);
+  h+=svgBarChart('SÉRIE HISTÓRICA MENSAL — '+yr,gMes.filter(g=>g.values.some(v=>v!=null)));
   h+=`<br><br><p style="text-align:center;color:var(--sub)">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
   out.innerHTML=h;
 }
 
 /* ── Gráfico de barras agrupadas (Satisfação verde + NPS azul) em SVG puro ── */
 function svgBarChart(title,groups){
-  const W=760,H=300,P={t:34,r:14,b:64,l:40};
-  const iw=W-P.l-P.r,ih=H-P.t-P.b,n=groups.length;
-  const gw=iw/n,bw=Math.min(16,gw/3);
+  const n=groups.length;
+  const W=Math.max(760,n*58),H=310,P={t:34,r:80,b:80,l:44};
+  const iw=W-P.l-P.r,ih=H-P.t-P.b;
+  const gw=iw/n,bw=Math.max(10,Math.min(20,gw/3));
   const COLORS=['#16a34a','#2563eb'],LBL=['Satisfação','NPS'];
   const y=v=>P.t+ih-(Math.max(0,Math.min(100,v))/100)*ih;
   let s=`<div style="margin-top:26px;page-break-inside:avoid"><h3>${esc(title)}</h3>
   <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">`;
   // grid + eixo Y
-  [0,25,50,75,100].forEach(v=>{s+=`<line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="var(--s4)" stroke-width="1"/><text x="${P.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--gTxt)">${v}%</text>`});
-  // linha de meta 90%
-  s+=`<line x1="${P.l}" y1="${y(META_S)}" x2="${W-P.r}" y2="${y(META_S)}" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/><text x="${W-P.r}" y="${y(META_S)-4}" text-anchor="end" font-size="9" fill="#dc2626">meta ${META_S}%</text>`;
+  [0,25,50,75,100].forEach(v=>{s+=`<line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="#e5e7eb" stroke-width="1"/><text x="${P.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#9ca3af">${v}%</text>`});
+  // linha de meta 90% — label ancorado à esquerda para não flutuar em espaço vazio
+  s+=`<line x1="${P.l}" y1="${y(META_S)}" x2="${W-P.r}" y2="${y(META_S)}" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/><text x="${P.l+4}" y="${y(META_S)-4}" text-anchor="start" font-size="9" fill="#dc2626">meta ${META_S}%</text>`;
   groups.forEach((g,i)=>{
     const cx=P.l+gw*i+gw/2;
     g.values.forEach((v,si)=>{
       if(v==null)return;
       const x=si===0?cx-bw-2:cx+2;
-      s+=`<rect x="${x}" y="${y(v)}" width="${bw}" height="${P.t+ih-y(v)}" rx="2" fill="${COLORS[si]}"/>`;
-      s+=`<text x="${x+bw/2}" y="${y(v)-3}" text-anchor="middle" font-size="9" fill="var(--ink)">${Math.round(v)}</text>`;
+      const bh=P.t+ih-y(v);
+      s+=`<rect x="${x}" y="${y(v)}" width="${bw}" height="${bh}" rx="2" fill="${COLORS[si]}"/>`;
+      // rótulo dentro da barra (texto branco) quando há altura suficiente
+      if(v>=8)s+=`<text x="${x+bw/2}" y="${y(v)+Math.min(13,bh-3)}" text-anchor="middle" font-size="8.5" fill="white" font-weight="600">${Math.round(v)}</text>`;
     });
-    const lbl=g.label.length>13?g.label.slice(0,12)+'…':g.label;
-    s+=`<text x="${cx}" y="${P.t+ih+12}" text-anchor="middle" font-size="9" fill="var(--gTxt)" transform="rotate(-32 ${cx} ${P.t+ih+12})">${esc(lbl)}</text>`;
+    // label eixo X rotacionado
+    const lbl=g.label.length>16?g.label.slice(0,15)+'…':g.label;
+    s+=`<text x="${cx}" y="${P.t+ih+13}" text-anchor="end" font-size="9" fill="#9ca3af" transform="rotate(-35 ${cx} ${P.t+ih+13})">${esc(lbl)}</text>`;
   });
   // legenda
-  const lx=P.l;
-  s+=`<rect x="${lx}" y="${H-16}" width="10" height="10" rx="2" fill="${COLORS[0]}"/><text x="${lx+14}" y="${H-7}" font-size="10" fill="var(--sub)">${LBL[0]}</text>`;
-  s+=`<rect x="${lx+90}" y="${H-16}" width="10" height="10" rx="2" fill="${COLORS[1]}"/><text x="${lx+104}" y="${H-7}" font-size="10" fill="var(--sub)">${LBL[1]}</text>`;
+  s+=`<rect x="${P.l}" y="${H-18}" width="10" height="10" rx="2" fill="${COLORS[0]}"/><text x="${P.l+14}" y="${H-9}" font-size="10" fill="#6b7280">${LBL[0]}</text>`;
+  s+=`<rect x="${P.l+90}" y="${H-18}" width="10" height="10" rx="2" fill="${COLORS[1]}"/><text x="${P.l+104}" y="${H-9}" font-size="10" fill="#6b7280">${LBL[1]}</text>`;
   return s+'</svg></div>';
 }
 
