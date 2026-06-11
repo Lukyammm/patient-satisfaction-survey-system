@@ -138,12 +138,27 @@ function getSaidasSheet_() {
 function saveRecord(payload) {
   const sheet = getSheet_();
   ensureHeader_(sheet);
-  const rowNumber = Number(payload.rowNumber) || nextDataRow_(sheet);
+  const isEdit = !!Number(payload.rowNumber);
+  const rowNumber = isEdit ? Number(payload.rowNumber) : nextDataRow_(sheet);
   const row = objectToRow_(payload);
+
+  // Compute aggregate counts from payload (avoids 13+ separate formula API calls)
+  const cnt = v => RATING_KEYS.reduce((n, k) => n + (String(payload[k] || '').toUpperCase() === v ? 1 : 0), 0);
+  const otimo = cnt('ÓTIMO'), bom = cnt('BOM'), reg = cnt('REGULAR'), ruim = cnt('RUIM'), na = cnt('N/A');
+  const total = otimo + bom + reg + ruim;
+  row[COL.otimo - 1] = otimo;
+  row[COL.bom - 1] = bom;
+  row[COL.regular - 1] = reg;
+  row[COL.ruim - 1] = ruim;
+  row[COL.na - 1] = na;
+  row[COL.totalConsiderado - 1] = total;
+  row[COL.taxaSatisfacao - 1] = total ? (otimo + bom) / total : 0;
+
   sheet.getRange(rowNumber, 1, 1, LAST_COL).setValues([row]);
-  applyRowFormulas_(sheet, rowNumber);
-  sheet.getRange(rowNumber, 1, 1, LAST_COL).setBorder(true, true, true, true, true, true, '#e2e8f0', SpreadsheetApp.BorderStyle.SOLID);
-  return { ok: true, rowNumber, message: rowNumber === Number(payload.rowNumber) ? 'Registro atualizado.' : 'Registro salvo na MATRIZ.' };
+  SpreadsheetApp.flush();
+
+  const saved = rowToObject_(row.map(v => v === '' ? '' : String(v)), rowNumber);
+  return { ok: true, rowNumber, record: saved, message: isEdit ? 'Registro atualizado.' : 'Registro salvo.' };
 }
 
 function deleteRecord(rowNumber) {

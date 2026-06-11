@@ -1072,7 +1072,31 @@ function reload(){
     .withFailureHandler(err=>{load(false);toast(err.message||err)})
     .getInitialData();
 }
-function saveRecord(e){e.preventDefault();load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);setForm({});reload();showTab('registros')}).withFailureHandler(err=>{load(false);toast(err.message||err)}).saveRecord(getForm())}
+function saveRecord(e){
+  e.preventDefault();
+  load(true);
+  const payload=getForm();
+  google.script.run
+    .withSuccessHandler(res=>{
+      load(false);
+      toast(res.message);
+      // Optimistic in-memory update — no full reload needed
+      if(res.record){
+        const idx=ST.records.findIndex(x=>x.rowNumber===res.rowNumber);
+        if(idx>=0) ST.records[idx]=res.record; else ST.records.push(res.record);
+        try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
+      }
+      setForm({});
+      renderAll();
+      showTab('registros');
+      // Silent background refresh to catch any server-side discrepancies
+      google.script.run
+        .withSuccessHandler(data=>{ST=data;ST.saidas=ST.saidas||[];ST.cadastros=ST.cadastros||[];ST.lookups.entrevistadores=ST.lookups.entrevistadores||[];try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}hydrate();renderAll();})
+        .getInitialData();
+    })
+    .withFailureHandler(err=>{load(false);toast(err.message||err)})
+    .saveRecord(payload);
+}
 function editRecord(rn){const r=ST.records.find(x=>x.rowNumber===rn);if(!r)return;setForm(r);showTab('novo')}
 function saveSaida(e){e.preventDefault();const p={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:$('sSaidas').value};if(!p.mes||!p.setor)return toast('Informe mês e setor.');load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);$('sRowNumber').value='';$('formSaida').reset();reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).saveSaida(p)}
 function editSaida(rn){const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
