@@ -401,7 +401,7 @@ function backfillSatisfacaoBlocks() {
 // ── OCR via Google Vision API ──
 
 function ocrPdfViaVisionApi(base64Content) {
-  const props = PropertiesService.getUserProperties();
+  const props = PropertiesService.getScriptProperties();
   const keyJson = props.getProperty('GOOGLE_CLOUD_KEY');
   Logger.log('DEBUG: keyJson exists: ' + !!keyJson);
   Logger.log('DEBUG: keyJson length: ' + (keyJson ? keyJson.length : 0));
