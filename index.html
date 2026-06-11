@@ -66,7 +66,7 @@
   <style type="text/tailwindcss">
     @layer components {
       .ctl  { @apply bg-s3 border border-s4 rounded-lg px-3 py-1.5 text-sm text-ink outline-none focus:border-blue-500 transition-colors; }
-      .ctls { @apply bg-transparent border border-s4 rounded-md px-2.5 py-1 text-xs text-sub outline-none focus:border-blue-500 transition-colors; }
+      .ctls { @apply bg-s3 border border-s4 rounded-lg px-3 py-1.5 text-sm text-sub outline-none focus:border-blue-500 transition-colors font-500; }
       .card { @apply bg-s2 rounded-2xl p-5; }
       .btn  { @apply border border-s4 bg-s2 rounded-xl px-3.5 py-1.5 text-sm font-medium text-sub hover:bg-s3 hover:text-ink transition; min-height:36px; }
       .btn-p{ @apply rounded-xl px-4 py-2 text-sm font-semibold text-white transition; min-height:36px; background:linear-gradient(135deg,#2563eb,#1d4ed8); }
@@ -158,18 +158,18 @@
     @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
     /* ── Filtros: quick chips de período ── */
-    .qp{display:inline-flex;align-items:center;padding:6px 11px;min-height:32px;border-radius:99px;font-size:12px;font-weight:500;color:var(--sub);background:var(--s3);border:1px solid transparent;cursor:pointer;transition:all .14s ease;white-space:nowrap}
-    .qp:hover{color:var(--ink);background:var(--s4a)}
-    .qp.active{background:var(--seg-sel);color:#fff;font-weight:600;box-shadow:var(--seg-sh)}
+    .qp{display:inline-flex;align-items:center;padding:7px 13px;min-height:32px;border-radius:7px;font-size:12px;font-weight:600;color:var(--sub);background:var(--s3);border:1px solid var(--s4);cursor:pointer;transition:all .12s ease;white-space:nowrap}
+    .qp:hover{color:var(--ink);background:var(--s4a);border-color:var(--s4a)}
+    .qp.active{background:var(--seg-sel);color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(37,99,235,.3);border-color:var(--seg-sel)}
 
     /* ── Filtros avançados ── */
-    .advBtn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-size:12px;font-weight:500;color:var(--sub);background:var(--s3);border:1px solid transparent;cursor:pointer;transition:all .14s ease}
-    .advBtn:hover{color:var(--ink);background:var(--s4a)}
-    .advBtn.open{background:var(--s4a);color:var(--ink)}
-    .advBtn .chev{transition:transform .2s ease}
-    .advBtn.open .chev{transform:rotate(180deg)}
-    .advp{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 12px;margin-top:-2px}
-    .advp.open{display:flex;animation:fade .15s ease}
+    .advBtn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--sub);background:var(--s3);border:1px solid var(--s4);cursor:pointer;transition:all .12s ease}
+    .advBtn:hover{color:var(--ink);background:var(--s4a);border-color:var(--s4a)}
+    .advBtn.open{background:var(--s4a);color:var(--ink);border-color:var(--blue);background:rgba(37,99,235,.08)}
+    .advBtn .chev{transition:transform .2s ease;opacity:.6}
+    .advBtn.open .chev{transform:rotate(180deg);opacity:1}
+    .advp{display:none;flex-direction:column;gap:10px;padding:0;margin:0;background:var(--s3);border-top:1px solid var(--s4)}
+    .advp.open{display:flex;padding:12px 24px;animation:fade .15s ease}
     .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#2563eb;color:#fff;font-size:10px;font-weight:700}
 
     /* ── Critérios de avaliação (empilhados, cor por resposta) ── */
@@ -340,6 +340,9 @@
     /* ── Card section headers (form sections only, not report) ── */
     .card>h4.mb-4{padding-left:10px;border-left:3px solid var(--blue);opacity:.9}
 
+    /* ── Header filter layout ── */
+    .hdr-filter{flex-wrap:wrap;row-gap:8px;column-gap:12px}
+
     /* ── Form progress bar ── */
     #formProgressBar{background:linear-gradient(90deg,#2563eb,#7c3aed)!important}
 
@@ -430,53 +433,61 @@
 
     <!-- Row 2: filters -->
     <div class="hdr-row max-w-[1320px] mx-auto px-6" style="border-bottom:1px solid var(--s4)">
-      <div class="hdr-filter min-h-[44px] flex items-center gap-2 py-1.5">
-        <!-- Quick period presets -->
+      <div class="hdr-filter min-h-[44px] flex items-center justify-between gap-3 py-1.5">
+        <!-- Left: Quick period presets -->
         <div id="quickPeriods" class="flex items-center gap-1.5 flex-wrap"></div>
-        <span class="hide-sm" style="width:1px;height:18px;background:var(--s4);margin:0 4px"></span>
-        <select id="gMes"   onchange="onMesChange()" class="ctls"><option value="">Todos os meses</option></select>
-        <select id="gSetor" onchange="renderAll()" class="ctls"><option value="">Todos os setores</option></select>
-        <button id="advBtn" onclick="toggleAdv()" class="advBtn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
-          Mais filtros<span id="advCount" class="badge" style="display:none"></span>
-          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <button id="advClearChip" onclick="clearAdv()" class="advBtn" style="display:none;color:var(--blue);border-color:var(--blue);background:rgba(37,99,235,.07)">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          <span id="advClearLabel">Limpar filtros</span>
-        </button>
-        <div id="savedFiltersContainer" style="display:inline-flex;gap:4px;align-items:center"></div>
-        <button onclick="reload()" class="advBtn px-2.5" title="Atualizar dados">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        </button>
-        <div class="ml-auto hide-sm">
-          <button onclick="downloadCSV()" class="advBtn">
+
+        <!-- Middle: Main filters & actions -->
+        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:center;flex:1">
+          <select id="gMes"   onchange="onMesChange()" class="ctls"><option value="">Período</option></select>
+          <select id="gSetor" onchange="renderAll()" class="ctls"><option value="">Setor</option></select>
+          <button id="advBtn" onclick="toggleAdv()" class="advBtn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+            Avançado<span id="advCount" class="badge" style="display:none;background:var(--blue)"></span>
+            <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button id="advClearChip" onclick="clearAdv()" class="advBtn" style="display:none;color:var(--blue);border-color:var(--blue);background:rgba(37,99,235,.08)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span id="advClearLabel">Limpar</span>
+          </button>
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <div id="savedFiltersContainer" style="display:inline-flex;gap:2px;align-items:center"></div>
+          <button onclick="reload()" class="advBtn px-2.5" title="Atualizar dados">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+          <button onclick="downloadCSV()" class="advBtn hide-sm">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Exportar CSV
           </button>
         </div>
       </div>
       <!-- Advanced filters panel -->
-      <div id="advPanel" class="advp">
-        <select id="fTipo" onchange="renderAll()" class="ctls"><option value="">Tipo: todos</option></select>
-        <select id="fSexo" onchange="renderAll()" class="ctls"><option value="">Sexo: todos</option></select>
-        <select id="fEnt"  onchange="renderAll()" class="ctls"><option value="">Entrevistador: todos</option></select>
-        <select id="fNps"  onchange="renderAll()" class="ctls">
-          <option value="">NPS: todos</option>
-          <option value="P">Promotores (9–10)</option>
-          <option value="N">Neutros (7–8)</option>
-          <option value="D">Detratores (0–6)</option>
-        </select>
-        <select id="fManif" onchange="renderAll()" class="ctls">
-          <option value="">Manifestação: todas</option>
-          <option value="any">Com manifestação</option>
-          <option value="reclamacoes">Com reclamação</option>
-          <option value="sugestoes">Com sugestão</option>
-          <option value="elogios">Com elogio</option>
-          <option value="comentarios">Com comentário</option>
-        </select>
-        <button onclick="saveCurrentFilter(prompt('Nome do filtro:'))" class="advBtn">💾 Salvar filtro</button>
-        <button onclick="clearAdv()" class="advBtn">Limpar filtros</button>
+      <div id="advPanel" class="advp" style="margin-left:-24px;margin-right:-24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
+          <select id="fTipo" onchange="renderAll()" class="ctls"><option value="">Tipo: todos</option></select>
+          <select id="fSexo" onchange="renderAll()" class="ctls"><option value="">Sexo: todos</option></select>
+          <select id="fEnt"  onchange="renderAll()" class="ctls"><option value="">Entrevistador: todos</option></select>
+          <select id="fNps"  onchange="renderAll()" class="ctls">
+            <option value="">NPS: todos</option>
+            <option value="P">Promotores (9–10)</option>
+            <option value="N">Neutros (7–8)</option>
+            <option value="D">Detratores (0–6)</option>
+          </select>
+          <select id="fManif" onchange="renderAll()" class="ctls">
+            <option value="">Manifestação: todas</option>
+            <option value="any">Com manifestação</option>
+            <option value="reclamacoes">Com reclamação</option>
+            <option value="sugestoes">Com sugestão</option>
+            <option value="elogios">Com elogio</option>
+            <option value="comentarios">Com comentário</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button onclick="saveCurrentFilter(prompt('Nome do filtro:'))" class="advBtn">💾 Salvar filtro</button>
+          <button onclick="clearAdv()" class="advBtn">Limpar</button>
+        </div>
       </div>
     </div>
   </header>
