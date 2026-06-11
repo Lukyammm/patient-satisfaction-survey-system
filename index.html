@@ -384,7 +384,7 @@
           <span id="advClearLabel">Limpar filtros</span>
         </button>
         <div id="savedFiltersContainer" style="display:inline-flex;gap:4px;align-items:center"></div>
-        <button onclick="reload()" class="advBtn px-2.5" title="Atualizar dados">
+        <button onclick="reload(this)" class="advBtn px-2.5" title="Atualizar dados">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
         <div class="ml-auto hide-sm">
@@ -924,7 +924,8 @@ function renderManifestacoes(){
     return true;
   });
 
-  $('manifSub').textContent=filtered.length+' manifestação'+(filtered.length===1?'':'ões')+' no período';
+  if($('manifSub'))$('manifSub').textContent=filtered.length+' manifestação'+(filtered.length===1?'':'ões')+' no período';
+  if(!$('manifTable'))return;
   $('manifTable').innerHTML=filtered.length?filtered.map(m=>`<div style="padding:14px;border-bottom:1px solid var(--s4);${m.resolvido?'opacity:.65':''}"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px"><span class="tag ${m.cls}">${m.lbl}</span><span class="pill ${m.resolvido?'p-ok':'p-mt'}" style="margin-top:2px">${m.resolvido?'✓ Resolvido':'Aberto'}</span>${m.resolvido?`<span class="pill p-mt" style="margin-top:2px;font-size:10px">${m.dataResolucao}</span>`:''}</div><p style="margin:0;font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:8px">${esc(m.text)}</p><div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--gTxt)"><span>${esc(m.setor||'Sem setor')} · ${m.data?.split('-').reverse().join('/') || ''}</span><button class="btn" style="padding:4px 10px;font-size:11px" onclick="toggleManifestationStatus('${esc(m.manifKey)}')">${m.resolvido?'Reabrir':'Marcar como resolvida'}</button></div></div>`).join(''):'<div class="empty">Nenhuma manifestação para os filtros selecionados.</div>';
 }
 function load(v){$('topbar').classList.toggle('on',v)}
@@ -1618,17 +1619,12 @@ function applyData(data){
   PENDING.forEach(rec=>{if(!ST.records.some(x=>x.rowNumber===rec.rowNumber))ST.records.push(rec)});
   try{sessionStorage.setItem('psq',JSON.stringify(ST))}catch(e){}
 }
-function reload(){
+function reload(btn){
   load(true);
-  const reloadBtn=event?.target;
-  if(reloadBtn){
-    reloadBtn.style.opacity='0.5';
-    reloadBtn.style.pointerEvents='none';
-  }
-  toast('Atualizando dados...');
+  if(btn){btn.style.opacity='0.5';btn.style.pointerEvents='none';}
   google.script.run
-    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false);if(reloadBtn){reloadBtn.style.opacity='1';reloadBtn.style.pointerEvents='auto'}toast('Dados atualizados!')})
-    .withFailureHandler(err=>{load(false);if(reloadBtn){reloadBtn.style.opacity='1';reloadBtn.style.pointerEvents='auto'}toast(err.message||err)})
+    .withSuccessHandler(data=>{applyData(data);hydrate();renderAll();load(false);if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}toast('Dados atualizados!')})
+    .withFailureHandler(err=>{load(false);if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}toast(err.message||err)})
     .getInitialData();
 }
 function saveRecord(e){
