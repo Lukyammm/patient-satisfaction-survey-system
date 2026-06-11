@@ -1018,8 +1018,8 @@ function rSetores(){
     const satNum=s.ot+s.bo;  // Ótimo + Bom
     const satDen=s.ot+s.bo+s.re+s.ru;  // Ótimo + Bom + Regular + Ruim (exclui N/A)
     return`<tr><td><span class="dot ${fd}"></span>${esc(k)}</td><td>${s.total}</td>
-    <td><span class="mbar"><i style="width:${Math.min(100,ap||0)}%;${abd?'background:#ef4444':''}"></i></span><span style="color:${abd?'#ef4444':'var(--ink)'}">${fmt(ap)}</span></td>
-    <td><span class="mbar"><i style="width:${Math.min(100,s.sat||0)}%;${sbd?'background:#ef4444':''}"></i></span><span style="color:${sbd?'#ef4444':'var(--ink)'}">${fmt(s.sat,1)}</span></td>
+    <td style="color:${abd?'#ef4444':'var(--ink);font-weight:500'}">${fmt(ap)}</td>
+    <td style="color:${sbd?'#ef4444':'var(--ink);font-weight:500'}">${fmt(s.sat,1)}</td>
     <td style="text-align:center;color:var(--sub);font-size:13px">${satNum}</td>
     <td style="text-align:center;color:var(--sub);font-size:13px">${satDen}</td>
     <td>${fmt(s.nps)}</td></tr>`;
