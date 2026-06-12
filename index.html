@@ -187,6 +187,27 @@
     .fsel.on{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.35)}
     .fsel.on select,.fsel.on>svg{color:var(--blue)}
     .fsel.on select{font-weight:600}
+    /* ── Custom Select (replaces native dropdown) ── */
+    .csel-val{font-size:12px;font-weight:500;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;pointer-events:none;user-select:none}
+    .fsel.on .csel-val{color:var(--blue);font-weight:600}
+    .fsel.csel-is-open::after{transform:translateY(-60%) rotate(225deg)!important}
+    .csel-panel{position:absolute;top:calc(100% + 6px);left:0;min-width:190px;max-height:280px;overflow-y:auto;background:var(--s2);border:1px solid rgba(0,0,0,.1);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:500;display:none}
+    .csel-panel.open{display:block;animation:cselIn .12s ease}
+    @keyframes cselIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+    .csel-option{padding:8px 14px;font-size:12px;color:var(--ink);cursor:pointer;transition:background .08s;white-space:nowrap}
+    .csel-option:hover{background:var(--s3)}
+    .csel-option.selected{color:var(--blue);font-weight:600}
+    .csel-outer{position:relative;display:inline-block}
+    .csel-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:transparent;padding:0;border:none;text-align:left;font-family:inherit}
+    .csel-btn::after{content:"";display:inline-block;width:6px;height:6px;border-right:1.5px solid var(--mut);border-bottom:1.5px solid var(--mut);transform:rotate(45deg) translateY(-2px);flex-shrink:0;margin-left:2px;transition:transform .14s ease}
+    .csel-outer.csel-is-open .csel-btn::after{transform:rotate(225deg) translateY(2px)}
+    .csel-outer .csel-panel{top:calc(100% + 4px)}
+    .csel-outer.csel-ctls{display:inline-flex}
+    .csel-outer.csel-ctls .csel-btn{border:1px solid var(--s4);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--sub);min-width:120px;justify-content:space-between}
+    .csel-outer.csel-ctls .csel-btn:hover,.csel-outer.csel-ctls.csel-is-open .csel-btn{border-color:rgba(37,99,235,.5)}
+    .csel-outer.csel-ctl{display:inline-flex}
+    .csel-outer.csel-ctl .csel-btn{background:var(--s3);border:1px solid var(--s4);border-radius:8px;padding:6px 12px;font-size:14px;color:var(--ink);min-width:160px;justify-content:space-between}
+    .csel-outer.csel-ctl .csel-btn:hover{background:var(--s4a)}
     .fbar-actions{margin-left:auto;display:flex;align-items:center;gap:6px}
     .icoBtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:99px;background:var(--s3);border:1px solid transparent;color:var(--sub);cursor:pointer;transition:all .14s ease}
     .icoBtn:hover{background:var(--s4a);color:var(--ink)}
@@ -1160,7 +1181,7 @@ function allM(){const s=new Set(ST.records.map(mo).filter(Boolean));ST.saidas.fo
 function hydrate(){
   const m=allM().reverse(),cm=$('gMes').value;
   $('gMes').innerHTML='<option value="">Todos os meses</option>'+m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('');
-  $('gMes').value=m.includes(cm)?cm:(m[0]||'');
+  $('gMes').value=m.includes(cm)?cm:'';
   const cr=$('repMes').value;
   $('repMes').innerHTML=m.map(x=>`<option value="${x}">${ml(x)}</option>`).join('')||'<option value="">Sem dados</option>';
   if(m.includes(cr))$('repMes').value=cr;
@@ -1174,6 +1195,7 @@ function hydrate(){
   keep('fSexo',ST.lookups.sexos||[],'Sexo: todos');
   keep('fEnt',ST.lookups.entrevistadores||[],'Entrevistador: todos');
   renderCads();
+  ['gMes','repMes','fTipo','fSexo','fEnt'].forEach(id=>CS[id]?.refresh());
 }
 function refreshSetores(mes){
   const cs=$('gSetor').value;
@@ -1181,6 +1203,7 @@ function refreshSetores(mes){
   const sets=[...new Set(rr.map(r=>String(r.setor||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   $('gSetor').innerHTML='<option value="">Todos os setores</option>'+sets.map(v=>`<option>${esc(v)}</option>`).join('');
   if(sets.includes(cs))$('gSetor').value=cs;
+  CS['gSetor']?.refresh();
 }
 function rows(mes,setor){return ST.records.filter(r=>(!mes||mo(r)===mes)&&(!setor||r.setor===setor))}
 function saidas(mes,setor){return ST.saidas.filter(s=>(!mes||s.mes===mes)&&(!setor||s.setor===setor)).reduce((t,x)=>t+x.saidas,0)}
@@ -1990,7 +2013,96 @@ function confirmCsvImport(){
     .importRecords(payloads);
 }
 
+/* ── Custom Select (substituição dos dropdowns nativos) ── */
+class CustomSelect {
+  constructor(sel) {
+    this._sel = sel;
+    this._open = false;
+    this._lbl = document.createElement('span');
+    this._panel = document.createElement('div');
+    this._panel.className = 'csel-panel';
+    this._isFsel = sel.parentElement.classList.contains('fsel');
+    this._hookValue();
+    this._build();
+  }
+  _hookValue() {
+    const self = this;
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(this._sel, 'value', {
+      get() { return desc.get.call(this); },
+      set(v) { desc.set.call(this, v); self._sync(); },
+      configurable: true
+    });
+  }
+  _build() {
+    const sel = this._sel;
+    sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden';
+    if (this._isFsel) {
+      this._lbl.className = 'csel-val';
+      sel.parentElement.insertBefore(this._lbl, sel);
+      sel.parentElement.appendChild(this._panel);
+      this._trigger = sel.parentElement;
+    } else {
+      const outer = document.createElement('div');
+      outer.className = 'csel-outer ' + (sel.classList.contains('ctl') ? 'csel-ctl' : 'csel-ctls');
+      sel.parentElement.insertBefore(outer, sel);
+      outer.appendChild(sel);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'csel-btn';
+      btn.appendChild(this._lbl);
+      outer.insertBefore(btn, sel);
+      outer.appendChild(this._panel);
+      this._trigger = btn;
+      this._outer = outer;
+    }
+    this.refresh();
+    this._trigger.addEventListener('click', e => { e.stopPropagation(); this._open ? this.close() : this.open(); });
+    document.addEventListener('click', () => this.close());
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.close(); });
+  }
+  refresh() {
+    this._panel.innerHTML = Array.from(this._sel.options)
+      .map(o => `<div class="csel-option" data-val="${o.value.replace(/"/g, '&quot;')}">${o.textContent}</div>`)
+      .join('');
+    this._panel.querySelectorAll('.csel-option').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        this._sel.value = el.dataset.val;
+        this.close();
+        this._sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    this._sync();
+  }
+  _sync() {
+    const opt = this._sel.options[this._sel.selectedIndex];
+    this._lbl.textContent = opt ? opt.text : '';
+    this._panel.querySelectorAll('.csel-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.val === this._sel.value);
+    });
+  }
+  open() {
+    document.querySelectorAll('.csel-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.fsel.csel-is-open,.csel-outer.csel-is-open').forEach(el => el.classList.remove('csel-is-open'));
+    this._panel.classList.add('open');
+    this._open = true;
+    (this._outer || (this._isFsel ? this._sel.parentElement : null))?.classList.add('csel-is-open');
+    const selEl = this._panel.querySelector('.csel-option.selected');
+    if (selEl) selEl.scrollIntoView({ block: 'nearest' });
+  }
+  close() {
+    if (!this._open) return;
+    this._panel.classList.remove('open');
+    this._open = false;
+    (this._outer || (this._isFsel ? this._sel.parentElement : null))?.classList.remove('csel-is-open');
+  }
+}
 buildForm();buildNps();buildQuickPeriods();setupFormValidation();
+const CS = {};
+['gMes','gSetor','repMes','fTipo','fSexo','fEnt','fNps','fManif'].forEach(id => {
+  const el = $(id); if (el) CS[id] = new CustomSelect(el);
+});
 // Show cached data immediately while fresh data loads
 try{const c=localStorage.getItem('psq');if(c){const d=JSON.parse(c);d.records=(d.records||[]).filter(r=>!String(r.rowNumber).startsWith('tmp_'));d.records.forEach(r=>delete r._saving);applyData(d);hydrate();renderAll()}}catch(e){}
 reload();
