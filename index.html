@@ -731,7 +731,7 @@
             <span id="incFilterLabel">Inconsistências</span>
           </button>
           <input id="q" class="ctl" placeholder="Buscar (ex: setor:ortopedia, 10/06)…" oninput="renderTable();updateSearchSuggestions()" style="min-width:200px">
-          <div id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--s2);border:1px solid var(--s4);border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:10">
+          <div id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--s2);border:1px solid var(--s4);border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:1000">
           </div>
         </div>
       </div>
@@ -988,6 +988,14 @@ function updateSearchSuggestions(){
 }
 
 function setSearchValue(val){$('q').value=val;$('searchSuggestions').style.display='none';renderTable();}
+
+document.addEventListener('click',function(e){
+  const input=$('q');
+  const suggestions=$('searchSuggestions');
+  if(suggestions&&input&&!input.contains(e.target)&&!suggestions.contains(e.target)){
+    suggestions.style.display='none';
+  }
+});
 
 /* ── Filtros Salvos ── */
 function getSavedFilters(){try{return JSON.parse(localStorage.getItem('pesquisa_saved_filters'))||{}}catch(e){return{}}}
