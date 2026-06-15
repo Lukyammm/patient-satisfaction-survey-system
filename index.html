@@ -1515,10 +1515,13 @@ function renderReport(){
       h+=`<tr><td class="orow" colspan="8"><b>OBSERVAÇÕES</b>${ob.length?ob.map((o,i)=>`<div>${i+1} — ${esc(o)} (SIC)</div>`).join(''):'<div>Sem observações no período.</div>'}</td></tr>`;
       h+='</tbody></table>';
     });
-    [['RECLAMAÇÃO','reclamacoes'],['SUGESTÃO','sugestoes'],['ELOGIO','elogios'],['COMENTÁRIO','comentarios']].forEach(([t,f])=>{
+    // Manifestações divididas por categoria — sempre exibe as 4
+    h+=`<h4>MANIFESTAÇÕES</h4><table><tbody>`;
+    [['RECLAMAÇÕES','reclamacoes'],['SUGESTÕES','sugestoes'],['COMENTÁRIOS','comentarios'],['ELOGIOS','elogios']].forEach(([t,f])=>{
       const it=sr.map(r=>String(r[f]||'').trim()).filter(Boolean);
-      if(it.length)h+=`<div class="mn"><b>${t}:</b></div>`+it.map((x,i)=>`<div class="mn">${i+1} — ${esc(x)} (SIC)</div>`).join('');
+      h+=`<tr><td class="orow"><b>${t}</b>${it.length?it.map((x,i)=>`<div>${i+1} — ${esc(x)} (SIC)</div>`).join(''):'<div>Nenhuma no período.</div>'}</td></tr>`;
     });
+    h+='</tbody></table>';
   });
   // Gráfico 1: Satisfação e NPS por setor (incl. total HUC)
   const gSet=sets.map(st=>{const s=sum(rr.filter(r=>(r.setor||'SEM SETOR')===st));return{label:st,values:[s.sat,s.nps]}});
