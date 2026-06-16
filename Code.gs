@@ -127,6 +127,45 @@ function saveSaida(payload) {
   return { ok: true, rowNumber, saida: { rowNumber, mes, setor, saidas }, message: isEdit ? 'Saídas atualizadas.' : 'Saídas registradas.' };
 }
 
+function saveSaidasBatch(payloads) {
+  if (!Array.isArray(payloads) || !payloads.length) throw new Error('Nenhuma saída para salvar.');
+  const sheet = getSaidasSheet_();
+  const lastRow = sheet.getLastRow();
+  const existing = lastRow >= SAIDAS_FIRST_ROW
+    ? sheet.getRange(SAIDAS_FIRST_ROW, 1, lastRow - SAIDAS_FIRST_ROW + 1, 3).getDisplayValues()
+    : [];
+  const keyToRow = {};
+  existing.forEach((row, i) => {
+    const mes = String(row[0] || '').trim();
+    const setor = String(row[1] || '').trim();
+    if (mes && setor) keyToRow[mes + '|' + setor.toLowerCase()] = SAIDAS_FIRST_ROW + i;
+  });
+
+  const seen = {};
+  let nextRow = sheet.getLastRow() + 1;
+  const saved = payloads.map(payload => {
+    const mes = String(payload.mes || '').trim();
+    const setor = String(payload.setor || '').trim();
+    const saidas = Number(payload.saidas) || 0;
+    if (!mes || !setor) throw new Error('Informe mês e setor em todas as saídas.');
+    if (saidas < 0) throw new Error('Saídas não podem ser negativas.');
+    const key = mes + '|' + setor.toLowerCase();
+    if (seen[key]) throw new Error('Há meses repetidos para o mesmo setor.');
+    seen[key] = true;
+    const requestedRow = Number(payload.rowNumber);
+    const rowNumber = requestedRow >= SAIDAS_FIRST_ROW ? requestedRow : (keyToRow[key] || nextRow++);
+    sheet.getRange(rowNumber, 1, 1, 3).setValues([[mes, setor, saidas]]);
+    keyToRow[key] = rowNumber;
+    return { rowNumber, mes, setor, saidas };
+  });
+
+  return {
+    ok: true,
+    saidas: saved,
+    message: saved.length === 1 ? 'Saída registrada.' : saved.length + ' saídas registradas.'
+  };
+}
+
 function deleteSaida(rowNumber) {
   rowNumber = Number(rowNumber);
   if (!rowNumber || rowNumber < SAIDAS_FIRST_ROW) throw new Error('Linha inválida.');
