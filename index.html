@@ -909,7 +909,7 @@
   <div id="csvModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeCsvImport()">
     <div style="background:var(--s1);border:1px solid var(--s4);border-radius:14px;padding:22px;width:min(820px,94vw);max-height:88vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.25)">
       <h4 class="text-sm font-semibold mb-1" style="color:var(--ink)">Importar pesquisas via CSV</h4>
-      <p class="text-xs text-mut mb-3">Arquivo separado por ponto e vírgula (<b>;</b>), com cabeçalho. Colunas reconhecidas: Unidade Internidade (setor), Prontuário, DN, Sexo, Tipo Respondente, Data Pesquisa, critérios de Acolhimento / Assistência / Serviços, observações, NPS Score e Pesquisador. Valores "Não Preenchido" ficam em branco.</p>
+      <p class="text-xs text-mut mb-3">Arquivo separado por ponto e vírgula (<b>;</b>), com cabeçalho. Colunas reconhecidas: Unidade Internidade (setor), Prontuário, DN, Sexo, Tipo Respondente, Data Pesquisa, critérios de Acolhimento / Assistência / Serviços, Sugestões, Reclamações, Comentários e Elogios por bloco, NPS Score e Pesquisador. Valores "Não Preenchido" ficam em branco.</p>
       <div id="csvDrop" onclick="$('csvFile').click()"
            ondragover="event.preventDefault();this.classList.add('over')"
            ondragleave="this.classList.remove('over')"
@@ -943,6 +943,9 @@ const RF=BLOCKS.flatMap(b=>b[2].map(c=>c[0]));
 // MF = as 12 chaves de manifestação (4 por bloco). MANIF_ORDER = ordem dentro de cada bloco.
 const MF=BLOCKS.flatMap(b=>b[3].map(m=>m[0]));
 const MANIF_ORDER=['sugestoes','reclamacoes','comentarios','elogios'];
+const MANIF_CATS=[['t-rc','RECLAMAÇÃO','reclamacoes'],['t-sg','SUGESTÃO','sugestoes'],['t-el','ELOGIO','elogios'],['t-cm','COMENTÁRIO','comentarios']];
+const BLOCK_LABELS=['Acolhimento','Assistência','Serviços'];
+const REPORT_MANIF_ORDER=[['reclamacoes','RECLAMAÇÕES'],['sugestoes','SUGESTÕES'],['comentarios','COMENTÁRIOS'],['elogios','ELOGIOS']];
 // Dado uma categoria (ex: 'reclamacoes'), retorna as 3 chaves de bloco correspondentes
 function manifFields(cat){const i=MANIF_ORDER.indexOf(cat);return i<0?[]:BLOCKS.map(b=>b[3][i][0]);}
 const RATINGS=['ÓTIMO','BOM','REGULAR','RUIM','N/A'];
@@ -1060,18 +1063,16 @@ function renderManifestacoes(){
   const typeFilter=$('fManifType')?.value||'';
   const statusFilter=$('fManifStatus')?.value||'';
   const status=getManifestationStatus();
-  const cats=[['t-rc','RECLAMAÇÃO','reclamacoes'],['t-sg','SUGESTÃO','sugestoes'],['t-el','ELOGIO','elogios'],['t-cm','COMENTÁRIO','comentarios']];
-  const BLABEL=['Acolhimento','Assistência','Serviços'];
   const allManif=[];
 
   adv(scopedRows($('gSetor').value)).forEach(r=>{
-    cats.forEach(([cls,lbl,cat])=>{
+    MANIF_CATS.forEach(([cls,lbl,cat])=>{
       manifFields(cat).forEach((f,bi)=>{
         const t=String(r[f]||'').trim();
         if(t){
           const manifKey=`${r.rowNumber}_${f}`;
           const s=status[manifKey]||{};
-          allManif.push({cls,lbl,bloco:BLABEL[bi],text:t,setor:r.setor,data:r.data,resolvido:s.resolvido,dataResolucao:s.dataResolucao,manifKey,field:cat});
+          allManif.push({cls,lbl,bloco:BLOCK_LABELS[bi],text:t,setor:r.setor,data:r.data,resolvido:s.resolvido,dataResolucao:s.dataResolucao,manifKey,field:cat});
         }
       });
     });
@@ -1352,9 +1353,7 @@ function rSetores(){
   }).join('')||'<tr><td colspan="7" class="empty">Sem dados.</td></tr>';
 }
 function rManif(rr){
-  const cats=[['t-rc','RECLAMAÇÃO','reclamacoes'],['t-sg','SUGESTÃO','sugestoes'],['t-el','ELOGIO','elogios'],['t-cm','COMENTÁRIO','comentarios']];
-  const BLABEL=['Acolhimento','Assistência','Serviços'];
-  const items=[];cats.forEach(([cls,lbl,cat])=>manifFields(cat).forEach((f,bi)=>rr.forEach(r=>{const t=String(r[f]||'').trim();if(t)items.push({cls,lbl,bloco:BLABEL[bi],t,setor:r.setor,data:r.data})})));
+  const items=[];MANIF_CATS.forEach(([cls,lbl,cat])=>manifFields(cat).forEach((f,bi)=>rr.forEach(r=>{const t=String(r[f]||'').trim();if(t)items.push({cls,lbl,bloco:BLOCK_LABELS[bi],t,setor:r.setor,data:r.data})})));
   items.sort((a,b)=>String(b.data||'').localeCompare(String(a.data||'')));
   $('manifList').innerHTML=items.length?items.map(i=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1px solid var(--s4);border-radius:10px"><span class="tag ${i.cls}" style="margin-top:2px;flex-shrink:0">${i.lbl}</span><div style="min-width:0"><p style="margin:0;font-size:13px;color:var(--ink);line-height:1.5">${esc(i.t)}</p><small style="color:var(--gTxt);font-size:11px;display:block;margin-top:2px">${esc(i.setor||'')} · ${esc(i.bloco)}${i.data?' · '+i.data.split('-').reverse().join('/'):''}</small></div></div>`).join(''):'<div class="empty">Nenhuma manifestação no período.</div>';
 }
@@ -1515,9 +1514,9 @@ function renderReport(){
       h+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
       crit.forEach(([f,lbl])=>{const c=cf(sr,f),p=wp(c),cls=p==null?'':p<80?'pbd':p<META_S?'pwn':'';const tot=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM']+c['N/A'];
         h+=`<tr><td>${lbl.toUpperCase()}</td><td class="c">${c['ÓTIMO']}</td><td class="c">${c['BOM']}</td><td class="c">${c['REGULAR']}</td><td class="c">${c['RUIM']}</td><td class="c">${c['N/A']}</td><td class="c">${tot}</td><td class="c ${cls}">${p==null?'—':fmt(p,2)}</td></tr>`});
-      // Manifestações do bloco — sempre exibe as 4 categorias (ordem: Reclamações, Sugestões, Comentários, Elogios)
-      [[1,'RECLAMAÇÕES'],[0,'SUGESTÕES'],[2,'COMENTÁRIOS'],[3,'ELOGIOS']].forEach(([idx,lbl])=>{
-        const f=manif[idx][0];
+      // Manifestações do bloco — sempre exibe as 4 categorias
+      REPORT_MANIF_ORDER.forEach(([cat,lbl])=>{
+        const idx=MANIF_ORDER.indexOf(cat),f=manif[idx][0];
         const it=sr.map(r=>String(r[f]||'').trim()).filter(Boolean);
         h+=`<tr><td class="orow" colspan="8"><b>${lbl}</b>${it.length?it.map((x,i)=>`<div>${i+1} — ${esc(x)} (SIC)</div>`).join(''):'<div>Nenhuma no período.</div>'}</td></tr>`;
       });
@@ -1933,6 +1932,29 @@ function csvDate(v){
   return y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
 }
 // Mapeia cada campo do sistema para a coluna do CSV (cabeçalhos sem acento/minúsculos)
+const CSV_BLOCK_TERMS=[['acolhimento'],['assistencia'],['servico','servicos']];
+const CSV_MANIF_TERMS={
+  sugestoes:['sugestao','sugestoes'],
+  reclamacoes:['reclamacao','reclamacoes'],
+  comentarios:['comentario','comentarios'],
+  elogios:['elogio','elogios']
+};
+const hasAny=(h,terms)=>terms.some(t=>h.includes(t));
+function csvManifestHeader(bi,cat){
+  return h=>{
+    const hasBlock=hasAny(h,CSV_BLOCK_TERMS[bi]);
+    const hasCat=hasAny(h,CSV_MANIF_TERMS[cat]);
+    const hasAnyBlock=CSV_BLOCK_TERMS.some(terms=>hasAny(h,terms));
+    return (hasBlock&&hasCat) || (bi===0&&hasCat&&!hasAnyBlock);
+  };
+}
+function csvLegacyBlockCommentHeader(bi){
+  return h=>hasAny(h,CSV_BLOCK_TERMS[bi])&&h.includes('observa');
+}
+const CSV_MANIF_MAP=BLOCKS.flatMap((b,bi)=>b[3].map(([field],mi)=>{
+  const cat=MANIF_ORDER[mi];
+  return [field,h=>csvManifestHeader(bi,cat)(h)||(cat==='comentarios'&&csvLegacyBlockCommentHeader(bi)(h))];
+}));
 const CSV_MAP=[
   ['setor',h=>h.includes('unidade intern')||h==='setor'],
   ['pront',h=>h.includes('prontu')],
@@ -1943,7 +1965,6 @@ const CSV_MAP=[
   ['gentilezaAcolhimento',h=>h.includes('acolhimento')&&h.includes('gentileza')],
   ['agilidade',h=>h.includes('agilidade')],
   ['clareza',h=>h.includes('clareza')],
-  ['comentariosAcol',h=>h.includes('acolhimento')&&(h.includes('observa')||h.includes('coment'))],
   ['gentilezaAssistencia',h=>h.includes('assistencia')&&h.includes('gentileza')],
   ['identificacao',h=>h.includes('diagnostico')||h.includes('identifica')],
   ['intimidade',h=>h.includes('intimidade')],
@@ -1951,14 +1972,13 @@ const CSV_MAP=[
   ['esclarecimento',h=>h.includes('esclarecimento')],
   ['cuidados',h=>h.includes('cuidados')],
   ['confianca',h=>h.includes('confianca')],
-  ['comentariosAssist',h=>h.includes('assistencia')&&(h.includes('observa')||h.includes('coment'))],
   ['acesso',h=>h.includes('acesso')],
   ['acomodacao',h=>h.includes('acomoda')],
   ['limpeza',h=>h.includes('limpeza')],
   ['enxoval',h=>h.includes('enxoval')],
   ['alimentacao',h=>h.includes('alimenta')],
   ['locomocao',h=>h.includes('locomo')],
-  ['comentariosServ',h=>h.includes('servico')&&(h.includes('observa')||h.includes('coment'))],
+  ...CSV_MANIF_MAP,
   ['nps',h=>h.includes('nps')],
   ['entrevistador',h=>h.includes('pesquisador')||h.includes('entrevistador')]
 ];
@@ -1971,10 +1991,17 @@ function processCsvText(text){
   if(rows.length<2){toast('CSV sem linhas de dados (precisa de cabeçalho + registros).');return}
   const headers=rows[0].map(deacc);
   const colOf={};
-  CSV_MAP.forEach(([f,pred])=>{const i=headers.findIndex(pred);if(i>=0)colOf[f]=i});
+  CSV_MAP.forEach(([f,pred])=>{
+    headers.forEach((h,i)=>{if(pred(h)){(colOf[f]=colOf[f]||[]).push(i)}});
+  });
   if(colOf.data==null||colOf.setor==null){toast('Cabeçalho não reconhecido: precisa ter ao menos "Unidade Internidade" (setor) e "Data Pesquisa".');return}
   CSV_ROWS=rows.slice(1).map((cells,li)=>{
-    const get=f=>{const v=colOf[f]!=null?String(cells[colOf[f]]||'').trim():'';return deacc(v)==='nao preenchido'?'':v};
+    const normCell=v=>{const s=String(v||'').trim();return deacc(s)==='nao preenchido'?'':s};
+    const get=(f,join=false)=>{
+      const idxs=colOf[f]||[];
+      const vals=idxs.map(i=>normCell(cells[i])).filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i);
+      return join?vals.join('\n'):(vals[0]||'');
+    };
     const p={rowNumber:'',encaminhamentos:''};MF.forEach(k=>p[k]='');
     p.setor=get('setor').toUpperCase();
     p.pront=get('pront');
@@ -1983,7 +2010,7 @@ function processCsvText(text){
     p.dn=csvDate(get('dn'));
     p.data=csvDate(get('data'));
     RF.forEach(f=>p[f]=csvRating(get(f)));
-    p.comentariosAcol=get('comentariosAcol');p.comentariosAssist=get('comentariosAssist');p.comentariosServ=get('comentariosServ');
+    MF.forEach(f=>p[f]=get(f,true));
     const nps=get('nps');
     p.nps=nps!==''&&!isNaN(+nps)&&+nps>=0&&+nps<=10?String(+nps):'';
     p.entrevistador=get('entrevistador').toUpperCase();

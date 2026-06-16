@@ -230,7 +230,7 @@ function ensureHeader_(sheet) {
   const a2 = sheet.getRange('A2').getValue();
   const l3 = sheet.getRange('L3').getValue();
   if (a2 === 'SETOR' && l3 === 'SUGESTÕES') return;                    // layout novo já presente
-  if (a2 === 'SETOR' && sheet.getLastRow() >= FIRST_DATA_ROW) return;  // layout antigo COM dados — rodar migrateToBlockManifestations()
+  if (a2 === 'SETOR' && sheet.getLastRow() >= FIRST_DATA_ROW) return;  // layout legado COM dados — rodar migrateToBlockManifestations()
   writeHeader_(sheet);
 }
 
@@ -472,13 +472,13 @@ function backfillSatisfacaoBlocks() {
 }
 
 /**
- * MIGRAÇÃO ÚNICA — converte o layout antigo (1 "OBSERVAÇÕES" por bloco + grupo único de
- * MANIFESTAÇÕES) para o novo (Sugestões/Reclamações/Comentários/Elogios em CADA bloco).
+ * MIGRAÇÃO ÚNICA — converte o layout legado para o novo modelo com
+ * Sugestões/Reclamações/Comentários/Elogios em CADA bloco.
  *
  * Regras:
- *   - OBSERVAÇÕES de cada bloco  -> "Comentários" do mesmo bloco
+ *   - Textos livres de cada bloco -> "Comentários" do mesmo bloco
  *   - Manifestações globais antigas (Sugestões/Reclamações/Comentários/Elogios) -> bloco 1 (Acolhimento)
- *   - No Acolhimento, a observação antiga e o comentário global são concatenados (sem perder nada)
+ *   - No Acolhimento, o texto livre antigo e o comentário global são concatenados (sem perder nada)
  *
  * Segurança: faz uma cópia de backup da aba ANTES de reescrever, e aborta se já migrado.
  * Execute UMA única vez pelo editor de script: Funções > migrateToBlockManifestations
@@ -487,23 +487,24 @@ function migrateToBlockManifestations() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) { const m = 'Aba MATRIZ não encontrada.'; Logger.log(m); return m; }
+  const LEGACY_BLOCK_TEXT_HEADER = 'OBSERVAÇÕES';
 
   // Já migrado? (col 12 / L na linha 3 já é "SUGESTÕES" no layout novo)
   if (sheet.getRange('A2').getValue() === 'SETOR' && sheet.getRange('L3').getValue() === 'SUGESTÕES') {
     const m = 'Migração já aplicada anteriormente — nada a fazer.'; Logger.log(m); return m;
   }
   // Confere o layout antigo esperado antes de mexer
-  if (sheet.getRange('A2').getValue() !== 'SETOR' || sheet.getRange('L3').getValue() !== 'OBSERVAÇÕES') {
-    const m = 'Cabeçalho não corresponde ao layout antigo esperado (A2=SETOR, L3=OBSERVAÇÕES). Abortando por segurança.';
+  if (sheet.getRange('A2').getValue() !== 'SETOR' || sheet.getRange('L3').getValue() !== LEGACY_BLOCK_TEXT_HEADER) {
+    const m = 'Cabeçalho não corresponde ao layout legado esperado. Abortando por segurança.';
     Logger.log(m); return m;
   }
 
   // Mapa de colunas do layout ANTIGO (snapshot fixo para leitura)
   const OLD_COL = {
     setor:1, pront:2, data:3, tipo:4, dn:5, idade:6, sexo:7,
-    gentilezaAcolhimento:8, agilidade:9, clareza:10, satisfacao1:11, obsAcolhimento:12,
-    gentilezaAssistencia:13, identificacao:14, intimidade:15, horarioDescanso:16, esclarecimento:17, cuidados:18, confianca:19, satisfacao2:20, obsAssistencia:21,
-    acesso:22, acomodacao:23, limpeza:24, enxoval:25, alimentacao:26, locomocao:27, satisfacao3:28, obsServicos:29,
+    gentilezaAcolhimento:8, agilidade:9, clareza:10, satisfacao1:11, textoAcolhimento:12,
+    gentilezaAssistencia:13, identificacao:14, intimidade:15, horarioDescanso:16, esclarecimento:17, cuidados:18, confianca:19, satisfacao2:20, textoAssistencia:21,
+    acesso:22, acomodacao:23, limpeza:24, enxoval:25, alimentacao:26, locomocao:27, satisfacao3:28, textoServicos:29,
     sugestoes:30, reclamacoes:31, comentarios:32, elogios:33, nps:34, entrevistador:35,
     otimo:36, bom:37, regular:38, ruim:39, na:40, totalConsiderado:41, taxaSatisfacao:42, encaminhamentos:43
   };
@@ -522,7 +523,7 @@ function migrateToBlockManifestations() {
 
   const newRows = [];
   oldValues.forEach(row => {
-    const anyManif = ['sugestoes','reclamacoes','comentarios','elogios','obsAcolhimento','obsAssistencia','obsServicos']
+    const anyManif = ['sugestoes','reclamacoes','comentarios','elogios','textoAcolhimento','textoAssistencia','textoServicos']
       .some(k => String(get(row, k) || '').trim());
     const anyBase = ['setor','pront','data','tipo','sexo','nps'].some(k => String(get(row, k) || '').trim());
     const anyRating = RATING_KEYS.some(k => String(get(row, k) || '').trim());
@@ -533,13 +534,12 @@ function migrateToBlockManifestations() {
     p.data = normalizeDate_(get(row, 'data'));
     p.dn = normalizeDate_(get(row, 'dn'));
     RATING_KEYS.forEach(k => p[k] = get(row, k));
-    // Manifestações por bloco
     p.sugestoesAcol   = get(row, 'sugestoes');
     p.reclamacoesAcol = get(row, 'reclamacoes');
-    p.comentariosAcol = merge(get(row, 'obsAcolhimento'), get(row, 'comentarios'));
+    p.comentariosAcol = merge(get(row, 'textoAcolhimento'), get(row, 'comentarios'));
     p.elogiosAcol     = get(row, 'elogios');
-    p.comentariosAssist = get(row, 'obsAssistencia');
-    p.comentariosServ   = get(row, 'obsServicos');
+    p.comentariosAssist = get(row, 'textoAssistencia');
+    p.comentariosServ   = get(row, 'textoServicos');
     newRows.push(computeRow_(p));
   });
 
