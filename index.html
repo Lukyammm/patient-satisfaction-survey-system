@@ -1514,11 +1514,12 @@ function renderReport(){
       h+=`<h4>${titulo}</h4><table><thead><tr><th>CRITÉRIOS AVALIADOS</th><th>ÓTIMO</th><th>BOM</th><th>REGULAR</th><th>RUIM</th><th>N/A</th><th>TOTAL</th><th>PORCENTAGEM</th></tr></thead><tbody>`;
       crit.forEach(([f,lbl])=>{const c=cf(sr,f),p=wp(c),cls=p==null?'':p<80?'pbd':p<META_S?'pwn':'';const tot=c['ÓTIMO']+c['BOM']+c['REGULAR']+c['RUIM']+c['N/A'];
         h+=`<tr><td>${lbl.toUpperCase()}</td><td class="c">${c['ÓTIMO']}</td><td class="c">${c['BOM']}</td><td class="c">${c['REGULAR']}</td><td class="c">${c['RUIM']}</td><td class="c">${c['N/A']}</td><td class="c">${tot}</td><td class="c ${cls}">${p==null?'—':fmt(p,2)}</td></tr>`});
-      // Manifestações do bloco — sempre exibe as 4 categorias
+      // Manifestações do bloco — exibe apenas categorias com conteúdo
       REPORT_MANIF_ORDER.forEach(([cat,lbl])=>{
         const idx=MANIF_ORDER.indexOf(cat),f=manif[idx][0];
         const it=sr.map(r=>String(r[f]||'').trim()).filter(Boolean);
-        h+=`<tr><td class="orow" colspan="8"><b>${lbl}</b>${it.length?it.map((x,i)=>`<div>${i+1} — ${esc(x)} (SIC)</div>`).join(''):'<div>Nenhuma no período.</div>'}</td></tr>`;
+        if(!it.length)return;
+        h+=`<tr><td class="orow" colspan="8"><b>${lbl}</b>${it.map((x,i)=>`<div>${i+1} — ${esc(x)} (SIC)</div>`).join('')}</td></tr>`;
       });
       h+='</tbody></table>';
     });
