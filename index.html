@@ -354,6 +354,10 @@
     .tbl-card-value{font-size:13px;color:var(--ink);font-weight:500}
     .tbl-card-actions{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--s4)}
     .tbl-card-actions button{flex:1;padding:8px 12px!important;font-size:12px!important}
+    .saida-rows{display:grid;gap:8px}
+    .saida-row{display:grid;grid-template-columns:1fr 96px 30px;gap:8px;align-items:end}
+    .saida-row .btn-g{height:38px;padding:0!important;font-size:18px!important;line-height:1}
+    .saida-actions{display:flex;gap:8px;flex-wrap:wrap}
 
     /* ══ Responsivo ══ */
     /* Tablet */
@@ -389,6 +393,7 @@
       .g4{grid-template-columns:1fr 1fr!important}
       .nps{gap:3px}
       .npsleg{font-size:9.5px}
+      .saida-row{grid-template-columns:1fr 86px 30px}
     }
     @media(max-width:420px){.g4{grid-template-columns:1fr!important}}
     /* ── Card section headers (form sections only, not report) ── */
@@ -785,13 +790,17 @@
       </div>
       <div class="grid g-saida gap-3" style="grid-template-columns:290px 1fr;align-items:start">
         <form class="card" id="formSaida" onsubmit="saveSaida(event)">
-          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-4">Registrar saídas</h4>
-          <input type="hidden" id="sRowNumber">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-mut mb-1">Registrar saídas</h4>
+          <p class="text-xs text-mut mb-4">Informe um setor e lance vários meses de uma vez.</p>
           <div class="grid gap-3">
-            <div><label class="fl">Mês/Ano</label><input id="sMes" type="month" required class="fi"></div>
             <div><label class="fl">Setor</label><input id="sSetor" required list="setoresList" class="fi"></div>
-            <div><label class="fl">Nº de saídas</label><input id="sSaidas" type="number" min="0" required class="fi"></div>
-            <button class="btn-p" type="submit">Salvar</button>
+            <div class="saida-rows" id="saidaRows"></div>
+            <div class="saida-actions">
+              <button class="btn" type="button" onclick="addSaidaRow()">Adicionar mês</button>
+              <button class="btn" type="button" onclick="addNextSaidaMonths(6)">Adicionar 6 meses</button>
+              <button class="btn-g" type="button" onclick="resetSaidaForm()">Limpar</button>
+            </div>
+            <button class="btn-p" type="submit" id="saidaSubmit">Salvar lançamentos</button>
           </div>
         </form>
         <div class="card p-0 overflow-auto">
@@ -1899,32 +1908,94 @@ function setEditMode(on,rn){
   if($('editRowLabel'))$('editRowLabel').textContent=rn?'#'+rn:'';
 }
 function cancelEdit(){setForm({});setEditMode(false);showTab('registros')}
+function addSaidaRow(mes='',saidas='',rowNumber=''){
+  const rows=$('saidaRows');
+  rows.insertAdjacentHTML('beforeend',`<div class="saida-row">
+    <input type="hidden" class="sRowNumber" value="${esc(rowNumber)}">
+    <div><label class="fl">Mês/Ano</label><input type="month" required class="fi sMes" value="${esc(mes)}"></div>
+    <div><label class="fl">Saídas</label><input type="number" min="0" required class="fi sSaidas" value="${esc(saidas)}"></div>
+    <button class="btn-g" type="button" onclick="removeSaidaRow(this)" title="Remover mês">×</button>
+  </div>`);
+}
+function addMonths(ym,n){
+  const [y,m]=String(ym).split('-').map(Number);
+  const d=new Date(y||new Date().getFullYear(),(m||new Date().getMonth()+1)-1+n,1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function currentMonth(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function addNextSaidaMonths(count){
+  const rows=[...document.querySelectorAll('#saidaRows .saida-row')];
+  if(rows.length===1&&!rows[0].querySelector('.sMes').value&&!rows[0].querySelector('.sSaidas').value&&!rows[0].querySelector('.sRowNumber').value)rows[0].remove();
+  const existing=[...document.querySelectorAll('#saidaRows .sMes')].map(i=>i.value).filter(Boolean).sort();
+  let start=existing.length?addMonths(existing[existing.length-1],1):currentMonth();
+  const used=new Set(existing);
+  for(let i=0;i<count;i++){
+    while(used.has(start))start=addMonths(start,1);
+    addSaidaRow(start,'');
+    used.add(start);
+    start=addMonths(start,1);
+  }
+}
+function removeSaidaRow(btn){
+  const rows=[...document.querySelectorAll('#saidaRows .saida-row')];
+  if(rows.length>1)btn.closest('.saida-row').remove();
+  else{
+    const row=rows[0];
+    row.querySelector('.sRowNumber').value='';
+    row.querySelector('.sMes').value='';
+    row.querySelector('.sSaidas').value='';
+  }
+}
+function resetSaidaForm(){
+  $('formSaida').reset();
+  $('saidaRows').innerHTML='';
+  $('saidaSubmit').textContent='Salvar lançamentos';
+  addSaidaRow();
+}
+function saidaFormPayloads(){
+  const setor=$('sSetor').value.trim();
+  if(!setor){toast('Informe o setor.');return null}
+  const seen=new Set(),payloads=[];
+  for(const row of document.querySelectorAll('#saidaRows .saida-row')){
+    const mes=row.querySelector('.sMes').value;
+    const saidas=Number(row.querySelector('.sSaidas').value);
+    const rowNumber=row.querySelector('.sRowNumber').value;
+    if(!mes&&!row.querySelector('.sSaidas').value)continue;
+    if(!mes){toast('Informe o mês em todas as linhas preenchidas.');return null}
+    if(!Number.isFinite(saidas)||saidas<0){toast('Informe saídas válidas.');return null}
+    if(seen.has(mes)){toast('Remova meses repetidos antes de salvar.');return null}
+    seen.add(mes);
+    payloads.push({rowNumber,mes,setor,saidas});
+  }
+  if(!payloads.length){toast('Adicione ao menos um mês.');return null}
+  return payloads;
+}
 function saveSaida(e){
   e.preventDefault();
-  const p={rowNumber:$('sRowNumber').value,mes:$('sMes').value,setor:$('sSetor').value.trim(),saidas:Number($('sSaidas').value)||0};
-  if(!p.mes||!p.setor)return toast('Informe mês e setor.');
-  const editing=!!(p.rowNumber&&Number(p.rowNumber));
-  const tempId=editing?Number(p.rowNumber):'tmp_s'+Date.now();
-  const rec={rowNumber:tempId,mes:p.mes,setor:p.setor,saidas:p.saidas,_saving:true};
-  const prevIdx=ST.saidas.findIndex(x=>x.rowNumber===tempId);
-  const prev=prevIdx>=0?ST.saidas[prevIdx]:null;
-  if(prevIdx>=0)ST.saidas[prevIdx]=rec;else ST.saidas.push(rec);
-  $('sRowNumber').value='';$('formSaida').reset();
-  renderAll();
-  toast(editing?'Saídas atualizadas.':'Saídas registradas.');
+  const payloads=saidaFormPayloads();
+  if(!payloads)return;
+  const btn=$('saidaSubmit'),oldText=btn.textContent;
+  btn.disabled=true;btn.textContent='Salvando…';load(true);
   google.script.run
     .withSuccessHandler(res=>{
-      const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
-      if(i>=0){if(res&&res.saida){res.saida._saving=false;ST.saidas[i]=res.saida;}else{ST.saidas[i].rowNumber=res.rowNumber||tempId;delete ST.saidas[i]._saving;}try{localStorage.setItem('psq2',JSON.stringify(ST))}catch(_){}renderAll();}
+      load(false);btn.disabled=false;btn.textContent=oldText;
+      toast(res.message||'Saídas registradas.');
+      resetSaidaForm();
+      google.script.run.withSuccessHandler(data=>{applyData(data);hydrate();renderAll()}).getInitialData();
     })
     .withFailureHandler(err=>{
-      const i=ST.saidas.findIndex(x=>x.rowNumber===tempId);
-      if(i>=0){if(prev)ST.saidas[i]=prev;else ST.saidas.splice(i,1);}
-      renderAll();toast('Erro ao salvar: '+(err.message||err));
+      load(false);btn.disabled=false;btn.textContent=oldText;
+      toast('Erro ao salvar: '+(err.message||err));
     })
-    .saveSaida(p);
+    .saveSaidasBatch(payloads);
 }
-function editSaida(rn){const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;$('sRowNumber').value=s.rowNumber;$('sMes').value=s.mes;$('sSetor').value=s.setor;$('sSaidas').value=s.saidas;showTab('saidas')}
+function editSaida(rn){
+  const s=ST.saidas.find(x=>x.rowNumber===rn);if(!s)return;
+  $('sSetor').value=s.setor;$('saidaRows').innerHTML='';
+  addSaidaRow(s.mes,s.saidas,s.rowNumber);
+  $('saidaSubmit').textContent='Atualizar saída';
+  showTab('saidas');
+}
 function rmSaida(rn){if(!confirm('Excluir?'))return;load(true);google.script.run.withSuccessHandler(res=>{load(false);toast(res.message);reload()}).withFailureHandler(err=>{load(false);toast(err.message||err)}).deleteSaida(rn)}
 function downloadCSV(){google.script.run.withSuccessHandler(csv=>{const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pesquisa_huc.csv';a.click();URL.revokeObjectURL(a.href)}).exportCsv()}
 
@@ -2180,7 +2251,7 @@ class CustomSelect {
     (this._outer || (this._isFsel ? this._sel.parentElement : null))?.classList.remove('csel-is-open');
   }
 }
-buildForm();buildNps();buildQuickPeriods();setupFormValidation();
+buildForm();buildNps();buildQuickPeriods();setupFormValidation();resetSaidaForm();
 const CS = {};
 ['gMes','gSetor','repMes','fTipo','fSexo','fEnt','fNps','fManif'].forEach(id => {
   const el = $(id); if (el) CS[id] = new CustomSelect(el);
