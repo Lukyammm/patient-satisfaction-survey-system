@@ -330,6 +330,10 @@
     .rpt .mn{font-size:13px;margin:4px 0;line-height:1.65;color:var(--sub)}
     .rpt .mn b{text-transform:uppercase;color:var(--ink)}
     .fn{color:var(--mut);font-size:11px}
+    .report-signatures{display:flex;justify-content:center;gap:56px;margin:34px auto 0;text-align:center;color:var(--sub);break-inside:avoid;page-break-inside:avoid}
+    .report-signature{width:260px}
+    .report-signature .line{display:block;border-top:1px solid var(--sub);margin:0 auto 8px}
+    .report-signature b{display:block;font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--sub)}
     .print-letterhead{display:none}
     .empty{text-align:center;color:var(--sub);padding:48px 10px;font-size:13px}
     .empty::before{content:"";display:block;width:40px;height:40px;margin:0 auto 12px;background:var(--s3);border-radius:10px;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") center/20px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") center/20px no-repeat;opacity:.4}
@@ -429,6 +433,10 @@
       .rpt th,.rpt td.orow{background:#f1f5f9!important}
       .rpt td.orow{font-size:9.8px!important;line-height:1.45!important;padding:5px 7px!important}
       .rpt td.orow b{font-size:9px!important;letter-spacing:.04em!important}
+      .rpt .report-signatures{display:flex!important;justify-content:center!important;gap:18mm!important;margin:11mm auto 0!important;text-align:center!important}
+      .rpt .report-signature{width:62mm!important}
+      .rpt .report-signature .line{border-color:#111!important;margin-bottom:2mm!important}
+      .rpt .report-signature b{font-size:9.5px!important;font-weight:500!important;letter-spacing:.02em!important}
       .rpt svg{max-width:100%!important;break-inside:avoid;page-break-inside:avoid}
       .rpt svg text{fill:#111!important}
     }
@@ -1558,7 +1566,10 @@ function renderReport(){
   const yr=mes.slice(0,4),MN=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
   const gMes=MN.map((nm,i)=>{const m=yr+'-'+String(i+1).padStart(2,'0');const s=sum(adv(ST.records.filter(r=>mo(r)===m)));return{label:nm,values:[s.total?s.sat:null,s.total?s.nps:null]}});
   h+=svgBarChart('SÉRIE HISTÓRICA MENSAL — '+yr,gMes.filter(g=>g.values.some(v=>v!=null)));
-  h+=`<br><br><p style="text-align:center;color:var(--sub)">_____________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____________________________________<br>DIREÇÃO DE GESTÃO DO CUIDADO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COORDENAÇÃO SERVIÇO SOCIAL</p>`;
+  h+=`<div class="report-signatures">
+    <div class="report-signature"><span class="line"></span><b>DIREÇÃO DE GESTÃO DO CUIDADO</b></div>
+    <div class="report-signature"><span class="line"></span><b>COORDENAÇÃO SERVIÇO SOCIAL</b></div>
+  </div>`;
   out.innerHTML=h;
 }
 
