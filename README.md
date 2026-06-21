@@ -28,11 +28,19 @@ This project was developed to solve real operational problems using web technolo
 
 The goal of this project is to improve operational efficiency, reduce manual work, and support better decision-making through automation and clear data visualization.
 
-## Demo guide image
 
-> Demonstrative image with fictitious data, created only to guide the project presentation.
+## Guia visual do sistema
 
-![Patient Satisfaction Survey System overview](./docs/screenshots/overview.svg)
+> Mockups demonstrativos do sistema, com dados ficticios e sem informacoes reais de pacientes ou da instituicao.
+
+### Formulario de pesquisa
+![Formulario de pesquisa](./docs/screenshots/survey-form.svg)
+
+### Analise de satisfacao
+![Analise de satisfacao](./docs/screenshots/analytics-dashboard.svg)
+
+### Manifestacoes por bloco
+![Manifestacoes por bloco](./docs/screenshots/block-manifestations.svg)
 
 ## Manifestações por bloco
 
