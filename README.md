@@ -1,6 +1,6 @@
-# Patient Satisfaction Survey System
+# Patient Experience Analytics
 
-Repository: `patient-satisfaction-survey-system`
+Repository: `patient-experience-analytics`
 
 ## Overview
 
