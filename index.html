@@ -240,6 +240,8 @@
     .ind-tb tr:hover .ind-row-cp{opacity:1}
     .ind-row-cp:hover{background:var(--s3);color:var(--ink)}
     .ind-row-cp.ok{color:#16a34a;opacity:1}
+    .ind-current{background:rgba(37,99,235,.06);border-left:3px solid #2563eb}
+    .ind-current td:first-child::after{content:" ·";margin-left:4px;color:#2563eb;font-weight:600}
 
     /* ── Importar CSV ── */
     #csvDrop{border:2px dashed var(--s4);border-radius:14px;padding:26px 16px;text-align:center;color:var(--sub);font-size:13px;cursor:pointer;transition:all .15s ease;background:var(--s3)}
@@ -2308,6 +2310,7 @@ class CustomSelect {
 }
 /* ── Modal Indicadores por mês ── */
 let _indData = {sat:[], nps:[]};
+let _currentMonth='';
 
 function openIndModal(){
   _buildIndData();
@@ -2321,17 +2324,32 @@ function closeIndModal(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('indModal').classList.contains('open'))closeIndModal()});
 
+function _getMonthKey(){
+  const now=new Date();
+  return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+}
+
+function _rowsForInd(mes){
+  const monthKey=_getMonthKey();
+  if(mes===monthKey){
+    const cut=new Date(mes.split('-')[0],+mes.split('-')[1]-1,20);
+    return ST.records.filter(r=>(!mes||mo(r)===mes)&&new Date(r.data||'9999')<cut);
+  }
+  return rows(mes,'');
+}
+
 function _buildIndData(){
   const months=allM().slice().reverse();
+  _currentMonth=_getMonthKey();
   _indData.sat=months.map(mes=>{
-    const s=sum(rows(mes,''));
+    const s=sum(_rowsForInd(mes));
     const num=s.ot+s.bo, den=s.ot+s.bo+s.re+s.ru;
-    return{mes,num,den,res:s.sat};
+    return{mes,num,den,res:s.sat,isCurrent:mes===_currentMonth};
   });
   _indData.nps=months.map(mes=>{
-    const s=sum(rows(mes,''));
+    const s=sum(_rowsForInd(mes));
     const num=s.p-s.d, den=s.p+s.n+s.d;
-    return{mes,num,den,res:s.nps};
+    return{mes,num,den,res:s.nps,isCurrent:mes===_currentMonth};
   });
 }
 
@@ -2347,13 +2365,14 @@ function _fmtInd(v,isRes,isNps){
 function _indRowHtml(r,type,idx){
   const isNps=type==='nps';
   const resCls=r.res==null?'':r.res>=75?'style="color:#15803d"':r.res>=50?'style="color:#92400e"':r.res>=0?'style="color:#b45309"':'style="color:#991b1b"';
-  return`<tr>
+  const rowCls=r.isCurrent?' class="ind-current"':'';
+  return`<tr${rowCls}>
     <td style="color:var(--sub);font-size:12px;white-space:nowrap">${mc(r.mes)}</td>
     <td>${r.num!=null?r.num:'—'}</td>
     <td>${r.den!=null?r.den:'—'}</td>
     <td class="ind-res" ${resCls}>${_fmtInd(r.res,true,isNps)}</td>
     <td style="padding:4px 8px">
-      <button class="ind-row-cp" id="indRowCp_${type}_${idx}" title="Copiar linha (mês + num + den)" onclick="indCopyRow('${type}',${idx})">
+      <button class="ind-row-cp" id="indRowCp_${type}_${idx}" title="Copiar numerador e denominador" onclick="indCopyRow('${type}',${idx})">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
     </td>
@@ -2368,7 +2387,7 @@ function _renderIndTables(){
 function indCopyRow(type,idx){
   const r=_indData[type][idx];
   if(!r)return;
-  const text=`${mc(r.mes)}\t${r.num!=null?r.num:''}\t${r.den!=null?r.den:''}`;
+  const text=`${r.num!=null?r.num:''}\t${r.den!=null?r.den:''}`;
   navigator.clipboard.writeText(text).then(()=>{
     const btn=$(`indRowCp_${type}_${idx}`);
     if(btn){btn.classList.add('ok');setTimeout(()=>btn.classList.remove('ok'),1400)}
