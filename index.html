@@ -213,6 +213,34 @@
     .icoBtn:hover{background:var(--s4a);color:var(--ink)}
     .fbar-sep{width:1px;height:18px;background:var(--s4);margin:0 4px;flex-shrink:0}
 
+    /* ── Modal Indicadores por mês ── */
+    #indModal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:var(--z-modal);display:none;align-items:center;justify-content:center;padding:16px}
+    #indModal.open{display:flex;animation:fade .15s ease}
+    .ind-wrap{background:var(--s2);border:1px solid var(--s4);border-radius:16px;width:min(780px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.22)}
+    .ind-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--s4);position:sticky;top:0;background:var(--s2);z-index:2;border-radius:16px 16px 0 0}
+    .ind-sec{padding:18px 20px}
+    .ind-sec+.ind-sec{padding-top:4px}
+    .ind-sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .ind-sec-title span{display:inline-block;width:10px;height:10px;border-radius:3px;flex-shrink:0}
+    .ind-tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--s4)}
+    .ind-tb{width:100%;border-collapse:collapse;font-size:12.5px}
+    .ind-tb thead tr{background:var(--s3)}
+    .ind-tb th{padding:8px 14px;text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+    .ind-tb th:not(:first-child){text-align:right}
+    .ind-tb th .th-inner{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+    .ind-tb th:first-child .th-inner{justify-content:flex-start}
+    .ind-tb td{padding:7px 14px;border-top:1px solid var(--s4);color:var(--ink);font-size:12.5px}
+    .ind-tb td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+    .ind-tb td.ind-res{font-weight:700}
+    .ind-tb tr:hover td{background:var(--s3)}
+    .ind-cp{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid var(--s4);background:transparent;color:var(--mut);cursor:pointer;transition:all .12s ease;flex-shrink:0;padding:0}
+    .ind-cp:hover{background:var(--s3);color:var(--ink)}
+    .ind-cp.ok{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#16a34a}
+    .ind-row-cp{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;border:0;background:transparent;color:var(--mut);cursor:pointer;transition:all .12s ease;padding:0;opacity:0}
+    .ind-tb tr:hover .ind-row-cp{opacity:1}
+    .ind-row-cp:hover{background:var(--s3);color:var(--ink)}
+    .ind-row-cp.ok{color:#16a34a;opacity:1}
+
     /* ── Importar CSV ── */
     #csvDrop{border:2px dashed var(--s4);border-radius:14px;padding:26px 16px;text-align:center;color:var(--sub);font-size:13px;cursor:pointer;transition:all .15s ease;background:var(--s3)}
     #csvDrop:hover,#csvDrop.over{border-color:var(--blue);color:var(--ink);background:rgba(37,99,235,.05)}
@@ -545,6 +573,9 @@
         </button>
         <div id="savedFiltersContainer" style="display:inline-flex;gap:4px;align-items:center"></div>
         <div class="fbar-actions">
+          <button onclick="openIndModal()" class="icoBtn" title="Indicadores por mês">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </button>
           <button onclick="reload()" class="icoBtn" title="Atualizar dados">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           </button>
@@ -2275,6 +2306,89 @@ class CustomSelect {
     (this._outer || (this._isFsel ? this._sel.parentElement : null))?.classList.remove('csel-is-open');
   }
 }
+/* ── Modal Indicadores por mês ── */
+let _indData = {sat:[], nps:[]};
+
+function openIndModal(){
+  _buildIndData();
+  _renderIndTables();
+  $('indModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeIndModal(){
+  $('indModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('indModal').classList.contains('open'))closeIndModal()});
+
+function _buildIndData(){
+  const months=allM().slice().reverse();
+  _indData.sat=months.map(mes=>{
+    const s=sum(rows(mes,''));
+    const num=s.ot+s.bo, den=s.ot+s.bo+s.re+s.ru;
+    return{mes,num,den,res:s.sat};
+  });
+  _indData.nps=months.map(mes=>{
+    const s=sum(rows(mes,''));
+    const num=s.p-s.d, den=s.p+s.n+s.d;
+    return{mes,num,den,res:s.nps};
+  });
+}
+
+function _fmtInd(v,isRes,isNps){
+  if(v==null||isNaN(v))return'—';
+  if(isRes){
+    const d=isNps?0:1;
+    return v.toFixed(d).replace('.',',')+' %';
+  }
+  return String(v);
+}
+
+function _indRowHtml(r,type,idx){
+  const isNps=type==='nps';
+  const resCls=r.res==null?'':r.res>=75?'style="color:#15803d"':r.res>=50?'style="color:#92400e"':r.res>=0?'style="color:#b45309"':'style="color:#991b1b"';
+  return`<tr>
+    <td style="color:var(--sub);font-size:12px;white-space:nowrap">${mc(r.mes)}</td>
+    <td>${r.num!=null?r.num:'—'}</td>
+    <td>${r.den!=null?r.den:'—'}</td>
+    <td class="ind-res" ${resCls}>${_fmtInd(r.res,true,isNps)}</td>
+    <td style="padding:4px 8px">
+      <button class="ind-row-cp" id="indRowCp_${type}_${idx}" title="Copiar linha (mês + num + den)" onclick="indCopyRow('${type}',${idx})">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </td>
+  </tr>`;
+}
+
+function _renderIndTables(){
+  $('indBodySat').innerHTML=_indData.sat.map((r,i)=>_indRowHtml(r,'sat',i)).join('');
+  $('indBodyNps').innerHTML=_indData.nps.map((r,i)=>_indRowHtml(r,'nps',i)).join('');
+}
+
+function indCopyRow(type,idx){
+  const r=_indData[type][idx];
+  if(!r)return;
+  const text=`${mc(r.mes)}\t${r.num!=null?r.num:''}\t${r.den!=null?r.den:''}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=$(`indRowCp_${type}_${idx}`);
+    if(btn){btn.classList.add('ok');setTimeout(()=>btn.classList.remove('ok'),1400)}
+  }).catch(()=>toast('Não foi possível copiar.'));
+}
+
+function indCopyCol(type,col){
+  const data=_indData[type];
+  const btnId=`indCp${type.charAt(0).toUpperCase()+type.slice(1)}${col.charAt(0).toUpperCase()+col.slice(1)}`;
+  let lines;
+  if(col==='num')lines=data.map(r=>r.num!=null?String(r.num):'');
+  else if(col==='den')lines=data.map(r=>r.den!=null?String(r.den):'');
+  else lines=data.map(r=>r.res!=null?r.res.toFixed(type==='nps'?0:1).replace('.',','):'');
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const btn=$(btnId);
+    if(btn){btn.classList.add('ok');setTimeout(()=>btn.classList.remove('ok'),1400)}
+    toast('Coluna copiada!');
+  }).catch(()=>toast('Não foi possível copiar.'));
+}
+
 buildForm();buildNps();buildQuickPeriods();setupFormValidation();resetSaidaForm();
 const CS = {};
 ['gMes','gSetor','repMes','fTipo','fSexo','fEnt','fNps','fManif'].forEach(id => {
@@ -2285,6 +2399,65 @@ try{const c=localStorage.getItem('psq2');if(c){const d=JSON.parse(c);d.records=(
 reload();
 window.addEventListener('scroll',()=>{const vis=window.scrollY>300&&!!document.querySelector('#relatorio.active');document.getElementById('rptFab').classList.toggle('vis',vis);},{passive:true});
 </script>
+
+<!-- Modal: Indicadores gerais por mês -->
+<div id="indModal" onclick="if(event.target===this)closeIndModal()">
+  <div class="ind-wrap">
+    <div class="ind-hd">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink)">Indicadores gerais por mês</div>
+        <div style="font-size:11px;color:var(--mut);margin-top:2px">Dados globais · independente de filtros ativos</div>
+      </div>
+      <button onclick="closeIndModal()" class="icoBtn" title="Fechar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Taxa de Satisfação -->
+    <div class="ind-sec">
+      <div class="ind-sec-title">
+        <span style="background:#3b82f6"></span>
+        Taxa de Satisfação
+      </div>
+      <div class="ind-tbl-wrap">
+        <table class="ind-tb">
+          <thead>
+            <tr>
+              <th><div class="th-inner">Mês</div></th>
+              <th><div class="th-inner">Numerador <button class="ind-cp" id="indCpSatNum" title="Copiar coluna" onclick="indCopyCol('sat','num')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th><div class="th-inner">Denominador <button class="ind-cp" id="indCpSatDen" title="Copiar coluna" onclick="indCopyCol('sat','den')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th><div class="th-inner">Resultado <button class="ind-cp" id="indCpSatRes" title="Copiar coluna" onclick="indCopyCol('sat','res')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="indBodySat"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NPS -->
+    <div class="ind-sec" style="padding-top:6px;padding-bottom:20px">
+      <div class="ind-sec-title">
+        <span style="background:#8b5cf6"></span>
+        NPS
+      </div>
+      <div class="ind-tbl-wrap">
+        <table class="ind-tb">
+          <thead>
+            <tr>
+              <th><div class="th-inner">Mês</div></th>
+              <th><div class="th-inner">Numerador <button class="ind-cp" id="indCpNpsNum" title="Copiar coluna" onclick="indCopyCol('nps','num')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th><div class="th-inner">Denominador <button class="ind-cp" id="indCpNpsDen" title="Copiar coluna" onclick="indCopyCol('nps','den')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th><div class="th-inner">Resultado <button class="ind-cp" id="indCpNpsRes" title="Copiar coluna" onclick="indCopyCol('nps','res')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="indBodyNps"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="rptFab">
   <button onclick="window.print()" title="Imprimir / PDF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
